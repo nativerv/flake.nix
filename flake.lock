@@ -1,0 +1,86 @@
+{
+  "nodes": {
+    "disko": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1680146283,
+        "narHash": "sha256-YZSw3O6uv6NqOJP+dol/njmzblRFIsrmqqb0HsL4mcQ=",
+        "owner": "nix-community",
+        "repo": "disko",
+        "rev": "4d9c89abde7ccedf743a01119d41fb880793bcba",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "disko",
+        "type": "github"
+      }
+    },
+    "nix-index-database": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1679224439,
+        "narHash": "sha256-QkvcuC4b67FUkkxlMsLTMPbwoD7yZr0UvJpu6jkFuLo=",
+        "owner": "Mic92",
+        "repo": "nix-index-database",
+        "rev": "2f5e6e915d70c04d673a8930f94591595c73eb84",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Mic92",
+        "repo": "nix-index-database",
+        "type": "github"
+      }
+    },
+    "nixpkgs-22-11": {
+      "locked": {
+        "lastModified": 1680334310,
+        "narHash": "sha256-ISWz16oGxBhF7wqAxefMPwFag6SlsA9up8muV79V9ck=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "884e3b68be02ff9d61a042bc9bd9dd2a358f95da",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-22.11",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs-unstable": {
+      "locked": {
+        "lastModified": 1680213900,
+        "narHash": "sha256-cIDr5WZIj3EkKyCgj/6j3HBH4Jj1W296z7HTcWj1aMA=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "e3652e0735fbec227f342712f180f4f21f0594f2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "disko": "disko",
+        "nix-index-database": "nix-index-database",
+        "nixpkgs-22-11": "nixpkgs-22-11",
+        "nixpkgs-unstable": "nixpkgs-unstable"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

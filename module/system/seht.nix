@@ -1,102 +1,81 @@
-{ inputs, pkgs, lib, flake, ... }: {
+{
+  inputs ? null, 
+  config ? null, 
+  pkgs ? null, 
+  lib ? null, 
+  flake ? null, 
+  ...
+}: {
   # Modules of which this host consists
   imports = [
+    # If you want to use modules from other flakes (such as nixos-hardware):
+    # inputs.hardware.nixosModules.common-cpu-amd
+    # inputs.hardware.nixosModules.common-ssd
+
     inputs.disko.nixosModules.disko
+    inputs.sops-nix.nixosModules.sops
+
+    (flake + /module/platform/x86_64.nix)
 
     (flake + /module/archetype/minimal.nix)
+    (flake + /module/archetype/sane.nix)
 
-    (flake + /module/configuration.nix)
     (flake + /module/bootloader/grub.nix)
-    (flake + /module/nix-sane-defaults.nix)
-    (flake + /module/zram.nix)
+
+    (flake + /module/subsystem/zram.nix)
+
     (flake + /module/server/sshd.nix)
+
+    (flake + /module/program/neovim.nix)
+    (flake + /module/program/htop.nix)
+    (flake + /module/program/bash.nix)
+    (flake + /module/program/sudo.nix)
     (flake + /module/program/nix-index.nix)
 
     (flake + /module/user/nrv.nix)
   ];
 
+  sops.secrets."test".sopsFile = "${flake}/sus/nrv/test.yaml";
+
   # The name
   networking.hostName = "seht";
 
-  # Setup devices
-  disko.devices = import ./seht-disks.nix {
-    inherit lib;
-    disks = [ "/dev/vda" ];
-  };
+  # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
+  system.stateVersion = "22.11";
 
-  # Neovim
-  programs.neovim.enable = true;
-  programs.neovim.defaultEditor = true;
+  # Autologin nrv in the VM
+  services.getty.autologinUser = "nrv";
+
+  # Set TERM to xterm so that i can use vim properly.
+  # TODO: also fix it it mangling my terminal
+  # (temporary fix is doing `&& reset`)
+  #boot.kernelParams = [ "TERM=xterm" ]; # thougth this would do the TODO.
+  environment.variables.TERM = "xterm";
+
+  # services.xserver.desktopManager.xfce.enable = true;
+  # services.xserver.displayManager.lightdm.enable = true;
+  # services.xserver.enable = true;
+
+  # Setup devices
+  # disko.devices = import ./seht-disks.nix {
+  #   inherit lib;
+  #   disks = [ "/dev/vda" ];
+  # };
 
   environment.systemPackages = with pkgs; [
     git
     stow
   ];
 
-  # Htop
-  programs.htop.enable = true;
-  programs.htop.package = pkgs.htop-vim;
-  environment.etc."htoprc".text = ''
-    # htop_version=3.3.0-dev
-    # config_reader_min_version=3
-    # fields=0 48 17 18 38 39 40 2 46 47 49 1
-    hide_kernel_threads=1
-    hide_userland_threads=1
-    hide_running_in_container=0
-    shadow_other_users=0
-    show_thread_names=1
-    show_program_path=0
-    highlight_base_name=1
-    highlight_deleted_exe=1
-    shadow_distribution_path_prefix=1
-    highlight_megabytes=1
-    highlight_threads=1
-    highlight_changes=1
-    highlight_changes_delay_secs=10
-    find_comm_in_cmdline=1
-    strip_exe_from_cmdline=1
-    show_merged_command=1
-    header_margin=1
-    screen_tabs=1
-    detailed_cpu_time=0
-    cpu_count_from_one=0
-    show_cpu_usage=1
-    show_cpu_frequency=1
-    show_cpu_temperature=1
-    degree_fahrenheit=0
-    update_process_names=0
-    account_guest_in_cpu_meter=0
-    color_scheme=0
-    enable_mouse=1
-    delay=15
-    hide_function_bar=0
-    header_layout=two_50_50
-    column_meters_0=AllCPUs Memory Swap
-    column_meter_modes_0=1 1 1
-    column_meters_1=Tasks LoadAverage Zram DiskIO Uptime Battery
-    column_meter_modes_1=2 2 2 2 2 2
-    tree_view=1
-    sort_key=39
-    tree_sort_key=0
-    sort_direction=-1
-    tree_sort_direction=1
-    tree_view_always_by_pid=0
-    all_branches_collapsed=0
-    screen:Main=PID USER PRIORITY NICE M_VIRT M_RESIDENT M_SHARE STATE PERCENT_CPU PERCENT_MEM TIME Command
-    .sort_key=M_RESIDENT
-    .tree_sort_key=PID
-    .tree_view=1
-    .tree_view_always_by_pid=0
-    .sort_direction=-1
-    .tree_sort_direction=1
-    .all_branches_collapsed=0
-    screen:I/O=PID USER IO_PRIORITY IO_RATE IO_READ_RATE IO_WRITE_RATE PERCENT_SWAP_DELAY PERCENT_IO_DELAY Command
-    .sort_key=IO_RATE
-    .tree_sort_key=PID
-    .tree_view=0
-    .tree_view_always_by_pid=0
-    .sort_direction=-1
-    .tree_sort_direction=1
-    .all_branches_collapsed=0
-  '';
+  # Nicely reload system units when changing configs
+  #systemd.user.startServices = "sd-switch";
+
+  # WARNING: This does not do anything when using flakes!
+  # WARNING: Provide this config when using nixpkgs input.
+  nixpkgs = {
+    # You can add overlays (package additions and overrides) here
+    overlays = [];
+    # Configure your nixpkgs instance.
+    config = {};
+  };
 }

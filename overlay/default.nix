@@ -1,0 +1,3 @@
+{
+  free = import ./free.nix;
+}

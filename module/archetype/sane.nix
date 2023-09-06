@@ -1,9 +1,16 @@
+# Sane defaults module. Enables nix command, and makes your system use your
+# flake inputs as both flake registries and legacy channels
+
 { inputs, lib, config, ... }: 
 {
   nix = {
     # This will add each flake input as a registry
-    # To make nix3 commands consistent with your flake
-    registry = lib.mapAttrs (_: value: { flake = value; }) inputs;
+    # and also pin 'nixpkgs' specifically to the unstable
+    # channel, to make nix3 commands consistent with your flake
+    registry =
+      lib.mapAttrs (_: value: { flake = value; }) inputs
+        # // { nixpkgs = { flake = inputs.nixpkgs-unstable; }; }
+      ;
 
     # This will additionally add your inputs to the system's legacy channels
     # Making legacy nix commands consistent as well, awesome!

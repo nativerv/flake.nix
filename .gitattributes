@@ -1,0 +1,4 @@
+.sops.yaml filter=crypt diff=crypt merge=crypt
+keys/** filter=crypt diff=crypt merge=crypt
+sus/** filter=crypt diff=crypt merge=crypt
+locked filter=crypt diff=crypt merge=crypt

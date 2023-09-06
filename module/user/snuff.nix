@@ -1,6 +1,6 @@
 { lib, flake, ... }:
 let
-  name = "nrv";
+  name = "snuff";
 in {
   users.users = {
     ${name} = {
@@ -11,3 +11,4 @@ in {
     };
   };
 }
+

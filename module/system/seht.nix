@@ -4,6 +4,7 @@
   pkgs ? null, 
   lib ? null, 
   flake ? null, 
+  modulesPath ? null,
   ...
 }: {
   # Modules of which this host consists
@@ -15,12 +16,13 @@
     inputs.disko.nixosModules.disko
     inputs.sops-nix.nixosModules.sops
 
-    (flake + /module/platform/x86_64.nix)
+    (flake + /module/program/nixos-shell.nix)
+    (flake + /module/archetype/qemu.nix)
 
     (flake + /module/archetype/minimal.nix)
     (flake + /module/archetype/sane.nix)
 
-    (flake + /module/bootloader/grub.nix)
+    #(flake + /module/bootloader/grub.nix)
 
     (flake + /module/subsystem/zram.nix)
 
@@ -34,6 +36,14 @@
 
     (flake + /module/user/nrv.nix)
   ];
+
+  virtualisation = {
+    forwardPorts = [
+      { from = "host"; host.port = 2222; guest.port = 22; }
+    ];
+  };
+
+  #services.openssh.enable = true;
 
   sops.secrets."test".sopsFile = "${flake}/sus/nrv/test.yaml";
 

@@ -49,13 +49,13 @@
       "locked": {
         "lastModified": 1698737528,
         "narHash": "sha256-65qiCQPFGCpdjcfQrO1EZKe+LFD0tzmlecFOACNwMbY=",
-        "owner": "mic92",
+        "owner": "Mic92",
         "repo": "nixos-shell",
         "rev": "8a835e240adc32e68d6fc7ca5aaf3f597de08d5f",
         "type": "github"
       },
       "original": {
-        "owner": "mic92",
+        "owner": "Mic92",
         "repo": "nixos-shell",
         "type": "github"
       }

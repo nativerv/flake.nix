@@ -3,6 +3,10 @@
 
 { inputs, lib, config, ... }: 
 {
+  # Clean tmp just in case
+  boot.tmp.cleanOnBoot = true;
+
+  # Nix (the thing) config
   nix = {
     # This will add each flake input as a registry
     # and also pin 'nixpkgs' specifically to the unstable

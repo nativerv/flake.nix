@@ -11,6 +11,8 @@ let
     ;
 in
 pkgs.mkShell {
+  name = "e1337shell";
+
   nativeBuildInputs = [
     import-keys-hook
   ];

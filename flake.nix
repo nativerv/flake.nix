@@ -18,6 +18,9 @@
     sops-nix.inputs.nixpkgs.follows = "nixpkgs-unstable";
     sops-nix.inputs.nixpkgs-stable.follows = "nixpkgs-22-11";
 
+    nixos-shell.url = "github:Mic92/nixos-shell";
+    nixos-shell.inputs.nixpkgs.follows = "nixpkgs-unstable";
+
     # Home manager
     # home-manager.url = "github:nix-community/home-manager";
     # home-manager.inputs.nixpkgs.follows = "nixpkgs-unstable";
@@ -55,8 +58,7 @@
         };
         overlays = [ self.overlays.free ];
       };
-    in
-    {
+    in {
       lib = import ./lib;
       overlays = import ./overlay;
       devShells.${system}.default = import ./shell.nix { inherit pkgs system inputs; };
@@ -69,8 +71,7 @@
           # to share hostname & stuff cleaner?
           seht = import ./module/system/seht.nix {};
           umbriel = import ./module/system/umbriel.nix {};
-        in
-        {
+        in {
           ${seht.networking.hostName} = nixpkgs-unstable.lib.nixosSystem {
             inherit system pkgs lib;
             modules = [ ./module/system/seht.nix ];

@@ -16,8 +16,8 @@
     inputs.disko.nixosModules.disko
     inputs.sops-nix.nixosModules.sops
 
-    (flake + /module/program/nixos-shell.nix)
-    (flake + /module/archetype/qemu.nix)
+    (flake + /module/platform/nixos-shell.nix)
+    (flake + /module/platform/qemu.nix)
 
     (flake + /module/archetype/minimal.nix)
     (flake + /module/archetype/sane.nix)

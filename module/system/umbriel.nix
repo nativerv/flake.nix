@@ -11,15 +11,7 @@
   imports =
     lib.optional (builtins.pathExists ./do-userdata.nix) ./do-userdata.nix
     ++ [
-      # modulesPath is provided by `lib.nixosSystem` function
-      # it points to whatever nixpkgs repo that function comes from,
-      # so you can include it's modules.
-      # example: https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/virtualisation/digital-ocean-config.nix
-      (modulesPath + "/virtualisation/digital-ocean-config.nix")
-
       inputs.sops-nix.nixosModules.sops
-
-      (flake + /module/platform/x86_64.nix)
 
       (flake + /module/archetype/minimal.nix)
       (flake + /module/archetype/sane.nix)

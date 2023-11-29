@@ -40,6 +40,26 @@
         "type": "github"
       }
     },
+    "nixos-shell": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1698737528,
+        "narHash": "sha256-65qiCQPFGCpdjcfQrO1EZKe+LFD0tzmlecFOACNwMbY=",
+        "owner": "mic92",
+        "repo": "nixos-shell",
+        "rev": "8a835e240adc32e68d6fc7ca5aaf3f597de08d5f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mic92",
+        "repo": "nixos-shell",
+        "type": "github"
+      }
+    },
     "nixpkgs-22-11": {
       "locked": {
         "lastModified": 1680334310,
@@ -58,11 +78,11 @@
     },
     "nixpkgs-unstable": {
       "locked": {
-        "lastModified": 1680213900,
-        "narHash": "sha256-cIDr5WZIj3EkKyCgj/6j3HBH4Jj1W296z7HTcWj1aMA=",
+        "lastModified": 1700794826,
+        "narHash": "sha256-RyJTnTNKhO0yqRpDISk03I/4A67/dp96YRxc86YOPgU=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "e3652e0735fbec227f342712f180f4f21f0594f2",
+        "rev": "5a09cb4b393d58f9ed0d9ca1555016a8543c2ac8",
         "type": "github"
       },
       "original": {
@@ -76,6 +96,7 @@
       "inputs": {
         "disko": "disko",
         "nix-index-database": "nix-index-database",
+        "nixos-shell": "nixos-shell",
         "nixpkgs": [
           "nixpkgs-unstable"
         ],

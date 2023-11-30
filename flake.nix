@@ -46,45 +46,42 @@
     ...
   } @ inputs:
     let
-      system = "x86_64-linux";
+      # Path to the root of this flake
       flake = ./.;
-      lib = self.lib.mkLib nixpkgs-unstable;
-      # FIXME: Is doing this and passing it directly to imports fine?
-      # Modules get `pkgs` automatically.
-      pkgs = self.lib.mkPkgs nixpkgs-unstable {
-        inherit system;
-        config = {
-          allowUnfreePredicate = lib.unfreeWhiteList (with pkgs; []);
-        };
-        overlays = [ self.overlays.free ];
-      };
+      # Generates outputs for all systems below
+      forAllSystems = nixpkgs-unstable.lib.genAttrs systems;
+      systems = [
+        "aarch64-linux"
+        "i686-linux"
+        "x86_64-linux"
+        "aarch64-darwin"
+        "x86_64-darwin"
+      ];
     in {
-      lib = import ./lib;
-      overlays = import ./overlay;
-      devShells.${system}.default = import ./shell.nix { inherit pkgs system inputs; };
+      # Reexport nixpkgs with our overlays applied
+      # Acessible on our configurations, and through nix build, shell, run, etc.
+      legacyPackages = forAllSystems (system: self.lib.mkPkgs nixpkgs-unstable system);
+
+      lib = import ./lib {
+        inherit self inputs flake;
+        lib = nixpkgs-unstable.lib;
+      };
+      overlays = import ./overlay { lib = nixpkgs-unstable.lib; };
+
+      # Devshell for bootstrapping
+      # Acessible through 'nix develop' or 'nix-shell' (legacy)
+      devShells = forAllSystems (system: {
+        default = self.legacyPackages.${system}.callPackage ./shell.nix {
+          inherit inputs;
+        };
+      });
 
       # NixOS configuration entrypoint
       # Available through 'nixos-rebuild --flake .#your-hostname'
-      nixosConfigurations =
-        let
-          # FIXME: this looks ugly as hell. Is there some way 
-          # to share hostname & stuff cleaner?
-          seht = import ./module/system/seht.nix {};
-          umbriel = import ./module/system/umbriel.nix {};
-        in {
-          ${seht.networking.hostName} = nixpkgs-unstable.lib.nixosSystem {
-            inherit system pkgs lib;
-            modules = [ ./module/system/seht.nix ];
-            # Pass flake inputs to our config
-            specialArgs = { inherit inputs flake; }; 
-          };
-          ${umbriel.networking.hostName} = nixpkgs-unstable.lib.nixosSystem {
-            inherit system pkgs lib;
-            modules = [ ./module/system/umbriel.nix ];
-            # Pass flake inputs to our config
-            specialArgs = { inherit inputs flake; }; 
-          };
-        };
+      nixosConfigurations = builtins.listToAttrs [
+        (self.lib.mkNixosConfiguration nixpkgs-unstable "seht" { system = "x86_64-linux"; })
+        # (mkNixosConfiguration nixpkgs-unstable "umbriel" { system = "x86_64-linux"; })
+      ];
 
       # Standalone home-manager configuration entrypoint
       # Available through 'home-manager --flake .#your-username@your-hostname'

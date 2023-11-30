@@ -1,4 +1,4 @@
-{ lib, flake, ... }:
+{ self,  lib, flake, ... }:
 let
   name = "yukkop";
 in {
@@ -6,7 +6,7 @@ in {
     ${name} = {
       initialPassword = "kk";
       isNormalUser = true;
-      openssh.authorizedKeys.keyFiles = lib.ifUnlocked "${flake}/sus/ssh/${name}";
+      openssh.authorizedKeys.keyFiles = self.lib.ifUnlocked "${flake}/sus/ssh/${name}";
       extraGroups = [ "wheel" ];
     };
   };

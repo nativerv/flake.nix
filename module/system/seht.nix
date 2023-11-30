@@ -22,7 +22,7 @@
     (flake + /module/archetype/minimal.nix)
     (flake + /module/archetype/sane.nix)
 
-    #(flake + /module/bootloader/grub.nix)
+    (flake + /module/bootloader/grub.nix)
 
     (flake + /module/subsystem/zram.nix)
 
@@ -48,7 +48,7 @@
   sops.secrets."test".sopsFile = "${flake}/sus/nrv/test.yaml";
 
   # The name
-  networking.hostName = "seht";
+  # networking.hostName = "seht";
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "22.11";

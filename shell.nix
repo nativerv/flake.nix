@@ -7,7 +7,8 @@ let
     if inputs != null then
       inputs.sops-nix.packages.${system}.sops-import-keys-hook
     else
-      (pkgs.callPackage sops-nix-tarball {}).sops-import-keys-hook
+      inputs.sops-nix.packages.${system}.sops-import-keys-hook
+      #(pkgs.callPackage sops-nix-tarball {}).sops-import-keys-hook
     ;
 in
 pkgs.mkShell {

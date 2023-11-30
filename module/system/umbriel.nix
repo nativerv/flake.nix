@@ -18,6 +18,7 @@
 
       #(flake + /module/bootloader/grub.nix)
 
+      (flake + /module/bootloader/grub.nix)
       #(flake + /module/subsystem/zram.nix)
 
       (flake + /module/server/sshd.nix)
@@ -35,7 +36,7 @@
     ];
 
   # The name
-  networking.hostName = "umbriel";
+  # networking.hostName = "umbriel";
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "23.05";

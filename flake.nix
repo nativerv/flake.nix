@@ -80,9 +80,8 @@
 
       # NixOS configuration entrypoint
       # Available through 'nixos-rebuild --flake .#your-hostname'
-      nixosConfigurations = builtins.listToAttrs [
-        (self.lib.mkNixosConfiguration nixpkgs-unstable "seht" { system = "x86_64-linux"; })
-        # (mkNixosConfiguration nixpkgs-unstable "umbriel" { system = "x86_64-linux"; })
+      nixosConfigurations = with self.lib; builtins.listToAttrs [
+        (mkNixosConfiguration nixpkgs-unstable "seht" { system = "x86_64-linux"; })
       ];
 
       # Standalone home-manager configuration entrypoint

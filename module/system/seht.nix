@@ -1,6 +1,7 @@
 {
   inputs ? null, 
   config ? null, 
+  self ? null, 
   pkgs ? null, 
   lib ? null, 
   flake ? null, 
@@ -16,25 +17,25 @@
     inputs.disko.nixosModules.disko
     inputs.sops-nix.nixosModules.sops
 
-    (flake + /module/platform/nixos-shell.nix)
-    (flake + /module/platform/qemu.nix)
+    self.nixosModules."platform.nixos-shell"
+    self.nixosModules."platform.qemu"
 
-    (flake + /module/archetype/minimal.nix)
-    (flake + /module/archetype/sane.nix)
+    self.nixosModules."archetype.minimal"
+    self.nixosModules."archetype.sane"
 
-    (flake + /module/bootloader/grub.nix)
+    self.nixosModules."bootloader.grub"
 
-    (flake + /module/subsystem/zram.nix)
+    self.nixosModules."subsystem.zram"
 
-    (flake + /module/server/sshd.nix)
+    self.nixosModules."server.sshd"
 
-    (flake + /module/program/neovim.nix)
-    (flake + /module/program/htop.nix)
-    (flake + /module/program/bash.nix)
-    (flake + /module/program/sudo.nix)
-    (flake + /module/program/nix-index.nix)
+    self.nixosModules."program.neovim"
+    self.nixosModules."program.htop"
+    self.nixosModules."program.bash"
+    self.nixosModules."program.sudo"
+    self.nixosModules."program.nix-index"
 
-    (flake + /module/user/nrv.nix)
+    self.nixosModules."user.nrv"
   ];
 
   virtualisation = {

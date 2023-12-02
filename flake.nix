@@ -76,6 +76,8 @@
         };
       });
 
+      nixosModules = self.lib.readModulesRecursive' ./module;
+
       # NixOS configuration entrypoint
       # Available through 'nixos-rebuild --flake .#your-hostname'
       nixosConfigurations = builtins.listToAttrs [

@@ -21,6 +21,12 @@
   isLocked = !(builtins.readFile ../locked == "0");
   ifUnlocked = lib.optional (!isLocked);
 
+  /* Default nixpkgs config */
+  defaultConfig = nixpkgs: {
+    allowUnfreePredicate = unfreeWhiteList (with nixpkgs; [
+    ]);
+  };
+
   /* Utility for NisOS configuration creation with sane defaults.
 
      Example:
@@ -52,23 +58,62 @@
        Any omitted args will be substituted with defaults. This function is
        less usable if you don't want the defaults of this flake.
 
+     ```nix
+     mkNixosConfiguration inputs.nixpkgs-23-05 "my-system-custom" {
+       system = "x86_64-linux"; 
+       overlays = [ foo bar baz ];
+       config = { allowUnfree = true; };
+       specialArgs = { inherit a b c; }
+     }
+     ```
+       => an `aarch64-linux` system with configuration called
+       "my-system-custom" at `module/system/my-system-custom.nix`, with pkgs
+       from `inputs.nixpkgs-23-05`, lib from `inputs.nixpkgs-23-05`, hostname
+       'my-system-hostname', overlays foo, bar and baz, nixpkgs config with
+       unfree software enabled and a, b and c passed as special args to
+       modules.
+       NOTE: if you pass pkgs or lib directly it will not use overlays and
+       config provided.
+
      Type:
-       mkNixosConfiguration :: Any -> String -> Any -> { name :: String; value :: Any; }
+       Options :: {
+         system :: String;        # system architecture
+         config :: AttrSet;       # see docs on `nixpkgs.config`
+         overlays :: [OverlayFn]; # see the docs on nixpkgs overlays
+         pkgs :: AttrSet;         # package set
+         lib :: AttrSet;          # nixpkgs library attrset
+         specialArgs :: AttrSet;  # custom arguments to pass to modules
+       }
+       mkNixosConfiguration :: Nixpkgs -> String -> Options -> { name :: String; value :: NixosSystem; }
   */
-  mkNixosConfiguration = nixpkgs: name: args: {
+  mkNixosConfiguration =
+  with builtins;
+  nixpkgs:
+  name:
+  options@{
+    config ? defaultConfig nixpkgs,
+    overlays ? [ self.overlays.default ],
+    ...
+  }: {
     inherit name;
     value = let
-      system = args.system;
-      pkgs = mkPkgs nixpkgs system;
+      args = removeAttrs options [ "config" "overlays" ];
+      pkgs = import nixpkgs {
+        inherit (args) system;
+        inherit overlays config;
+      };
       lib = pkgs.lib;
+      systemModulePath = ../module/system/${name}.nix;
+      systemModule = filter pathExists [ systemModulePath ];
     in nixpkgs.lib.nixosSystem (args // {
-      inherit system;
       pkgs = args.pkgs or pkgs;
       lib = args.lib or lib;
       modules = args.modules or [
-        ../module/system/${name}.nix
         ({ networking.hostName = name; })
-      ];
+      ]
+      ++ lib.warnIf (systemModule == [] && !(args ? modules))
+        "Module '${toString systemModulePath}' does not exist and you haven't provided your own modules. Default NixOS system will be built."
+        systemModule;
       specialArgs = args.specialArgs or { inherit self inputs flake; }; # Pass flake inputs to our config
     });
   };

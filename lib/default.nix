@@ -31,7 +31,7 @@
 
      Example:
      ```nix
-     mkNixosConfiguration inputs.nixpkgs-unstable "my-system" { system = "x86_64-linux"; }
+     mkNixosConfiguration ./module inputs.nixpkgs-unstable "my-system" { system = "x86_64-linux"; }
      ```
         => an `x86_64-linux` system with configuration at
         `module/system/my-system.nix`, pkgs from `inputs.nixpkgs-unstable` with
@@ -40,7 +40,7 @@
         modules.
 
      ```nix
-     mkNixosConfiguration inputs.nixpkgs-23-05 "my-system-custom" {
+     mkNixosConfiguration ./module inputs.nixpkgs-23-05 "my-system-custom" {
        system = "aarch64-linux"; 
        pkgs = mypkgs;
        lib = mypkgs.lib;
@@ -59,7 +59,7 @@
        less usable if you don't want the defaults of this flake.
 
      ```nix
-     mkNixosConfiguration inputs.nixpkgs-23-05 "my-system-custom" {
+     mkNixosConfiguration ./module inputs.nixpkgs-23-05 "my-system-custom" {
        system = "x86_64-linux"; 
        overlays = [ foo bar baz ];
        config = { allowUnfree = true; };
@@ -82,12 +82,21 @@
          overlays :: [OverlayFn]; # see the docs on nixpkgs overlays
          pkgs :: AttrSet;         # package set
          lib :: AttrSet;          # nixpkgs library attrset
+         modules :: [Module];     # NixOS modules
          specialArgs :: AttrSet;  # custom arguments to pass to modules
        }
-       mkNixosConfiguration :: Nixpkgs -> String -> Options -> { name :: String; value :: NixosSystem; }
+       mkNixosConfiguration ::
+         Path          # dir with your modules with `system/name.nix` in it
+         -> Nixpkgs    # nixpkgs from your flake inputs
+         -> String     # configuration name (used for flake attribute and
+                       hostname)
+         -> Options    # options above
+         -> { name :: String; value :: NixosSystem; };
+                               
   */
   mkNixosConfiguration =
   with builtins;
+  modulesPath:
   nixpkgs:
   name:
   options@{
@@ -103,7 +112,7 @@
         inherit overlays config;
       };
       lib = pkgs.lib;
-      systemModulePath = ../module/system/${name}.nix;
+      systemModulePath = /${modulesPath}/system/${name}.nix;
       systemModule = filter pathExists [ systemModulePath ];
     in nixpkgs.lib.nixosSystem (args // {
       pkgs = args.pkgs or pkgs;

@@ -1,4 +1,5 @@
 {
+  pkgs ? null,
   modulesPath ? null,
   ...
 }: {
@@ -27,4 +28,10 @@
     "console=tty1"
     "console=ttyS0,115200"
   ];
+
+  # TODO: make this (or an alternative) work
+  # resize in console tty - for usage in terminal emulators
+  # programs.bash.interactiveShellInit = ''
+  #   trap "${pkgs.xterm}/bin/resize" WINCH
+  # '';
 }

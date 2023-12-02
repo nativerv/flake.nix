@@ -15,6 +15,7 @@ in
       bind -x '"\C-l": clear'     
       printf '\033[2 q'
 
+      # vi mode
       ${lib.optionalString viMode "set -o vi"}
       set show-mode-in-prompt on
       set vi-cmd-mode-string "\1\e[2 q\2"

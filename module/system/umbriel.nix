@@ -4,6 +4,7 @@
   flake ? null,
   lib ? null,
   pkgs ? null,
+  self ? null,
   modulesPath ? null,
   ...
 }:
@@ -13,26 +14,26 @@
     ++ [
       inputs.sops-nix.nixosModules.sops
 
-      (flake + /module/archetype/minimal.nix)
-      (flake + /module/archetype/sane.nix)
+      self.nixosModule."archetype.minimal"
+      self.nixosModule."archetype.sane"
 
-      #(flake + /module/bootloader/grub.nix)
+      #self.nixosModule."bootloader.grub"
 
-      (flake + /module/bootloader/grub.nix)
-      #(flake + /module/subsystem/zram.nix)
+      self.nixosModule."bootloader.grub"
+      #self.nixosModule."subsystem.zram"
 
-      (flake + /module/server/sshd.nix)
+      self.nixosModule."server.sshd"
 
-      (flake + /module/program/sudo.nix)
-      (flake + /module/program/bash.nix)
-      (flake + /module/program/neovim.nix)
-      (flake + /module/program/htop.nix)
-      (flake + /module/program/nix-index.nix)
+      self.nixosModule."program.sudo"
+      self.nixosModule."program.bash"
+      self.nixosModule."program.neovim"
+      self.nixosModule."program.htop"
+      self.nixosModule."program.nix-index"
 
-      (flake + /module/user/yukkop.nix)
-      (flake + /module/user/snuff.nix)
-      (flake + /module/user/nrv.nix)
-      (flake + /module/user/pih-pah.nix)
+      self.nixosModule."user.yukkop"
+      self.nixosModule."user.snuff"
+      self.nixosModule."user.nrv"
+      self.nixosModule."user.pih-pah"
     ];
 
   # The name

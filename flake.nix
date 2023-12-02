@@ -80,7 +80,9 @@
 
       # NixOS configuration entrypoint
       # Available through 'nixos-rebuild --flake .#your-hostname'
-      nixosConfigurations = with self.lib; builtins.listToAttrs [
+      nixosConfigurations = with self.lib; let 
+        mkNixosConfiguration = self.lib.mkNixosConfiguration ./module;
+      in builtins.listToAttrs [
         (mkNixosConfiguration nixpkgs-unstable "seht" { system = "x86_64-linux"; })
       ];
 

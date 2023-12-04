@@ -42,6 +42,7 @@
     forwardPorts = [
       { from = "host"; host.port = 2222; guest.port = 22; }
     ];
+    diskSize = 1024*10;
   };
 
   #services.openssh.enable = true;

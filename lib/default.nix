@@ -7,9 +7,7 @@
   mkPkgs = nixpkgs: system: import nixpkgs {
     inherit system;
     overlays = [ self.overlays.default ];
-    config = {
-      allowUnfreePredicate = unfreeWhiteList (with nixpkgs; []);
-    };
+    config = defaultConfig nixpkgs;
   };
 
   /* Make a whitelist predicate for allowUnfreePredicate

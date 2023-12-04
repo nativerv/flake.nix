@@ -28,15 +28,18 @@
     config = {
       # Disable if you don't want unfree packages
       allowUnfree = true;
-      # Workaround for https://github.com/nix-community/home-manager/issues/2942
-      allowUnfreePredicate = (_: true);
+      # # Workaround for https://github.com/nix-community/home-manager/issues/2942
+      # allowUnfreePredicate = (_: true);
     };
   };
 
-  # TODO: Set your username
   home = {
-    username = "your-username";
-    homeDirectory = "/home/your-username";
+    username = "nrv";
+    homeDirectory = "/home/nrv";
+    packages = with pkgs; [
+      hello
+      hello-unfree
+    ];
   };
 
   # Add stuff for your user as you see fit:

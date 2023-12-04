@@ -22,8 +22,12 @@
     nixos-shell.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
     # Home manager
-    # home-manager.url = "github:nix-community/home-manager";
-    # home-manager.inputs.nixpkgs.follows = "nixpkgs-unstable";
+    home-manager.url = "github:nix-community/home-manager";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs-unstable";
+
+    # Deploy
+    deploy-rs.url = "github:serokell/deploy-rs";
+    deploy-rs.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
     # hardware.url = "github:nixos/nixos-hardware";
 
@@ -43,6 +47,8 @@
     disko,
     nix-index-database,
     nixpkgs-22-11,
+    home-manager,
+    deploy-rs,
     ...
   } @ inputs:
     let
@@ -88,15 +94,41 @@
 
       # Standalone home-manager configuration entrypoint
       # Available through 'home-manager --flake .#your-username@your-hostname'
-      # homeConfigurations = {
-      #   # FIXME replace with your username@hostname
-      #   "your-username@your-hostname" = home-manager.lib.homeManagerConfiguration {
-      #     pkgs = nixpkgs.legacyPackages.x86_64-linux; # Home-manager requires 'pkgs' instance
-      #     extraSpecialArgs = { inherit inputs; }; # Pass flake inputs to our config
-      #     # > Our main home-manager configuration file <
-      #     modules = [ ./home-manager/home.nix ];
-      #   };
-      # };
+      homeConfigurations = {
+        "nrv@seht" = home-manager.lib.homeManagerConfiguration {
+          pkgs = self.legacyPackages.x86_64-linux; # Home-manager requires 'pkgs' instance
+          extraSpecialArgs = { inherit inputs; }; # Pass flake inputs to our config
+          # > Our main home-manager configuration file <
+          modules = [ ./home-manager/home.nix ];
+        };
+      };
+      deploy.nodes.seht-deploy = {
+        sshOpts = [ "-p" "2222" "-oStrictHostKeyChecking=no" ];
+        hostname = "localhost";
+        fastConnection = true;
+        profiles = {
+          # system = {
+          #   sshUser = "admin";
+          #   path =
+          #     deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.example-nixos-system;
+          #   user = "root";
+          # };
+          home = {
+            sshUser = "nrv";
+            profilePath = "/nix/var/nix/profiles/per-user/nrv/home";
+            path = deploy-rs.lib.x86_64-linux.activate.custom
+              (self.homeConfigurations."nrv@seht").activationPackage
+              "$PROFILE/activate";
+            user = "nrv";
+          };
+          hello = {
+            sshUser = "nrv";
+            path = deploy-rs.lib.x86_64-linux.activate.custom nixpkgs-unstable.legacyPackages.x86_64-linux.hello "./bin/hello";
+            user = "nrv";
+          };
+        };
+      };
+      checks = builtins.mapAttrs (system: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
     };
 }
 

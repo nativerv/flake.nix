@@ -43,6 +43,8 @@
       { from = "host"; host.port = 2222; guest.port = 22; }
     ];
     diskSize = 1024*10;
+    writableStoreUseTmpfs = false;
+    memorySize = 1024;
   };
 
   #services.openssh.enable = true;

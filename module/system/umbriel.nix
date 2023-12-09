@@ -114,18 +114,18 @@
 
   ###
 
-   systemd.services.pih-pah-server = {
-     enable = true;
-     description = "pih-pah server";
-     serviceConfig = {
-       Type = "exec";
-       User = "pih-pah";
-       Group = "pih-pah";
-       ExecStart = "/srv/pih-pah/pih-pah-server 127.0.0.1:5010";
-       Restart = "on-failure";
-     };
-     wantedBy = [ "default.target" ];
-   };
+   # systemd.services.pih-pah-server = {
+   #   enable = true;
+   #   description = "pih-pah server";
+   #   serviceConfig = {
+   #     Type = "exec";
+   #     User = "pih-pah";
+   #     Group = "pih-pah";
+   #     ExecStart = "/srv/pih-pah/pih-pah-server 127.0.0.1:5010";
+   #     Restart = "on-failure";
+   #   };
+   #   wantedBy = [ "default.target" ];
+   # };
 
   environment = {
     systemPackages = with pkgs; [

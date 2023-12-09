@@ -23,7 +23,7 @@
     self.nixosModules."archetype.minimal"
     self.nixosModules."archetype.sane"
 
-    self.nixosModules."bootloader.grub"
+    #self.nixosModules."bootloader.grub"
 
     self.nixosModules."subsystem.zram"
 
@@ -40,7 +40,7 @@
 
   virtualisation = {
     forwardPorts = [
-      { from = "host"; host.port = 2222; guest.port = 22; }
+      { from = "host"; host.port = 2223; guest.port = 22; }
     ];
     diskSize = 1024*10;
     writableStoreUseTmpfs = false;

@@ -5,6 +5,7 @@
     # Nixpkgs
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgs-22-11.url = "github:nixos/nixpkgs/nixos-22.11";
+    nixpkgs-23-11.url = "github:nixos/nixpkgs/nixos-23.11";
 
     # Disk management
     disko.url = "github:nix-community/disko";
@@ -47,6 +48,7 @@
     disko,
     nix-index-database,
     nixpkgs-22-11,
+    nixpkgs-23-11,
     home-manager,
     deploy-rs,
     ...
@@ -57,11 +59,10 @@
       # Generates outputs for all systems below
       forAllSystems = nixpkgs-unstable.lib.genAttrs systems;
       systems = [
-        "aarch64-linux"
-        "i686-linux"
         "x86_64-linux"
-        "aarch64-darwin"
-        "x86_64-darwin"
+        # "aarch64-linux"
+        # "x86_64-darwin"
+        # "aarch64-darwin"
       ];
     in {
       # Reexport nixpkgs with our overlays applied
@@ -90,6 +91,7 @@
         mkNixosConfiguration = self.lib.mkNixosConfiguration ./module;
       in builtins.listToAttrs [
         (mkNixosConfiguration nixpkgs-unstable "seht" { system = "x86_64-linux"; })
+        (mkNixosConfiguration nixpkgs-23-11 "umbriel" { system = "aarch64-linux"; })
       ];
 
       # Standalone home-manager configuration entrypoint
@@ -102,31 +104,63 @@
           modules = [ ./home-manager/home.nix ];
         };
       };
-      deploy.nodes.seht-deploy = {
+      deploy.nodes.seht = let
+        inherit (self.nixosConfigurations.seht.config.nixpkgs) system;
+      in {
         sshOpts = [ "-p" "2222" "-oStrictHostKeyChecking=no" ];
-        hostname = "localhost";
+        hostname = (builtins.head (self.lib.ifUnlocked (builtins.fromTOML (builtins.readFile ./sus/common/seht.toml)))).address;
         fastConnection = true;
-        profiles = {
-          # system = {
-          #   sshUser = "admin";
-          #   path =
-          #     deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.example-nixos-system;
-          #   user = "root";
-          # };
-          home = {
-            sshUser = "nrv";
-            profilePath = "/nix/var/nix/profiles/per-user/nrv/home";
-            path = deploy-rs.lib.x86_64-linux.activate.custom
-              (self.homeConfigurations."nrv@seht").activationPackage
-              "$PROFILE/activate";
-            user = "nrv";
-          };
-          hello = {
-            sshUser = "nrv";
-            path = deploy-rs.lib.x86_64-linux.activate.custom nixpkgs-unstable.legacyPackages.x86_64-linux.hello "./bin/hello";
-            user = "nrv";
-          };
+        profilesOrder = [ "system" "home" ];
+        profiles.system = {
+          sshUser = "root";
+          path = deploy-rs.lib.x86_64-linux.activate.nixos
+            self.nixosConfigurations.seht;
+          user = "root";
         };
+       profiles.home = {
+          sshUser = "nrv";
+          profilePath = "/nix/var/nix/profiles/per-user/nrv/home";
+          path = deploy-rs.lib.x86_64-linux.activate.custom
+            (self.homeConfigurations."nrv@seht").activationPackage
+            "$PROFILE/activate";
+          user = "nrv";
+        };
+        profiles.hello = {
+          sshUser = "nrv";
+          path = deploy-rs.lib.x86_64-linux.activate.custom
+            nixpkgs-unstable.legacyPackages.x86_64-linux.hello
+            "./bin/hello";
+          user = "nrv";
+        };
+      };
+
+      deploy.nodes.umbriel = let
+        inherit (self.nixosConfigurations.umbriel.config.nixpkgs) system;
+      in {
+        hostname = (builtins.head (self.lib.ifUnlocked (builtins.fromTOML (builtins.readFile ./sus/common/umbriel.toml)))).address;
+        fastConnection = true;
+        profilesOrder = [ "system" "home" ];
+        profiles.system = {
+          sshUser = "root";
+          path = deploy-rs.lib.aarch64-linux.activate.nixos
+            self.nixosConfigurations.umbriel;
+          user = "root";
+        };
+       # profiles.home = {
+       #    sshUser = "nrv";
+       #    profilePath = "/nix/var/nix/profiles/per-user/nrv/home";
+       #    path = deploy-rs.lib.x86_64-linux.activate.custom
+       #      (self.homeConfigurations."nrv@seht").activationPackage
+       #      "$PROFILE/activate";
+       #    user = "nrv";
+       #  };
+       #  profiles.hello = {
+       #    sshUser = "nrv";
+       #    path = deploy-rs.lib.x86_64-linux.activate.custom
+       #      nixpkgs-unstable.legacyPackages.x86_64-linux.hello
+       #      "./bin/hello";
+       #    user = "nrv";
+       #  };
       };
       checks = builtins.mapAttrs (system: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
     };

@@ -9,38 +9,46 @@
   ...
 }:
 {
-  imports =
-    lib.optional (builtins.pathExists ./do-userdata.nix) ./do-userdata.nix
-    ++ [
-      inputs.sops-nix.nixosModules.sops
+  imports = [
+    #(modulesPath + "/installer/scan/not-detected.nix")
+    (modulesPath + "/profiles/qemu-guest.nix")
+    #self.nixosModules."platform.qemu"
 
-      self.nixosModule."archetype.minimal"
-      self.nixosModule."archetype.sane"
+    inputs.sops-nix.nixosModules.sops
 
-      #self.nixosModule."bootloader.grub"
+    # For nixos-anywhere
+    #inputs.disko.nixosModules.disko
 
-      self.nixosModule."bootloader.grub"
-      #self.nixosModule."subsystem.zram"
+    self.nixosModules."archetype.minimal"
+    self.nixosModules."archetype.sane"
 
-      self.nixosModule."server.sshd"
+    #self.nixosModules."bootloader.grub"
 
-      self.nixosModule."program.sudo"
-      self.nixosModule."program.bash"
-      self.nixosModule."program.neovim"
-      self.nixosModule."program.htop"
-      self.nixosModule."program.nix-index"
+    self.nixosModules."subsystem.zram"
 
-      self.nixosModule."user.yukkop"
-      self.nixosModule."user.snuff"
-      self.nixosModule."user.nrv"
-      self.nixosModule."user.pih-pah"
-    ];
+    self.nixosModules."server.sshd"
+
+    self.nixosModules."program.sudo"
+    self.nixosModules."program.bash"
+    self.nixosModules."program.neovim"
+    self.nixosModules."program.htop"
+    self.nixosModules."program.nix-index"
+
+    self.nixosModules."user.yukkop"
+    self.nixosModules."user.snuff"
+    self.nixosModules."user.nrv"
+    #self.nixosModules."user.pih-pah"
+  ];
+
+
+  # for deploy-rs (otherwise complains something about package signatures)
+  nix.trustedUsers = [ "@wheel" ];
 
   # The name
   # networking.hostName = "umbriel";
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
-  system.stateVersion = "23.05";
+  system.stateVersion = "23.11";
 
   # Docker
   virtualisation.docker.enable = true;
@@ -121,17 +129,76 @@
 
   environment = {
     systemPackages = with pkgs; [
-      alsaLib
-      chafa
-      cmake
-      docker
-      docker-compose
       git
-      jq
-      nginx
-      shellcheck
       tmux
-      zsh
     ];
   };  
+
+  # Was in example nixos-anywhere config.
+  boot.loader.grub = {
+    # no need to set devices, disko will add all devices that have a EF02 partition to the list already
+    # devices = [ ];
+    efiSupport = true;
+    efiInstallAsRemovable = true;
+  };
+
+  # Apparantly needed for nixos-anywhere to work?
+  # Otherwise getting 'ssh: ... no route to host' mid-install
+  users.users.root.openssh.authorizedKeys.keyFiles = self.lib.ifUnlocked "${flake}/sus/ssh/nrv";
+
+  # Disk partitions - will only run when installing.
+  disko.devices = let
+    volumeGroupName = "umbriel";
+  in {
+    disk.disk1 = {
+      device = lib.mkDefault "/dev/sda";
+      type = "disk";
+      content = {
+        type = "gpt";
+        partitions = {
+          boot = {
+            name = "boot";
+            size = "1M";
+            type = "EF02";
+          };
+          esp = {
+            name = "ESP";
+            size = "500M";
+            type = "EF00";
+            content = {
+              type = "filesystem";
+              format = "vfat";
+              mountpoint = "/boot";
+            };
+          };
+          root = {
+            name = "root";
+            size = "100%";
+            content = {
+              type = "lvm_pv";
+              vg = "${volumeGroupName}";
+            };
+          };
+        };
+      };
+    };
+    lvm_vg = {
+      ${volumeGroupName} = {
+        type = "lvm_vg";
+        lvs = {
+          root = {
+            size = "100%FREE";
+            content = {
+              type = "filesystem";
+              format = "ext4";
+              mountpoint = "/";
+              mountOptions = [
+                "defaults"
+              ];
+            };
+          };
+        };
+      };
+    };
+  };
 }

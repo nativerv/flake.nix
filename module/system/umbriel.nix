@@ -134,71 +134,73 @@
     ];
   };  
 
-  # Was in example nixos-anywhere config.
-  boot.loader.grub = {
-    # no need to set devices, disko will add all devices that have a EF02 partition to the list already
-    # devices = [ ];
-    efiSupport = true;
-    efiInstallAsRemovable = true;
-  };
 
-  # Apparantly needed for nixos-anywhere to work?
-  # Otherwise getting 'ssh: ... no route to host' mid-install
-  users.users.root.openssh.authorizedKeys.keyFiles = self.lib.ifUnlocked "${flake}/sus/ssh/nrv";
-
-  # Disk partitions - will only run when installing.
-  disko.devices = let
-    volumeGroupName = "umbriel";
-  in {
-    disk.disk1 = {
-      device = lib.mkDefault "/dev/sda";
-      type = "disk";
-      content = {
-        type = "gpt";
-        partitions = {
-          boot = {
-            name = "boot";
-            size = "1M";
-            type = "EF02";
-          };
-          esp = {
-            name = "ESP";
-            size = "500M";
-            type = "EF00";
-            content = {
-              type = "filesystem";
-              format = "vfat";
-              mountpoint = "/boot";
-            };
-          };
-          root = {
-            name = "root";
-            size = "100%";
-            content = {
-              type = "lvm_pv";
-              vg = "${volumeGroupName}";
-            };
-          };
-        };
-      };
-    };
-    lvm_vg = {
-      ${volumeGroupName} = {
-        type = "lvm_vg";
-        lvs = {
-          root = {
-            size = "100%FREE";
-            content = {
-              type = "filesystem";
-              format = "ext4";
-              mountpoint = "/";
-              mountOptions = [
-                "defaults"
-              ];
-            };
-          };
-        };
-      };
-    };
-  };
+  # # Config for nixos-anywhere
+  # # Was in example nixos-anywhere config.
+  # boot.loader.grub = {
+  #   # no need to set devices, disko will add all devices that have a EF02 partition to the list already
+  #   # devices = [ ];
+  #   efiSupport = true;
+  #   efiInstallAsRemovable = true;
+  # };
+  #
+  # # Apparantly needed for nixos-anywhere to work?
+  # # Otherwise getting 'ssh: ... no route to host' mid-install
+  # users.users.root.openssh.authorizedKeys.keyFiles = self.lib.ifUnlocked "${flake}/sus/ssh/nrv";
+  #
+  # # Disk partitions - will only run when installing.
+  # disko.devices = let
+  #   volumeGroupName = "umbriel";
+  # in {
+  #   disk.disk1 = {
+  #     device = lib.mkDefault "/dev/sda";
+  #     type = "disk";
+  #     content = {
+  #       type = "gpt";
+  #       partitions = {
+  #         boot = {
+  #           name = "boot";
+  #           size = "1M";
+  #           type = "EF02";
+  #         };
+  #         esp = {
+  #           name = "ESP";
+  #           size = "500M";
+  #           type = "EF00";
+  #           content = {
+  #             type = "filesystem";
+  #             format = "vfat";
+  #             mountpoint = "/boot";
+  #           };
+  #         };
+  #         root = {
+  #           name = "root";
+  #           size = "100%";
+  #           content = {
+  #             type = "lvm_pv";
+  #             vg = "${volumeGroupName}";
+  #           };
+  #         };
+  #       };
+  #     };
+  #   };
+  #   lvm_vg = {
+  #     ${volumeGroupName} = {
+  #       type = "lvm_vg";
+  #       lvs = {
+  #         root = {
+  #           size = "100%FREE";
+  #           content = {
+  #             type = "filesystem";
+  #             format = "ext4";
+  #             mountpoint = "/";
+  #             mountOptions = [
+  #               "defaults"
+  #             ];
+  #           };
+  #         };
+  #       };
+  #     };
+  #   };
+  # };
 }

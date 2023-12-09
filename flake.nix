@@ -140,7 +140,7 @@
         hostname = (builtins.head (self.lib.ifUnlocked (builtins.fromTOML (builtins.readFile ./sus/common/umbriel.toml)))).address;
         fastConnection = true;
         profilesOrder = [ "system" "home" ];
-        profiles.system = {
+        profiles."system" = {
           sshUser = "root";
           path = deploy-rs.lib.aarch64-linux.activate.nixos
             self.nixosConfigurations.umbriel;

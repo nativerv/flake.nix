@@ -163,7 +163,7 @@
   #
   # # Apparantly needed for nixos-anywhere to work?
   # # Otherwise getting 'ssh: ... no route to host' mid-install
-  # users.users.root.openssh.authorizedKeys.keyFiles = self.lib.ifUnlocked "${flake}/sus/ssh/nrv";
+  users.users.root.openssh.authorizedKeys.keyFiles = self.lib.ifUnlocked "${flake}/sus/ssh/nrv";
   #
   # # Disk partitions - will only run when installing.
   # disko.devices = let

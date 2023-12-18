@@ -40,6 +40,9 @@
     #self.nixosModules."user.pih-pah"
   ];
 
+  # Secrets config
+  sops.gnupg.sshKeyPaths = [ ];
+  sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
 
   # for deploy-rs (otherwise complains something about package signatures)
   nix.trustedUsers = [ "@wheel" ];
@@ -61,15 +64,18 @@
 
   # enable NAT
   networking.nat.enable = true;
-  networking.nat.externalInterface = "eth0";
+  networking.nat.externalInterface = "enp1s0";
   networking.nat.internalInterfaces = [ "wg-bfs" ];
   networking.firewall = {
-    #enable = false;
+    enable = false;
     allowedUDPPorts = [ 51820 ];
   };
+
   sops.secrets."wireguard/bfs/private.asc".sopsFile = "${flake}/sus/common/wg.yaml";
+
   networking.wireguard.interfaces = let                           
     subnet = "10.13.37";                                                                    
+    externalInterface = "enp1s0";
   in {                                                                                      
     # "wg-bfs" is the network interface name. You can name the interface arbitrarily.
     wg-bfs = {
@@ -82,13 +88,13 @@
       # This allows the wireguard server to route your traffic to the internet and hence be like a VPN
       # For this to work you have to set the dnsserver IP of your router (or dnsserver of choice) in your clients
       postSetup = ''
-        ${pkgs.iptables}/bin/iptables -t nat -A POSTROUTING -s ${subnet}.0/24 -o eth0 -j MASQUERADE
-      '';                                 
+        ${pkgs.iptables}/bin/iptables -t 'nat' -A 'POSTROUTING' -s ${subnet}.0/24 -o '${externalInterface}' -j 'MASQUERADE'
+      '';
                                                                                                    
       # This undoes the above command
       postShutdown = ''  
-        ${pkgs.iptables}/bin/iptables -t nat -D POSTROUTING -s ${subnet}.0/24 -o eth0 -j MASQUERADE
-      '';                
+        ${pkgs.iptables}/bin/iptables -t 'nat' -D 'POSTROUTING' -s ${subnet}.0/24 -o '${externalInterface}' -j 'MASQUERADE'
+      '';
                                                                                     
       # Path to the private key file.                                               
       #                                    

@@ -114,6 +114,11 @@
           publicKey = "3dVzf1jxnVVTkLAyxedW+kRQBexZDzYDwpaLIcTrLjc=";
           allowedIPs = [ "${subnet}.2/32" ];
         }                                
+        # nrv                               
+        {      
+          publicKey = "Kk2d0ncj24rO0qbuKh4V4t1OLnmVYbeaYvuEnL2OPFM=";
+          allowedIPs = [ "${subnet}.3/32" ];
+        }                                
       ];                                          
     };                                            
   };   

@@ -6,7 +6,9 @@ in {
     ${name} = {
       initialPassword = "123";
       isNormalUser = true;
-      openssh.authorizedKeys.keyFiles = self.lib.ifUnlocked "${flake}/sus/ssh/${name}";
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE/EhBI6sJb2yHbTkqhZiCzUrsLE6t+CZe7RhS22z7w5"
+      ];
       extraGroups = [ "wheel" ];
     };
   };

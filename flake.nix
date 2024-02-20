@@ -52,8 +52,7 @@
     home-manager,
     deploy-rs,
     ...
-  } @ inputs:
-    let
+  } @ inputs: let
       # Path to the root of this flake
       flake = ./.;
       # Generates outputs for all systems below
@@ -67,7 +66,11 @@
     in {
       # Reexport nixpkgs with our overlays applied
       # Acessible on our configurations, and through nix build, shell, run, etc.
-      legacyPackages = forAllSystems (system: self.lib.mkPkgs nixpkgs-unstable system);
+      legacyPackages = forAllSystems (system: import nixpkgs-unstable {
+        inherit system;
+        overlays = [ self.overlays.default ];
+        config = self.lib.defaultConfig nixpkgs-unstable;
+      });
 
       lib = import ./lib {
         inherit self inputs flake;

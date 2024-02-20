@@ -1,17 +1,6 @@
 { self, inputs, flake, lib, ... }: rec {
-  /* Create pkgs from supplied nixpkgs with default overlays and config of this flake.
-     `system` specifies architecture as usual.
-     If you want the config separately you can access it from the result of this
-     function under `config` attribute.
-  */
-  mkPkgs = nixpkgs: system: import nixpkgs {
-    inherit system;
-    overlays = [ self.overlays.default ];
-    config = defaultConfig nixpkgs;
-  };
-
   /* Make a whitelist predicate for allowUnfreePredicate
-     Useful because package 'names' and actual package names in `nixpkgs.pkgs` can differ
+     Useful because package 'names' and actual package names in `pkgs` can differ
   */
   unfreeWhiteList = list: pkg: builtins.elem (lib.getName pkg) (map lib.getName list);
 

@@ -31,8 +31,12 @@ in
       ll = "ls -l";
       la = "ls -a";
       nv = "nvim";
-      renv = "unset __NIXOS_SET_ENVIRONMENT_DONE; exec bash --login";
+      renv = "unset __NIXOS_SET_ENVIRONMENT_DONE; exec $SHELL --login";
       sc = "systemctl";
+      scu = "systemctl --user";
+      jc = "journalctl";
+      jcu = "journalctl --user";
+      tm = "tmux";
 
       # Allow aliases with sudo
       sudo = "sudo ";

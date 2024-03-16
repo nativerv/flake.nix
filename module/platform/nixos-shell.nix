@@ -1,7 +1,9 @@
 {
   inputs ? null,
   ...
-}: {
+}:
+{ ... }:
+{
   imports = [
     inputs.nixos-shell.nixosModules.nixos-shell
   ];

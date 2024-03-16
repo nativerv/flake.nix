@@ -1,4 +1,9 @@
-{ pkgs, ... }: {
+{ ... }:
+{
+  pkgs ? null,
+  ...
+}:
+{
   security.sudo.extraConfig = ''
     Defaults timestamp_timeout=10080,insults
   '';

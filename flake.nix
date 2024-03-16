@@ -76,7 +76,10 @@
         inherit self inputs flake;
         lib = nixpkgs-unstable.lib;
       };
-      overlays = import ./overlay { lib = nixpkgs-unstable.lib; };
+      overlays = import ./overlay {
+        inherit (nixpkgs-unstable) lib;
+        inherit flake self inputs;
+      };
 
       # Devshell for bootstrapping
       # Acessible through 'nix develop' or 'nix-shell' (legacy)
@@ -86,7 +89,7 @@
         };
       });
 
-      nixosModules = self.lib.readModulesRecursive' ./module;
+      nixosModules = self.lib.readModulesRecursive' ./module { inherit flake self inputs; };
 
       # NixOS configuration entrypoint
       # Available through 'nixos-rebuild --flake .#your-hostname'
@@ -94,7 +97,6 @@
         mkNixosConfiguration = self.lib.mkNixosConfiguration ./module;
       in builtins.listToAttrs [
         (mkNixosConfiguration nixpkgs-unstable "seht" { system = "x86_64-linux"; })
-        (mkNixosConfiguration nixpkgs-23-11 "umbriel" { system = "aarch64-linux"; })
       ];
 
       # Standalone home-manager configuration entrypoint
@@ -102,69 +104,52 @@
       homeConfigurations = {
         "nrv@seht" = home-manager.lib.homeManagerConfiguration {
           pkgs = self.legacyPackages.x86_64-linux; # Home-manager requires 'pkgs' instance
-          extraSpecialArgs = { inherit inputs; }; # Pass flake inputs to our config
           # > Our main home-manager configuration file <
           modules = [ ./home-manager/home.nix ];
         };
       };
+      
       deploy.nodes.seht = let
-        inherit (self.nixosConfigurations.seht.config.nixpkgs) system;
+        name = "seht";
+        inherit (self.nixosConfigurations."${name}".config.nixpkgs) system;
+        pkgs = self.legacyPackages."${system}";
+        # reuse `deploy-rs` package from nixpkgs to utilize cache.nixos.org
+        deployPkgs = builtins.foldl' (acc: cur: acc.extend cur) pkgs [
+          inputs.deploy-rs.overlay
+          (final: prev: {
+            deploy-rs = {
+              inherit (pkgs) deploy-rs;
+              inherit (prev.deploy-rs) lib;
+            };
+          })
+        ];
       in {
         sshOpts = [ "-p" "2222" "-oStrictHostKeyChecking=no" ];
-        hostname = (builtins.head (self.lib.ifUnlocked (builtins.fromTOML (builtins.readFile ./sus/common/seht.toml)))).address;
+        hostname = self.lib.parseTOMLIfUnlocked ./sus/common/${name}.toml;
         fastConnection = true;
         profilesOrder = [ "system" "home" ];
         profiles.system = {
           sshUser = "root";
-          path = deploy-rs.lib.x86_64-linux.activate.nixos
-            self.nixosConfigurations.seht;
+          path = deployPkgs.deploy-rs.lib.activate.nixos self.nixosConfigurations."${name}";
           user = "root";
         };
        profiles.home = {
           sshUser = "nrv";
           profilePath = "/nix/var/nix/profiles/per-user/nrv/home";
-          path = deploy-rs.lib.x86_64-linux.activate.custom
-            (self.homeConfigurations."nrv@seht").activationPackage
+          path = deployPkgs.deploy-rs.lib.activate.custom
+            (self.homeConfigurations."nrv@${name}").activationPackage
             "$PROFILE/activate";
           user = "nrv";
         };
         profiles.hello = {
           sshUser = "nrv";
-          path = deploy-rs.lib.x86_64-linux.activate.custom
-            nixpkgs-unstable.legacyPackages.x86_64-linux.hello
+          path = deployPkgs.deploy-rs.lib.activate.custom
+            nixpkgs-unstable.legacyPackages."${system}".hello
             "./bin/hello";
           user = "nrv";
         };
       };
 
-      deploy.nodes.umbriel = let
-        inherit (self.nixosConfigurations.umbriel.config.nixpkgs) system;
-      in {
-        hostname = (builtins.head (self.lib.ifUnlocked (builtins.fromTOML (builtins.readFile ./sus/common/umbriel.toml)))).address;
-        fastConnection = true;
-        profilesOrder = [ "system" "home" ];
-        profiles."system" = {
-          sshUser = "root";
-          path = deploy-rs.lib.aarch64-linux.activate.nixos
-            self.nixosConfigurations.umbriel;
-          user = "root";
-        };
-       # profiles.home = {
-       #    sshUser = "nrv";
-       #    profilePath = "/nix/var/nix/profiles/per-user/nrv/home";
-       #    path = deploy-rs.lib.x86_64-linux.activate.custom
-       #      (self.homeConfigurations."nrv@seht").activationPackage
-       #      "$PROFILE/activate";
-       #    user = "nrv";
-       #  };
-       #  profiles.hello = {
-       #    sshUser = "nrv";
-       #    path = deploy-rs.lib.x86_64-linux.activate.custom
-       #      nixpkgs-unstable.legacyPackages.x86_64-linux.hello
-       #      "./bin/hello";
-       #    user = "nrv";
-       #  };
-      };
       checks = builtins.mapAttrs (system: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
     };
 }

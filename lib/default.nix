@@ -7,6 +7,13 @@
   /* For knowing if the repo is locked */
   isLocked = !(builtins.readFile ../locked == "0");
   ifUnlocked = lib.optional (!isLocked);
+  parseTOMLIfUnlocked = path: lib.pipe path [
+    builtins.readFile
+    builtins.fromTOML
+    self.lib.ifUnlocked
+    builtins.head
+    (toml: toml.address)
+  ];
 
   /* Default nixpkgs config */
   defaultConfig = nixpkgs: {
@@ -15,6 +22,9 @@
   };
 
   /* Utility for NisOS configuration creation with sane defaults.
+
+     NOTE: the following is not in sync with `extraModuleArgs` and maybe
+     something else, i'm lazy to update it.
 
      Example:
      ```nix
@@ -109,8 +119,7 @@
       ]
       ++ lib.warnIf (systemModule == [] && !(args ? modules))
         "Module '${toString systemModulePath}' does not exist and you haven't provided your own modules. Default NixOS system will be built."
-        systemModule;
-      specialArgs = args.specialArgs or { inherit self inputs flake; }; # Pass flake inputs to our config
+        map (m: import m { inherit self inputs flake; }) systemModule;
     });
   };
 
@@ -145,7 +154,7 @@
   #   "foo.bar" = import ./module/foo/bar.nix
   # }
   # ```
-  readModulesRecursive' = path:
+  readModulesRecursive' = path: extraArgs:
     with lib;
     with builtins; let
       paths = pipe "${path}" [
@@ -160,7 +169,7 @@
       attrList =
         map (path': {
           name = pathToName (unsafeDiscardStringContext path');
-          value = import path';
+          value = import path' extraArgs;
         })
         paths;
     in

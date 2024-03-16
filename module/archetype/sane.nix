@@ -1,7 +1,14 @@
 # Sane defaults module. Enables nix command, and makes your system use your
 # flake inputs as both flake registries and legacy channels
-
-{ inputs, lib, config, ... }: 
+{
+  inputs ? null,
+  ...
+}:
+{
+  lib ? null,
+  config ? null,
+  ...
+}:
 {
   # Clean tmp just in case
   boot.tmp.cleanOnBoot = true;
@@ -18,7 +25,7 @@
 
     # This will additionally add your inputs to the system's legacy channels
     # Making legacy nix commands consistent as well, awesome!
-    nixPath = lib.mapAttrsToList 
+    nixPath = lib.mapAttrsToList
       (key: value: "${key}=${value.to.path}")
       config.nix.registry;
 

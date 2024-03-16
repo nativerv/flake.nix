@@ -1,8 +1,10 @@
+{ ... }:
 {
   lib ? null,
   pkgs ? null,
   ...
-}: {
+}:
+{
   # oom daemon - out of memory process killer
   systemd.oomd.enable = false;
 

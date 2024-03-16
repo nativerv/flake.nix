@@ -1,10 +1,13 @@
 {
-  inputs ? null, 
+  inputs ? null,
+  flake ? null,
+  self ? null,
+  ...
+}:
+{
   config ? null, 
-  self ? null, 
   pkgs ? null, 
   lib ? null, 
-  flake ? null, 
   modulesPath ? null,
   ...
 }: {
@@ -55,7 +58,7 @@
   # networking.hostName = "seht";
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
-  system.stateVersion = "22.11";
+  system.stateVersion = "23.11";
 
   # Autologin nrv in the VM
   services.getty.autologinUser = "nrv";

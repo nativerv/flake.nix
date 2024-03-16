@@ -1,4 +1,13 @@
-{ self, config, lib, flake, ... }:
+{
+  self ? null,
+  flake ? null,
+  ...
+}:
+{
+  config ? null,
+  lib ? null,
+  ...
+}:
 {
   users.users = {
     pih-pah = {
@@ -7,8 +16,7 @@
       openssh.authorizedKeys.keyFiles =
         self.lib.ifUnlocked "${flake}/sus/ssh/nrv"
         ++ self.lib.ifUnlocked "${flake}/sus/ssh/yukkop"
-        ++ self.lib.ifUnlocked "${flake}/sus/ssh/snuff"
-      ;
+        ++ self.lib.ifUnlocked "${flake}/sus/ssh/snuff";
       home = "/srv/pih-pah";
       extraGroups = ["pih-pah"];
     };

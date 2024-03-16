@@ -1,4 +1,9 @@
-{ config, lib, ... }:
+{ ... }:
+{
+  config ? null,
+  lib ? null,
+  ...
+}:
 let 
   viMode = config.programs.bash.viMode;
 in

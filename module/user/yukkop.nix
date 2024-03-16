@@ -1,4 +1,5 @@
-{ self,  lib, flake, ... }:
+{ ... }:
+{ ... }:
 let
   name = "yukkop";
 in {

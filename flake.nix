@@ -81,10 +81,9 @@
 
       packages = forAllSystems (system: let
         pkgs = self.legacyPackages.${system};
-      in {
-        inherit (import ./package/nixpak-test { inherit pkgs nixpak; }) bash-nixpak bash-nixpak-env;
-        firefox = pkgs.callPackage ./package/firefox { inherit nixpak; };
-      });
+      in
+        self.lib.readPackages pkgs ./package
+      );
 
       lib = import ./lib {
         inherit self inputs flake;

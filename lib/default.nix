@@ -181,4 +181,12 @@
         paths;
     in
       listToAttrs attrList;
+
+  readPackages = pkgs: path:
+    with lib;
+    pipe path [
+      builtins.readDir
+      (filterAttrs (_: type: type == "directory"))
+      (mapAttrs (name: _: pkgs.callPackage "${path}/${name}" {}))
+    ];
 }

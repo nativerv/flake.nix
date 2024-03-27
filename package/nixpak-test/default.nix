@@ -1,15 +1,11 @@
-{ pkgs, nixpak, ... }: let
-  mkNixPak = nixpak.lib.nixpak {
-    inherit (pkgs) lib;
-    inherit pkgs;
-  };
-  name = "bash-nixpak";
+{ pkgs, mkNixPak, ... }: let
+  name = "bash";
 
   sandboxed = mkNixPak {
     config = { sloth, ... }: {
 
       # the application to isolate
-      app.package = pkgs.writeShellScriptBin "${name}" ''exec ${pkgs.bash}/bin/bash'';
+      app.package = pkgs.bash;
 
       # path to the executable to be wrapped
       # this is usually autodetected but
@@ -22,8 +18,8 @@
 
       # same usage as --see, --talk, --own
       dbus.policies = {
-        "org.freedesktop.DBus" = "talk";
-        "ca.desrt.dconf" = "talk";
+        #"org.freedesktop.DBus" = "talk";
+        #"ca.desrt.dconf" = "talk";
       };
 
       # needs to be set for Flatpak emulation
@@ -64,14 +60,13 @@
       };
     };
   };
-in {
+in
   # Just the wrapped /bin/${mainProgram} binary
-  "${name}" = sandboxed.config.script;
+  #sandboxed.config.script;
 
   # A symlinkJoin that resembles the original package,
   # except the main binary is swapped for the
   # wrapper script, as are textual references
   # to the binary, like in D-Bus service files.
   # Useful for GUI apps.
-  "${name}-env" = sandboxed.config.env;
-}
+  sandboxed.config.env

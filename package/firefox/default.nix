@@ -1,8 +1,4 @@
-{ pkgs, nixpak, ... }: let
-  mkNixPak = nixpak.lib.nixpak {
-    inherit (pkgs) lib;
-    inherit pkgs;
-  };
+{ pkgs, mkNixPak , ... }: let
   name = "firefox";
   sandboxed = mkNixPak {
     config = { sloth, ... }: {

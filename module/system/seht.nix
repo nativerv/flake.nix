@@ -84,14 +84,12 @@
     git
     stow
     imv
-    (self.packages.${system}.bash-nixpak)
-    (self.lib.renamePackageBinary pkgs self.packages.${system}.bash-nixpak-env "bash-nixpak-env")
-
-    (self.packages.${system}.firefox)
+    #self.packages.${system}.nixpak-test
+    self.packages.${system}.firefox
   ];
   services.desktopManager.plasma6.enable = true;
   services.xserver.enable = true;
-  services.xserver.displayManager.autoLogin.enable = true;
+  services.xserver.displayManager.autoLogin.enable = false;
   services.xserver.displayManager.autoLogin.user = "nrv";
   services.xserver.displayManager.sddm.enable = true;
   services.xserver.displayManager.sddm.wayland.enable = true;
@@ -108,6 +106,8 @@
     khelpcenter
     print-manager
   ];
+
+  programs.hyprland.enable = true;
 
   # Nicely reload system units when changing configs
   #systemd.user.startServices = "sd-switch";

@@ -7,6 +7,8 @@
   /* For knowing if the repo is locked */
   isLocked = !(builtins.readFile ../locked == "0");
   ifUnlocked = lib.optional (!isLocked);
+
+  /* Read secret file */
   parseTOMLIfUnlocked = path: lib.pipe path [
     builtins.readFile
     builtins.fromTOML
@@ -14,6 +16,11 @@
     builtins.head
     (toml: toml.address)
   ];
+
+  /* Rename package */
+  renamePackageBinary = pkgs: package: newName: with lib; let
+    packageBinPath = removePrefix "${package}/" (getExe package);
+  in pkgs.writeShellScriptBin "${newName}" ''exec -a "$0" ${package}/${packageBinPath} "$@"'';
 
   /* Default nixpkgs config */
   defaultConfig = nixpkgs: {

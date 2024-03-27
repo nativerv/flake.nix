@@ -6,6 +6,12 @@
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgs-22-11.url = "github:nixos/nixpkgs/nixos-22.11";
     nixpkgs-23-11.url = "github:nixos/nixpkgs/nixos-23.11";
+    
+    # Sandboxing
+    nixpak = {
+      url = "github:nixpak/nixpak";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
 
     # Disk management
     disko.url = "github:nix-community/disko";
@@ -51,6 +57,7 @@
     nixpkgs-23-11,
     home-manager,
     deploy-rs,
+    nixpak,
     ...
   } @ inputs: let
       # Path to the root of this flake
@@ -70,6 +77,13 @@
         inherit system;
         overlays = [ self.overlays.default ];
         config = self.lib.defaultConfig nixpkgs-unstable;
+      });
+
+      packages = forAllSystems (system: let
+        pkgs = self.legacyPackages.${system};
+      in {
+        inherit (import ./package/nixpak-test { inherit pkgs nixpak; }) bash-nixpak bash-nixpak-env;
+        firefox = pkgs.callPackage ./package/firefox { inherit nixpak; };
       });
 
       lib = import ./lib {

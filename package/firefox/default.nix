@@ -1,4 +1,4 @@
-{ pkgs, mkNixPak , ... }: let
+{ pkgs, mkNixPak, ... }: let
   name = "firefox";
   sandboxed = mkNixPak {
     config = { sloth, ... }: {
@@ -67,7 +67,7 @@
       # where ${name} is generated from the drv name like:
       # hello -> Hello
       # my-app -> MyApp
-      flatpak.appId = "org.mozilla.Firefox";
+      flatpak.appId = "org.mozilla.firefox";
 
       gpu.enable = true;
 
@@ -92,7 +92,7 @@
         # see "Sloth values" below
         bind.rw = with sloth; [
           ## bind [src dest]
-          [ (concat [xdgStateHome "/nixpak/${name}/home"]) homeDir ]
+          [ (mkdir (concat [xdgStateHome "/sandboxes/${name}/home"])) homeDir ]
           ## bind src = dest
           (concat [runtimeDir "/doc"])
         ];
@@ -100,7 +100,7 @@
           #(concat [homeDir "/Downloads"])
         ];
         bind.dev = [
-          #"/dev/dri"
+          "/dev/dri"
         ];
       };
     };

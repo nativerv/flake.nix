@@ -80,19 +80,31 @@
   #   disks = [ "/dev/vda" ];
   # };
 
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+    # If you want to use JACK applications, uncomment this
+    #jack.enable = true;
+  };
   environment.systemPackages = with pkgs; [
     git
     stow
     imv
     #self.packages.${system}.nixpak-test
     self.packages.${system}.firefox
+    self.packages.${system}.telegram-desktop
   ];
   services.desktopManager.plasma6.enable = true;
-  services.xserver.enable = true;
-  services.xserver.displayManager.autoLogin.enable = false;
-  services.xserver.displayManager.autoLogin.user = "nrv";
-  services.xserver.displayManager.sddm.enable = true;
-  services.xserver.displayManager.sddm.wayland.enable = true;
+  services.xserver = {
+    enable = true;
+    displayManager.autoLogin.enable = true;
+    displayManager.autoLogin.user = "nrv";
+    displayManager.sddm.enable = true;
+    displayManager.sddm.wayland.enable = true;
+  };
   environment.plasma6.excludePackages = with pkgs.kdePackages; [
     plasma-browser-integration
     #konsole

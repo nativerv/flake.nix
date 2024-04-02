@@ -1,0 +1,22 @@
+commit a91638205e119ded42b03e93983fec3a78c56f47
+Author: nativerv <nativerv@protonmail.com>
+Date:   Sat Mar 30 18:48:58 2024 +0300
+
+    feat: print bwrap args
+
+diff --git a/common/flatpak-bwrap.c b/common/flatpak-bwrap.c
+index f7e8b10..0c46ada 100644
+--- a/common/flatpak-bwrap.c
++++ b/common/flatpak-bwrap.c
+@@ -369,8 +369,10 @@ flatpak_bwrap_bundle_args (FlatpakBwrap *bwrap,
+ 
+   data = g_new (gchar, data_len);
+   ptr = data;
+-  for (i = start; i < end; i++)
++  for (i = start; i < end; i++) {
++    printf("bwrap arg: '%s'\n", (char*)bwrap->argv->pdata[i]);
+     ptr = g_stpcpy (ptr, bwrap->argv->pdata[i]) + 1;
++  }
+ 
+   if (!flatpak_buffer_to_sealed_memfd_or_tmpfile (&args_tmpf, "bwrap-args", data, data_len, error))
+     return FALSE;

@@ -1,5 +1,7 @@
 { pkgs, mkNixPak, ... }: let
   name = "telegram-desktop";
+  appId = "org.telegram.desktop";
+
   sandboxed = mkNixPak {
     config = { sloth, ... }: {
 
@@ -69,7 +71,7 @@
       # where ${name} is generated from the drv name like:
       # hello -> Hello
       # my-app -> MyApp
-      flatpak.appId = "org.telegram.desktop";
+      flatpak.appId = appId;
 
       gpu.enable = true;
 
@@ -94,13 +96,12 @@
         # see "Sloth values" below
         bind.rw = with sloth; [
           [ (mkdir (concat [xdgStateHome "/sandboxes/${name}/home"])) homeDir ]
-          (concat [runtimeDir "/doc"])
+          [ (mkdir "/tmp/sandboxes/${name}") "/tmp" ]
+          [ (concat [runtimeDir "/doc/by-app/${appId}"]) (concat [runtimeDir "/doc"]) ]
         ];
-        bind.ro = [
-          #(concat [homeDir "/Downloads"])
-        ];
+        bind.ro = [ ];
         bind.dev = [
-          #"/dev/dri"
+          "/dev/dri"
         ];
       };
     };

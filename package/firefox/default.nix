@@ -1,5 +1,7 @@
 { pkgs, mkNixPak, ... }: let
   name = "firefox";
+  appId = "org.mozilla.firefox";
+
   sandboxed = mkNixPak {
     config = { sloth, ... }: {
 
@@ -67,7 +69,7 @@
       # where ${name} is generated from the drv name like:
       # hello -> Hello
       # my-app -> MyApp
-      flatpak.appId = "org.mozilla.firefox";
+      flatpak.appId = appId;
 
       gpu.enable = true;
 
@@ -91,14 +93,11 @@
         # supports runtime resolution of environment variables
         # see "Sloth values" below
         bind.rw = with sloth; [
-          ## bind [src dest]
           [ (mkdir (concat [xdgStateHome "/sandboxes/${name}/home"])) homeDir ]
-          ## bind src = dest
-          (concat [runtimeDir "/doc"])
+          [ (mkdir "/tmp/sandboxes/${name}") "/tmp" ]
+          [ (concat [runtimeDir "/doc/by-app/${appId}"]) (concat [runtimeDir "/doc"]) ]
         ];
-        bind.ro = [
-          #(concat [homeDir "/Downloads"])
-        ];
+        bind.ro = [ ];
         bind.dev = [
           "/dev/dri"
         ];

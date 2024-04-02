@@ -80,6 +80,7 @@
   #   disks = [ "/dev/vda" ];
   # };
 
+  services.flatpak.enable = true;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -93,9 +94,12 @@
     git
     stow
     imv
-    #self.packages.${system}.nixpak-test
+    foot
+
+    self.packages.${system}.nixpak-test
     self.packages.${system}.firefox
     self.packages.${system}.telegram-desktop
+    self.packages.${system}.ungoogled-chromium
   ];
   services.desktopManager.plasma6.enable = true;
   services.xserver = {

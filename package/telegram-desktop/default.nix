@@ -17,19 +17,22 @@
       # and to remove dependency on xdg-dbus-proxy
       dbus.enable = true;
 
-      # same usage as --see, --talk, --own
+      # same usage as xdg-dbus-proxy(1) --see, --talk, --own
       dbus.policies = {
-        # core dbus interface - ask dbus daemon stuff.
-        #"org.freedesktop.DBus" = "talk";
-
         # gtk's app configuration framework. telegram is qt so idk
         #"ca.desrt.dconf" = "see";
 
         # firefox stuff
         "org.telegram.desktop.*" = "own";
 
-        "org.kde.StatusNotifierWatcher" = "talk";
+        # don't read messages when afk (i think)
         "org.gnome.Mutter.IdleMonitor" = "talk";
+        "org.kde.StatusNotifierWatcher" = "talk";
+
+        # some stuff. probably tray
+        #"com.canonical.AppMenu.Registrar" = "talk";
+        #"com.canonical.indicator.application" = "talk";
+        #"org.ayatana.indicator.application" = "talk";
 
         # allow whatever the hell. maybe this allows all of them, maybe this allows usage of any of them whatsoever
         # TODO: granual portal permissions, don't allow every portal
@@ -40,19 +43,6 @@
 
         # allow inhibiting screensavers
         "org.freedesktop.ScreenSaver" = "talk";
-
-        # allow sharing screen
-        # (included in the org.freedeskto.portal.Desktop?)
-        #"org.freedesktop.portal.ScreenCast" = "talk";
-
-        # file chooser: save, open. only provides paths as usual
-        # (included in the org.freedeskto.portal.Desktop?)
-        #"org.freedesktop.portal.FileChooser" = "talk";
-
-        # actually passes files on demand to the sandbox. wires with FileChooser somehow (using dark magic)
-        # (included in the org.freedeskto.portal.Desktop?)
-        # TODO: research how exactly the access is granted (can it request any access? the access is provided by FileChooser?).
-        #"org.freedesktop.portal.Documents" = "talk";
       };
 
       # TODO: find a way for this to work.
@@ -66,11 +56,7 @@
       #  "org.freedesktop.Notifications" = [ "@/*" ];
       #};
 
-      # needs to be set for Flatpak emulation
-      # defaults to com.nixpak.${name}
-      # where ${name} is generated from the drv name like:
-      # hello -> Hello
-      # my-app -> MyApp
+      # flatpak id: for Flatpak emulation and the portals (documents, etc) to work
       flatpak.appId = appId;
 
       gpu.enable = true;
@@ -95,8 +81,8 @@
         # supports runtime resolution of environment variables
         # see "Sloth values" below
         bind.rw = with sloth; [
-          [ (mkdir (concat [xdgStateHome "/sandboxes/${name}/home"])) homeDir ]
-          [ (mkdir "/tmp/sandboxes/${name}") "/tmp" ]
+          [ (mkdir (concat [xdgStateHome "/sandbox/${name}/home"])) homeDir ]
+          [ (mkdir "/tmp/sandbox/${name}") "/tmp" ]
           [ (concat [runtimeDir "/doc/by-app/${appId}"]) (concat [runtimeDir "/doc"]) ]
         ];
         bind.ro = [ ];

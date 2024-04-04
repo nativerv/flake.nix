@@ -17,17 +17,20 @@
       # and to remove dependency on xdg-dbus-proxy
       dbus.enable = true;
 
-      # same usage as --see, --talk, --own
+      # same usage as xdg-dbus-proxy(1) --see, --talk, --own
       dbus.policies = {
         # core dbus interface - ask dbus daemon stuff.
         #"org.freedesktop.DBus" = "talk";
 
         # gtk's app configuration framework. firefox is gtk, so
-        "ca.desrt.dconf" = "see";
+        #"ca.desrt.dconf" = "see";
 
-        # firefox stuff
+        # firefox-owned
         "org.mozilla.Firefox.*" = "own";
         "org.mozilla.firefox.*" = "own";
+        #"org.mozilla.firefox_beta.*" = "own";
+        # media player remote interfacing
+        "org.mpris.MediaPlayer2.firefox.*" = "own";
 
         # allow whatever the hell. maybe this allows all of them, maybe this allows usage of any of them whatsoever
         # TODO: granual portal permissions, don't allow every portal
@@ -39,21 +42,19 @@
         # allow inhibiting screensavers
         "org.freedesktop.ScreenSaver" = "talk";
 
-        # allow sharing screen
-        # (included in the org.freedeskto.portal.Desktop?)
-        #"org.freedesktop.portal.ScreenCast" = "talk";
+        # allow opening directories and pointing at files to the user with native file manager
+        "org.freedesktop.FileManager1" = "talk";
 
-        # file chooser: save, open. only provides paths as usual
-        # (included in the org.freedeskto.portal.Desktop?)
-        #"org.freedesktop.portal.FileChooser" = "talk";
+        # accessibility bus - don't know/can't find what it allows so commented out
+        #"org.a11y.Bus" = "talk";
 
-        # actually passes files on demand to the sandbox. wires with FileChooser somehow (using dark magic)
-        # (included in the org.freedeskto.portal.Desktop?)
-        # TODO: research how exactly the access is granted (can it request any access? the access is provided by FileChooser?).
-        #"org.freedesktop.portal.Documents" = "talk";
+        # some gnome stuff - commented out for now, same as org.a11y.Bus ^
+        # gvfs package was on my arch machine only because of Nautilus
+        # which i installed once and never even used. so probably useless for me
+        #"org.gtk.vfs.*" = "talk";
       };
 
-      # TODO: find a way for this to work.
+      # TODO: find a way for this to work (granular portals access).
       # Example: --call=org.freedesktop.portal.*=* --broadcast=org.freedesktop.portal.*=@/org/freedesktop/portal/*
       #dbus.rules.call = {
       #  "org.freedesktop.portal.ScreenCast.*" = [ "*" ];
@@ -64,11 +65,7 @@
       #  "org.freedesktop.Notifications" = [ "@/*" ];
       #};
 
-      # needs to be set for Flatpak emulation
-      # defaults to com.nixpak.${name}
-      # where ${name} is generated from the drv name like:
-      # hello -> Hello
-      # my-app -> MyApp
+      # flatpak id: for Flatpak emulation and the portals (documents, etc) to work
       flatpak.appId = appId;
 
       gpu.enable = true;
@@ -87,17 +84,24 @@
           wayland = true;
           pulse = true;
           pipewire = true;
+          # TODO: pcsc (smart cards)
+          # TODO: cups (printers)
         };
 
         # lists of paths to be mounted inside the sandbox
         # supports runtime resolution of environment variables
         # see "Sloth values" below
         bind.rw = with sloth; [
-          [ (mkdir (concat [xdgStateHome "/sandboxes/${name}/home"])) homeDir ]
-          [ (mkdir "/tmp/sandboxes/${name}") "/tmp" ]
+          [ (mkdir (concat [xdgStateHome "/sandbox/${name}/home"])) homeDir ]
+          [ (mkdir "/tmp/sandbox/${name}") "/tmp" ]
           [ (concat [runtimeDir "/doc/by-app/${appId}"]) (concat [runtimeDir "/doc"]) ]
+
+          # kerberos auth stuff. use it if you need it
+          #/run/.heim_org.h5l.kcm-socket
         ];
-        bind.ro = [ ];
+        bind.ro = with sloth; [
+          (concat [runtimeDir "speech-dispatcher"]) # TODO: move that to Nixpak
+        ];
         bind.dev = [
           "/dev/dri"
         ];

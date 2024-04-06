@@ -77,7 +77,7 @@
         # Bind only paths that app needs
         bindEntireStore = false;
 
-        # disable all network access
+        # network access
         network = true;
 
         sockets = {

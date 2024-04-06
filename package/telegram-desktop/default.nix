@@ -22,7 +22,8 @@
         # gtk's app configuration framework. telegram is qt so idk
         #"ca.desrt.dconf" = "see";
 
-        # firefox stuff
+        # telegram-desktop stuff
+        "org.telegram.desktop" = "own";
         "org.telegram.desktop.*" = "own";
 
         # don't read messages when afk (i think)
@@ -68,7 +69,7 @@
         # Bind only paths that app needs
         bindEntireStore = false;
 
-        # disable all network access
+        # network access
         network = true;
 
         sockets = {

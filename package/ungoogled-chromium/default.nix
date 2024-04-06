@@ -17,7 +17,7 @@
       # and to remove dependency on xdg-dbus-proxy
       dbus.enable = true;
 
-      # same usage as --see, --talk, --own
+      # same usage as xdg-dbus-proxy(1) --see, --talk, --own
       dbus.policies = {
         # TODO: figure these out when system bus is implemented
         #  - --system-talk-name=org.bluez
@@ -65,7 +65,7 @@
         # Bind only paths that app needs
         bindEntireStore = false;
 
-        # disable all network access
+        # network access
         network = true;
 
         sockets = {

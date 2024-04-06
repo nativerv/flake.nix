@@ -1,7 +1,9 @@
-# Sane defaults module. Enables nix command, and makes your system use your
-# flake inputs as both flake registries and legacy channels
+# Sane defaults module.
+# Does independent stuff that you would want on any system.
 {
   inputs ? null,
+  flake ? null,
+  self ? null,
   ...
 }:
 {
@@ -13,12 +15,20 @@
   # Clean tmp just in case
   boot.tmp.cleanOnBoot = true;
 
+  # Symlink /etc/nixos to this flake.
+  # NOTE: maybe not *that* sane? Let's see if this spits errors or overwrites the stateful/handwritten config or whatever.
+  system.activationScripts.symlinkFlakeToEtcNixos.text = /* bash */ ''
+    rmdir '/etc/nixos' || true
+    ln -s ${flake} '/etc/nixos'
+  '';
+
   # Nix (the thing) config
   nix = {
     # This will add each flake input as a registry
     # and also pin 'nixpkgs' specifically to the unstable
     # channel, to make nix3 commands consistent with your flake
-    registry = lib.mapAttrs (_: value: { flake = value; }) inputs;
+    registry = lib.mapAttrs (_: value: { flake = value; }) inputs
+      // { dream.flake = self; };
 
     # This will additionally add your inputs to the system's legacy channels
     # Making legacy nix commands consistent as well, awesome!
@@ -26,7 +36,7 @@
       (key: value: "${key}=${value.to.path}")
       config.nix.registry;
 
-    # Disable channels - reason for them when using flakes.
+    # Disable channels - no reason for them when using flakes.
     channel.enable = false;
 
     settings = {

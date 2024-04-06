@@ -80,8 +80,14 @@
   #   disks = [ "/dev/vda" ];
   # };
 
+  # Flatpak
   services.flatpak.enable = true;
   security.rtkit.enable = true;
+
+  # GTK apps outside GNOME - cursor, theming & window decorations. 
+  programs.dconf.enable = true;
+
+  # Sound
   services.pipewire = {
     enable = true;
     alsa.enable = true;
@@ -96,10 +102,11 @@
     imv
     foot
 
-    self.packages.${system}.nixpak-test
+    #self.packages.${system}.nixpak-test
     self.packages.${system}.firefox
     self.packages.${system}.telegram-desktop
     self.packages.${system}.ungoogled-chromium
+    self.packages.${system}.gimp
   ];
   services.desktopManager.plasma6.enable = true;
   services.xserver = {

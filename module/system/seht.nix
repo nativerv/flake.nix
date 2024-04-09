@@ -107,7 +107,20 @@
     self.packages.${system}.telegram-desktop
     self.packages.${system}.ungoogled-chromium
     self.packages.${system}.gimp
+    self.packages.${system}.mpv
+    self.packages.${system}.vlc
+    self.packages.${system}.zathura
   ];
+  # programs.firejail = {
+  #   enable = true;
+  #   wrappedBinaries = {
+  #     mpv-firejailed = {
+  #       executable = "${pkgs.mpv}/bin/mpv";
+  #       profile = "${pkgs.firejail}/etc/firejail/mpv.profile";
+  #       desktop = "${pkgs.mpv}/share/applications/mpv.desktop";
+  #     };
+  #   };
+  # };
   services.desktopManager.plasma6.enable = true;
   services.xserver = {
     enable = true;

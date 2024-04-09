@@ -1,6 +1,10 @@
 nohup.out
+
 result
+result.*
+result-*
 *-result
+
 nixos
 *.qcow2
 key

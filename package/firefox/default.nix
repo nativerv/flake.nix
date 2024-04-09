@@ -19,9 +19,6 @@
 
       # same usage as xdg-dbus-proxy(1) --see, --talk, --own
       dbus.policies = {
-        # core dbus interface - ask dbus daemon stuff.
-        #"org.freedesktop.DBus" = "talk";
-
         # gtk's app configuration framework. firefox is gtk, so
         #"ca.desrt.dconf" = "see";
 
@@ -101,6 +98,8 @@
         ];
         bind.ro = with sloth; [
           (concat [runtimeDir "speech-dispatcher"]) # TODO: move that to Nixpak
+          # "/etc"
+          # "/run/current-system"
         ];
         bind.dev = [
           "/dev/dri"

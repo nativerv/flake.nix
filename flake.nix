@@ -76,7 +76,7 @@
       legacyPackages = forAllSystems (system: import nixpkgs-unstable {
         inherit system;
         overlays = [ self.overlays.default ];
-        config = self.lib.defaultConfig nixpkgs-unstable;
+        config = self.config.nixpkgs;
       });
 
       lib = import ./lib {
@@ -87,6 +87,11 @@
         inherit (nixpkgs-unstable) lib;
         inherit flake self inputs;
       };
+      config = import ./config {
+        inherit (nixpkgs-unstable) lib;
+        inherit flake self inputs;
+      };
+
       packages = forAllSystems (system: self.lib.readPackages
         self.legacyPackages.${system}.callPackage
         ./package

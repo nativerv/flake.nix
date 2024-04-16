@@ -6,15 +6,21 @@
   system ? "x86_64-linux",
   ...
 }: let
-  # WARNING: there may be consiquences to hardcoding the `nixpkgs` flake here. At least: it's API is unstable
-  inherit (inputs.nixpkgs.lib) nixosSystem;
-  inherit (self.legacyPackages."${system}") pkgs lib;
-  name = lib.pipe ./. [
+  nixpkgs = inputs.nixpkgs-unstable;
+  pkgs = import nixpkgs {
+    inherit system;
+    overlays = [ self.overlays.default ];
+    config = self.config.nixpkgs;
+  };
+
+  # Use folder name as name of this system
+  name = nixpkgs.lib.pipe ./. [
     (builtins.toString)
     (builtins.baseNameOf)
   ];
-in nixosSystem {
-  inherit lib pkgs system;
+
+in nixpkgs.lib.nixosSystem {
+  inherit pkgs;
   modules = [
     ({ networking.hostName = name; })
     (import ./${name}.nix { inherit flake self inputs; })

@@ -22,12 +22,6 @@
     packageBinPath = removePrefix "${package}/" (getExe package);
   in pkgs.writeShellScriptBin "${newName}" ''exec -a "$0" ${package}/${packageBinPath} "$@"'';
 
-  /* Default nixpkgs config */
-  defaultConfig = nixpkgs: {
-    allowUnfreePredicate = unfreeWhiteList (with nixpkgs; [
-    ]);
-  };
-
   /* Utility for NisOS configuration creation with sane defaults.
 
      NOTE: the following is not in sync with `extraModuleArgs` and maybe

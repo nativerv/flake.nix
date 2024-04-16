@@ -148,12 +148,16 @@
   # Nicely reload system units when changing configs
   #systemd.user.startServices = "sd-switch";
 
-  # WARNING: This does not do anything when using flakes!
-  # WARNING: Provide this config when using nixpkgs input.
   nixpkgs = {
     # You can add overlays (package additions and overrides) here
     overlays = [];
+
     # Configure your nixpkgs instance.
+    # WARNING: This does not work when using `import nixpkgs { ... }`!
+    # WARNING: Provide this config when importing nixpkgs input.
+    # Failed assertions:
+    # - Your system configures nixpkgs with an externally created instance.
+    # `nixpkgs.config` options should be passed when creating the instance instead.
     config = {};
   };
 }

@@ -100,7 +100,7 @@
   */
   mkNixosConfiguration =
   with builtins;
-  modulesPath:
+  systemsPath:
   nixpkgs:
   name:
   options@{
@@ -116,7 +116,7 @@
         inherit overlays config;
       };
       lib = pkgs.lib;
-      systemModulePath = /${modulesPath}/system/${name}.nix;
+      systemModulePath = /${systemsPath}/${name};
       systemModule = filter pathExists [ systemModulePath ];
     in nixpkgs.lib.nixosSystem (args // {
       pkgs = args.pkgs or pkgs;
@@ -182,11 +182,11 @@
     in
       listToAttrs attrList;
 
-  readPackages = pkgs: path:
+  readPackages = callPackage: path: extraArgs:
     with lib;
     pipe path [
       builtins.readDir
       (filterAttrs (_: type: type == "directory"))
-      (mapAttrs (name: _: pkgs.callPackage "${path}/${name}" {}))
+      (mapAttrs (name: _: callPackage "${path}/${name}" extraArgs))
     ];
 }

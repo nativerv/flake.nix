@@ -79,28 +79,19 @@
         config = self.lib.defaultConfig nixpkgs-unstable;
       });
 
-      packages = forAllSystems (system:
-        self.lib.readPackages
-          self.legacyPackages.${system}.callPackage
-          ./package
-          {}
-      );
       lib = import ./lib {
-        inherit self inputs flake;
-        lib = nixpkgs-unstable.lib;
+        inherit (nixpkgs-unstable) lib;
+        inherit flake self inputs;
       };
       overlays = import ./overlay {
         inherit (nixpkgs-unstable) lib;
         inherit flake self inputs;
       };
-
-      # Devshell for bootstrapping
-      # Acessible through 'nix develop' or 'nix-shell' (legacy)
-      devShells = forAllSystems (system: {
-        default = self.legacyPackages.${system}.callPackage ./shell.nix {
-          inherit inputs;
-        };
-      });
+      packages = forAllSystems (system: self.lib.readPackages
+        self.legacyPackages.${system}.callPackage
+        ./package
+        { inherit flake self inputs; }
+      );
 
       # Configuration modules for NixOS systems
       nixosModules = self.lib.readModulesRecursive'
@@ -115,7 +106,7 @@
         ./nixos/system
         { inherit flake self inputs; };
 
-      # Standalone home-manager configuration entrypoint
+      # User-private configurations (Home Manager)
       # Available through 'home-manager --flake .#your-username@your-hostname'
       homeConfigurations = {
         "nrv@seht" = home-manager.lib.homeManagerConfiguration {
@@ -124,7 +115,16 @@
           modules = [ ./home-manager/home.nix ];
         };
       };
+
+      # Devshell for bootstrapping
+      # Available through 'nix develop' or 'nix-shell' (legacy)
+      # devShells = forAllSystems (system: {
+      #   default = self.legacyPackages.${system}.callPackage ./shell.nix {
+      #     inherit inputs;
+      #   };
+      # });
       
+      # Deployments
       deploy.nodes.seht = let
         name = "seht";
         inherit (self.nixosConfigurations."${name}".config.nixpkgs) system;

@@ -79,12 +79,12 @@
         config = self.lib.defaultConfig nixpkgs-unstable;
       });
 
-      packages = forAllSystems (system: let
-        pkgs = self.legacyPackages.${system};
-      in
-        self.lib.readPackages pkgs ./package
+      packages = forAllSystems (system:
+        self.lib.readPackages
+          self.legacyPackages.${system}.callPackage
+          ./package
+          {}
       );
-
       lib = import ./lib {
         inherit self inputs flake;
         lib = nixpkgs-unstable.lib;
@@ -102,15 +102,18 @@
         };
       });
 
-      nixosModules = self.lib.readModulesRecursive' ./module { inherit flake self inputs; };
+      # Configuration modules for NixOS systems
+      nixosModules = self.lib.readModulesRecursive'
+        ./nixos/module
+        { inherit flake self inputs; };
 
-      # NixOS configuration entrypoint
-      # Available through 'nixos-rebuild --flake .#your-hostname'
-      nixosConfigurations = with self.lib; let 
-        mkNixosConfiguration = self.lib.mkNixosConfiguration ./module;
-      in builtins.listToAttrs [
-        (mkNixosConfiguration nixpkgs-unstable "seht" { system = "x86_64-linux"; })
-      ];
+      # NixOS systems
+      # Available through 'nixos-install --impure --flake .#system-name'
+      # Available through 'nixos-rebuild switch --flake .#system-name'
+      nixosConfigurations = self.lib.readPackages
+        (import)
+        ./nixos/system
+        { inherit flake self inputs; };
 
       # Standalone home-manager configuration entrypoint
       # Available through 'home-manager --flake .#your-username@your-hostname'

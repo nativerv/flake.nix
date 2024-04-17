@@ -32,7 +32,7 @@
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
-    # Deploy
+    # Deployment tool
     deploy-rs.url = "github:serokell/deploy-rs";
     deploy-rs.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
@@ -71,27 +71,37 @@
         # "aarch64-darwin"
       ];
     in {
-      # Reexport nixpkgs with our overlays applied
-      # Acessible on our configurations, and through nix build, shell, run, etc.
+      # Reexport nixpkgs with this flake's default overlays and config applied
+      # Available through `nix run .#package-name`
       legacyPackages = forAllSystems (system: import nixpkgs-unstable {
         inherit system;
         overlays = [ self.overlays.default ];
         config = self.config.nixpkgs;
       });
-
-      lib = import ./lib {
-        inherit (nixpkgs-unstable) lib;
-        inherit flake self inputs;
-      };
+      # Overlays are a pluggable middleware between the original `nixpkgs` and
+      # `nixpkgs` that is being used. They change or add packages and other
+      # stuff to `nixpkgs` once plugged in.
       overlays = import ./overlay {
         inherit (nixpkgs-unstable) lib;
         inherit flake self inputs;
       };
+
+      # Functions in Nix language to help in defining this flake.
+      # May be usable in other flakes
+      lib = import ./lib {
+        inherit (nixpkgs-unstable) lib;
+        inherit flake self inputs;
+      };
+      # This is a custom attribute where i store common configurations specific
+      # to this flake and stuff defined in it which don't fit into `lib`
       config = import ./config {
         inherit (nixpkgs-unstable) lib;
         inherit flake self inputs;
       };
 
+      # Packages defined in this flake. Include sandbox wrappers of some `legacyPackages`
+      # Declared in ./package/NAME
+      # Available through `nix run .#package-name`
       packages = forAllSystems (system: self.lib.readPackages
         self.legacyPackages.${system}.callPackage
         ./package
@@ -99,11 +109,14 @@
       );
 
       # Configuration modules for NixOS systems
+      # Declared in ./nixos/module/TYPE/NAME
+      # Available through `self.nixosModules."module-type.module-name"`
       nixosModules = self.lib.readModulesRecursive'
         ./nixos/module
         { inherit flake self inputs; };
 
       # NixOS systems
+      # Declared in ./nixos/system/NAME
       # Available through 'nixos-install --impure --flake .#system-name'
       # Available through 'nixos-rebuild switch --flake .#system-name'
       nixosConfigurations = self.lib.readPackages
@@ -111,8 +124,9 @@
         ./nixos/system
         { inherit flake self inputs; };
 
-      # User-private configurations (Home Manager)
-      # Available through 'home-manager --flake .#your-username@your-hostname'
+      # User home directory configurations (Home Manager)
+      # Declared in TODO
+      # Available through 'home-manager switch --flake .#your-username@your-hostname'
       homeConfigurations = {
         "nrv@seht" = home-manager.lib.homeManagerConfiguration {
           pkgs = self.legacyPackages.x86_64-linux; # Home-manager requires 'pkgs' instance
@@ -121,7 +135,7 @@
         };
       };
 
-      # Devshell for bootstrapping
+      # The devshell
       # Available through 'nix develop' or 'nix-shell' (legacy)
       # devShells = forAllSystems (system: {
       #   default = self.legacyPackages.${system}.callPackage ./shell.nix {
@@ -130,6 +144,7 @@
       # });
       
       # Deployments
+      # Available through `deploy .#deployment-name.profile-name`
       deploy.nodes.seht = let
         name = "seht";
         inherit (self.nixosConfigurations."${name}".config.nixpkgs) system;
@@ -171,6 +186,8 @@
         };
       };
 
+      # Additional checks/tests for this flake validity
+      # Available through `nix flake check`
       checks = builtins.mapAttrs (system: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
     };
 }

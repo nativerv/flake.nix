@@ -75,7 +75,10 @@
       # Available through `nix run .#package-name`
       legacyPackages = forAllSystems (system: import nixpkgs-unstable {
         inherit system;
-        overlays = [ self.overlays.default ];
+        overlays = [
+          (final: prev: { nixpkgs-flake = nixpkgs-unstable; })
+          self.overlays.default
+        ];
         config = self.config.nixpkgs;
       });
       # Overlays are a pluggable middleware between the original `nixpkgs` and

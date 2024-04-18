@@ -14,10 +14,7 @@
   };
 
   # Use folder name as name of this system
-  name = nixpkgs.lib.pipe ./. [
-    (builtins.toString)
-    (builtins.baseNameOf)
-  ];
+  name = builtins.baseNameOf ./.;
 
 in nixpkgs.lib.nixosSystem {
   inherit pkgs;

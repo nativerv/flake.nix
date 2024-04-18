@@ -3,7 +3,7 @@
   ...
 }: {
   /* Default nixpkgs config */
-  nixpkgs = pkgs: {
+  nixpkgs = { pkgs }: {
     allowUnfreePredicate = self.lib.unfreeWhiteList (with pkgs; [
       #hello-unfree
     ]);

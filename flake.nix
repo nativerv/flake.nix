@@ -125,15 +125,13 @@
         { inherit flake self inputs; };
 
       # User home directory configurations (Home Manager)
-      # Declared in TODO
-      # Available through 'home-manager switch --flake .#your-username@your-hostname'
-      homeConfigurations = {
-        "nrv@seht" = home-manager.lib.homeManagerConfiguration {
-          pkgs = self.legacyPackages.x86_64-linux; # Home-manager requires 'pkgs' instance
-          # > Our main home-manager configuration file <
-          modules = [ ./home-manager/home.nix ];
-        };
-      };
+      # Declared in ./home-manager/user/NAME
+      # Available through `nix run dream#home-manager -- switch --flake .#user-name` (initial)
+      # Available through `home-manager switch --flake .#user-name` (afterwards)
+      homeConfigurations = self.lib.readPackages
+        (import)
+        ./home-manager/user
+        { inherit flake self inputs; };
 
       # The devshell
       # Available through 'nix develop' or 'nix-shell' (legacy)

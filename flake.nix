@@ -117,8 +117,8 @@
 
       # NixOS systems
       # Declared in ./nixos/system/NAME
-      # Available through 'nixos-install --impure --flake .#system-name'
-      # Available through 'nixos-rebuild switch --flake .#system-name'
+      # Available through `nixos-install --impure --flake .#system-name`
+      # Available through `nixos-rebuild switch --flake .#system-name`
       nixosConfigurations = self.lib.readPackages
         (import)
         ./nixos/system
@@ -134,7 +134,7 @@
         { inherit flake self inputs; };
 
       # The devshell
-      # Available through 'nix develop' or 'nix-shell' (legacy)
+      # Available through `nix develop` or `nix-shell` (legacy)
       # devShells = forAllSystems (system: {
       #   default = self.legacyPackages.${system}.callPackage ./shell.nix {
       #     inherit inputs;

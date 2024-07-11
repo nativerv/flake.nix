@@ -1,6 +1,7 @@
 {
   description = "Nrv's personal Nix flake";
 
+  # Other Flakes that is used to build this one
   inputs = {
     # Nixpkgs
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -8,25 +9,29 @@
     nixpkgs-23-11.url = "github:nixos/nixpkgs/nixos-23.11";
     
     # Sandboxing
-    nixpak = {
-      url = "github:nixpak/nixpak";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
+    nixpak.url = "github:nixpak/nixpak";
+    nixpak.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
-    # Disk management
+    # Disk management & partitioning
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
-    # Nix-index command, with database
+    # Command for searching files in nixpkgs, with per-built database
     nix-index-database.url = "github:Mic92/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
+    # Secret management framework
     sops-nix.url = "github:Mic92/sops-nix";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs-unstable";
     sops-nix.inputs.nixpkgs-stable.follows = "nixpkgs-22-11";
 
+    # NixOS VM helper - `nixos-shell`
     nixos-shell.url = "github:Mic92/nixos-shell";
     nixos-shell.inputs.nixpkgs.follows = "nixpkgs-unstable";
+
+    # NixOS VM helper - `microvm`
+    # microvm.url = "github:astro/microvm.nix";
+    # microvm.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
     # Home manager
     home-manager.url = "github:nix-community/home-manager";
@@ -36,11 +41,14 @@
     deploy-rs.url = "github:serokell/deploy-rs";
     deploy-rs.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
-    # hardware.url = "github:nixos/nixos-hardware";
+    # Pre-built configs for various hardware (laptops, etc.)
+    #hardware.url = "github:nixos/nixos-hardware";
 
+    # Don't remember from where i stole my initial config but this was there
+    # maybe i'll use it later
     # Shameless plug: looking for a way to nixify your themes and make
     # everything match nicely? Try nix-colors!
-    # nix-colors.url = "github:misterio77/nix-colors";
+    #nix-colors.url = "github:misterio77/nix-colors";
 
     # This is here only to be pinned in the registry by
     # `module/archetype/sane.nix`
@@ -48,6 +56,7 @@
     nixpkgs.follows = "nixpkgs-unstable";
   };
 
+  # Outputs of this Flake
   outputs = {
     self,
     nixpkgs-unstable,
@@ -58,6 +67,7 @@
     home-manager,
     deploy-rs,
     nixpak,
+    #microvm,
     ...
   } @ inputs: let
       # Path to the root of this flake
@@ -110,7 +120,7 @@
         ./package
         { inherit flake self inputs; }
       );
-
+      
       # Configuration modules for NixOS systems
       # Declared in ./nixos/module/TYPE/NAME
       # Available through `self.nixosModules."module-type.module-name"`

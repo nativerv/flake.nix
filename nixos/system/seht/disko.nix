@@ -3,11 +3,15 @@ let
   # Some variables
   vg-name = "shitpile";
 
-  # Everything's in megabytes
-  start-offset = builtins.toString (1);
-  efi-size = builtins.toString (1024 * 0.5);
-  boot-size = builtins.toString (1024 * 1);
-  root-size = builtins.toString (1024 * 10);
+  mebi = builtins.toString;
+  gibi = n: builtins.toString (1024 * n);
+
+  # Everything's in mebibytes.
+  # Multiplication by 1024 turns them in gibibytes.
+  start-offset = mebi;
+  efi-size = mebi 512;
+  boot-size = gibi 1;
+  root-size = gibi 10;
   # home size is the 100%FREE
   swap-size = builtins.toString (1024 * 2);
 
@@ -19,7 +23,7 @@ let
   lvm-end = -swap-size;
 in {
   disk = {
-    vdb = {
+    main = {
       type = "disk";
       device = builtins.elemAt disks 0;
       content = {

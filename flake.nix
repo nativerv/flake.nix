@@ -158,7 +158,7 @@
       # Available through `deploy .#deployment-name.profile-name`
       deploy.nodes.seht = let
         name = "seht";
-        inherit (self.nixosConfigurations."${name}".config.nixpkgs) system;
+        inherit (self.nixosConfigurations."${name}".config.nixpkgs.pkgs) system;
         pkgs = self.legacyPackages."${system}";
         # reuse `deploy-rs` package from nixpkgs to utilize cache.nixos.org
         deployPkgs = builtins.foldl' (acc: cur: acc.extend cur) pkgs [
@@ -180,18 +180,18 @@
           path = deployPkgs.deploy-rs.lib.activate.nixos self.nixosConfigurations."${name}";
           user = "root";
         };
-       profiles.home = {
+        profiles.home = rec {
           sshUser = "nrv";
-          profilePath = "/nix/var/nix/profiles/per-user/nrv/home";
+          profilePath = "/home/${user}/.local/state/nix/profiles/home-manager";
           path = deployPkgs.deploy-rs.lib.activate.custom
-            (self.homeConfigurations."nrv@${name}").activationPackage
+            (self.homeConfigurations."${sshUser}").activationPackage
             "$PROFILE/activate";
-          user = "nrv";
+          user = "${sshUser}";
         };
         profiles.hello = {
           sshUser = "nrv";
           path = deployPkgs.deploy-rs.lib.activate.custom
-            nixpkgs-unstable.legacyPackages."${system}".hello
+            self.legacyPackages."${system}".hello
             "./bin/hello";
           user = "nrv";
         };

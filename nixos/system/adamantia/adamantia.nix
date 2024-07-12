@@ -18,6 +18,8 @@
     # inputs.hardware.nixosModules.common-ssd
 
     inputs.disko.nixosModules.disko
+    (import ./disko.nix { inherit lib; })
+
     inputs.sops-nix.nixosModules.sops
 
     self.nixosModules."platform.nixos-shell"

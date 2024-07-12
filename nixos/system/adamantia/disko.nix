@@ -1,125 +1,133 @@
-{ disks ? [ "/dev/vdb" ], ... }:
+{ disks ? [ "/dev/disk/by-id/does-not-exist2" ], lib, ... }:
 let
   # Name of the pool.
   # Note that this gets interpolated into strings and scripts AS IS.
-  # Be careful with names, use [-a-z0-9].
+  # Be careful with names
   zpool-name = "shitpile";
 
-  mebi = builtins.toString;
-  gibi = n: builtins.toString (1024 * n);
+  # Size of your drive
+  total-size = tebi 1;
 
   # Everything in the actual partitioning scheme below is in mebibytes.
-  # Helper `gibi` available that multiplies accordingly.
+  # Use the following helpers
+  mebi = lib.id;
+  gibi = n: 1024 * mebi n;
+  tebi = n: 1024 * gibi n;
 
   # Sizes
 
   # Alignment offset
-  start-offset = mebi 1;
+  start-offset-size = mebi 1;
   # OpenZFS docs use 1G offset at the end... Why not?
-  # I guess it does alignment as well and helps SSD not
+  # I guess it helpes with alignment as well and maybe helps SSD not
   # suffer that much on 100% load.
-  # (`disko` interprets negatives as going from the end)
-  end-offset = gibi -1;
+  end-offset-size = gibi 1;
 
   esp-size = mebi 512;
   boot-size = gibi 4;
   zpool-luks-size = gibi 600;
-  swap-size = gibi 2;
+  #swap-size = gibi 2;
 
   # Layout
 
   # Start alignment offset -> zpool size.
-  zpool-luks-start = start-offset;
-  zpool-luks-end = start-offset + esp-size;
+  zpool-luks-start = start-offset-size+1;
+  zpool-luks-end = start-offset-size + zpool-luks-size;
 
-  # ESP size <- End alignment offset.
-  esp-start = end-offset - esp-size;
-  esp-end = end-offset;
-
-  # Boot size <- ESP size <- End alignment offset.
-  boot-start = esp-start - boot-size;
-  boot-end = esp-start;
+  # # ESP size <- End alignment offset.
+  # esp-start = total-size - end-offset-size - esp-size;
+  # esp-end = total-size - end-offset-size;
+  #
+  # # Boot size <- ESP size <- End alignment offset.
+  # boot-start = esp-start - boot-size;
+  # boot-end = esp-start;
 in
-  assert zpool-luks-end < boot-start;
+  #assert zpool-luks-end < (total-size - boot-start);
 {
-  disk = {
-    main = {
-      type = "disk";
-      device = builtins.elemAt disks 0;
-      content = {
-        type = "table";
-        format = "gpt";
-        partitions = {
-          grub-mbr = {
-            size = "1M";
-            type = "EF02"; # for grub MBR
-          };
-          ESP = {
-            type = "EF00";
-            name = "ESP";
-            start = "${esp-start}M";
-            end = "${esp-end}M";
-            bootable = true;
-            content = {
-              type = "filesystem";
-              format = "vfat";
-              mountpoint = "/boot/efi";
-              mountOptions = [ "defaults" ];
-            };
-          };
-          boot = {
-            type = "partition";
-            name = "boot";
-            start = "${boot-start}M";
-            end = "${boot-end}M";
-            bootable = true;
-            content = {
-              type = "filesystem";
-              format = "ext4";
-              mountpoint = "/boot";
-              mountOptions = [ "defaults" "noatime" ];
-            };
-          };
-          luks = {
-            start = "${zpool-luks-start}M";
-            end = "${zpool-luks-end}M";
-            content = {
-              type = "luks";
-              name = "${zpool-name}-crypted";
-              settings.allowDiscards = true;
-              settings.bypassWorkqueues = true;
-              passwordFile = "/tmp/secret.key";
-              content = {
-                type = "zfs";
-                pool = "${zpool-name}";
-              };
-            };
-          };
-
-          # {
-          #   name = "swap";
-          #   type = "partition";
-          #   start = "-${swap-size}M";
-          #   end = "100%";
-          #   part-type = "primary";
-          #   content = {
-          #     type = "swap";
-          #     randomEncryption = true;
-          #   };
-          # }
+  disko.devices.disk = lib.genAttrs disks (device: {
+    type = "disk";
+    name = lib.replaceStrings [ "/" ] [ "_" ] device;
+    inherit device;
+    content = {
+      type = "gpt";
+      partitions = {
+        grub-mbr = {
+          priority = 0;
+          #start = "1M";
+          #end = "${builtins.toString start-offset-size}M";
+          size = "${builtins.toString start-offset-size}M";
+          type = "EF02"; # for grub MBR
         };
+        luks = {
+          priority = 1;
+          start = "${builtins.toString zpool-luks-start}M";
+          # end = "${builtins.toString zpool-luks-end}M";
+          size = "${builtins.toString zpool-luks-size}M";
+          content = {
+            type = "luks";
+            name = "${zpool-name}-crypted";
+            settings.allowDiscards = true;
+            settings.bypassWorkqueues = true;
+            passwordFile = "/tmp/secret.key";
+            content = {
+              type = "zfs";
+              pool = "${zpool-name}";
+            };
+          };
+        };
+        # ESP = {
+        #   priority = 3;
+        #   type = "EF00";
+        #   start = "${builtins.toString esp-start}M";
+        #   size = "${builtins.toString esp-size}M";
+        #   #end = "${builtins.toString esp-end}M";
+        #   name = "ESP";
+        #   # bootable = true;
+        #   content = {
+        #     type = "filesystem";
+        #     format = "vfat";
+        #     mountpoint = "/boot/efi";
+        #     mountOptions = [ "defaults" ];
+        #   };
+        # };
+        # boot = {
+        #   priority = 4;
+        #   name = "boot";
+        #   start = "${builtins.toString boot-start}M";
+        #   size = "${builtins.toString boot-size}M";
+        #   #end = "${builtins.toString boot-end}M";
+        #   # bootable = true;
+        #   content = {
+        #     type = "filesystem";
+        #     format = "ext4";
+        #     mountpoint = "/boot";
+        #     mountOptions = [ "defaults" "noatime" ];
+        #   };
+        # };
+
+        # {
+        #   name = "swap";
+        #   type = "partition";
+        #   start = "-${swap-size}M";
+        #   end = "100%";
+        #   part-type = "primary";
+        #   content = {
+        #     type = "swap";
+        #     randomEncryption = true;
+        #   };
+        # }
       };
     };
-  };
+  });
 
-  zpool = {
+  disko.devices.zpool = {
     ${zpool-name} = {
       type = "zpool";
       mode = ""; # "" is stripe/single drive
 
       # zpool options (`zpoolprops(7)`)
       options = {
-        ashift = 12;
+        ashift = "12";
       };
 
       # This is inherited to everything below
@@ -129,17 +137,17 @@ in
         mountpoint = "legacy";
         canmount = "off";
 
-        # Disable compression. I think this should be handled per-dataset.
+        # Compression should be handled per-dataset with none by default
         compression = "off";
 
         # Reduce writes and increase performance significantly
         atime = "off";
 
-        # Unicode in filenames stuff - compatibility & performance(?)
+        # Unicode in filenames... stuff - compatibility & performance(?)
         normalization = "formD";
 
         # POSIX attributes - POSIX compliance and drastic performance
-        # improvement.
+        # improvement
         acltype = "posixacl";
         xattr = "sa";
 
@@ -161,10 +169,13 @@ in
       # Create snapshot of the initial empty state. This is free.
       postCreateHook = "
         # Just in case
-        zfs list -t snapshot -H -o name | grep -E '^${zpool-name}@blank$' || zfs snapshot zroot@blank
+        zfs list -t snapshot -H -o name | grep -E '^${zpool-name}@blank$' || zfs snapshot ${zpool-name}@blank
 
-        # For the impermanence setup - to root every reboot.
-        zfs list -t snapshot -H -o name | grep -E '^root@blank$' || zfs snapshot ${zpool-name}/root@blank
+        # For the impermanence setup - to reset root every reboot.
+        zfs list -t snapshot -H -o name | grep -E '^${zpool-name}/root@blank$' || zfs snapshot ${zpool-name}/root@blank
+
+        # For the impermanence setup - to reset home every reboot.
+        zfs list -t snapshot -H -o name | grep -E '^${zpool-name}/home@blank$' || zfs snapshot ${zpool-name}/home@blank
       ";
 
       # TODO: persist/impermanence
@@ -176,16 +187,20 @@ in
         root = {
           type = "zfs_fs";
           mountpoint = "/";
+          options.mountpoint = "legacy";
           options.compression = "zstd";
         };
         home = {
           type = "zfs_fs";
           mountpoint = "/home";
+          options.mountpoint = "legacy";
           options.compression = "zstd";
         };
         docker = {
           type = "zfs_fs";
           mountpoint = "/var/lib/docker";
+          options.mountpoint = "legacy";
+          options.compression = "zstd";
         };
         # zfs_legacy_fs = {
         #   type = "zfs_fs";
@@ -221,5 +236,4 @@ in
       };
     };
   };
-
 }

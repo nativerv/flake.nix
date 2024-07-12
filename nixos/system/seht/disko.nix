@@ -8,7 +8,7 @@ let
 
   # Everything's in mebibytes.
   # Multiplication by 1024 turns them in gibibytes.
-  start-offset = mebi;
+  start-offset = mebi 1;
   efi-size = mebi 512;
   boot-size = gibi 1;
   root-size = gibi 10;

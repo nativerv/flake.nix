@@ -51,7 +51,7 @@
     #nix-colors.url = "github:misterio77/nix-colors";
 
     # This is here only to be pinned in the registry by
-    # `module/archetype/sane.nix`
+    # `nixos/module/archetype/sane.nix`
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgs.follows = "nixpkgs-unstable";
   };

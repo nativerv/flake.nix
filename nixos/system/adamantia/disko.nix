@@ -9,7 +9,18 @@ let
   zpool-name = "shitpile";
 
   # Size of your drive
-  total-size = tebi 1;
+  # 1 TeraByte is equal to:
+  # - 0.90949470177292823792 TebiByte
+  # - 931.322574615478515625 GibiByte
+  # - 953674.31640625 MebiByte
+  # - 976562500 KibiByte (actually a whole number)
+  # - 1000000000000 Byte, of course
+  # However, the actual number is bytes shown is 1000204886016,
+  # which in turn evenly divides to 976762584 KiB but still not
+  # evenly to MiB. Let's just count the total GiB count as 931,
+  # which is only a bit less than the actual size, and be done 
+  # with it:
+  total-size = gibi 931;
 
   # Everything in the actual partitioning scheme below is in mebibytes.
   # Use the following helpers
@@ -37,15 +48,45 @@ let
   zpool-luks-start = start-offset-size+1;
   zpool-luks-end = start-offset-size + zpool-luks-size;
 
-  # # ESP size <- End alignment offset.
-  # esp-start = total-size - end-offset-size - esp-size;
-  # esp-end = total-size - end-offset-size;
+  # ESP size <- End alignment offset.
+  esp-end = total-size - end-offset-size - 1;
+  esp-start = esp-end - esp-size;
+
+  # Boot size <- ESP size <- End alignment offset.
+  boot-end = esp-start - 1;
+  boot-start = boot-end - boot-size;
+
+  # Some crap:
+  # total-size = 50
+  # end-offset-size = 5
+  # esp-size = 10
+  # boot-size = 20
   #
-  # # Boot size <- ESP size <- End alignment offset.
-  # boot-start = esp-start - boot-size;
-  # boot-end = esp-start;
+  # esp-end    = 50 - 5 - 1 = 44
+  # esp-start  = 44 - 10 = 34
+  #
+  # boot-end   = 34 - 1 = 33
+  # boot-start = 33 - 20 = 13
+  # 1                                                50
+  # ##################################################
+  # -------------^-------------------^^---------^^----
+  #         boot-start = 13          ||         ||
+  #                                  ||         |offset = 5
+  #                                  ||         esp-end = 44
+  #                                  |esp-start = 35
+  #                                  boot-end = 34 
 in
   #assert zpool-luks-end < (total-size - boot-start);
+builtins.trace ''
+
+zpool-luks-start = "${builtins.toString(zpool-luks-start)}"
+zpool-luks-end   = "${builtins.toString(zpool-luks-end)}"
+esp-start        = "${builtins.toString(esp-start)}"
+esp-end          = "${builtins.toString(esp-end)}"
+boot-start       = "${builtins.toString(boot-start)}"
+boot-end         = "${builtins.toString(boot-end)}"
+''
+
 {
   disko.devices.disk = lib.genAttrs disks (device: {
     type = "disk";
@@ -56,7 +97,7 @@ in
       partitions = {
         grub-mbr = {
           priority = 0;
-          #start = "1M";
+          start = "1M";
           #end = "${builtins.toString start-offset-size}M";
           size = "${builtins.toString start-offset-size}M";
           type = "EF02"; # for grub MBR
@@ -78,35 +119,35 @@ in
             };
           };
         };
-        # ESP = {
-        #   priority = 3;
-        #   type = "EF00";
-        #   start = "${builtins.toString esp-start}M";
-        #   size = "${builtins.toString esp-size}M";
-        #   #end = "${builtins.toString esp-end}M";
-        #   name = "ESP";
-        #   # bootable = true;
-        #   content = {
-        #     type = "filesystem";
-        #     format = "vfat";
-        #     mountpoint = "/boot/efi";
-        #     mountOptions = [ "defaults" ];
-        #   };
-        # };
-        # boot = {
-        #   priority = 4;
-        #   name = "boot";
-        #   start = "${builtins.toString boot-start}M";
-        #   size = "${builtins.toString boot-size}M";
-        #   #end = "${builtins.toString boot-end}M";
-        #   # bootable = true;
-        #   content = {
-        #     type = "filesystem";
-        #     format = "ext4";
-        #     mountpoint = "/boot";
-        #     mountOptions = [ "defaults" "noatime" ];
-        #   };
-        # };
+        boot = {
+          priority = 2;
+          name = "boot";
+          start = "${builtins.toString boot-start}M";
+          #size = "${builtins.toString boot-size}M";
+          end = "${builtins.toString boot-end}M";
+          # bootable = true;
+          content = {
+            type = "filesystem";
+            format = "ext4";
+            mountpoint = "/boot";
+            mountOptions = [ "defaults" "noatime" ];
+          };
+        };
+        ESP = {
+          priority = 3;
+          type = "EF00";
+          start = "${builtins.toString esp-start}M";
+          #size = "${builtins.toString esp-size}M";
+          end = "${builtins.toString esp-end}M";
+          name = "ESP";
+          # bootable = true;
+          content = {
+            type = "filesystem";
+            format = "vfat";
+            mountpoint = "/boot/efi";
+            mountOptions = [ "defaults" ];
+          };
+        };
 
         # {
         #   name = "swap";

@@ -123,7 +123,10 @@ in
     };
   });
 
-  disko.devices.zpool = {
+  disko.devices.zpool = let
+    # "nodiratime" as well just to be sure
+    defaultMountOptions = [ "noatime" "nodiratime" ];
+  in {
     ${zpool-name} = {
       type = "zpool";
       mode = ""; # "" is stripe/single drive
@@ -133,6 +136,9 @@ in
         ashift = "12";
       };
 
+      # `mount -o` for root dataset.
+      mountOptions = defaultMountOptions;
+
       # This is inherited to everything below
       rootFsOptions = {
         # Means that ZFS won't mount the datasets automatically but NixOS will
@@ -141,6 +147,7 @@ in
         #       This option needs to be dupped for each dataset individually.
         #       See: https://github.com/nix-community/disko/issues/703
         mountpoint = "legacy";
+        # This is redundant with mountpoint=legacy but why not
         canmount = "off";
 
         # Quota: 10% free + 5% free for metadata: prevent permanently
@@ -153,26 +160,51 @@ in
 
         # Recordsize is the upper limit of logical block sizes.
         # Small files will get small blocks, large file will get up to this
-        # value-sized blocks.
-        # This is fine for most files in general as most of them are written
-        # once, overwritten in whole and read in whole/as fast as possible or
-        # written rarily and also in whole.
-        # The crucial exceptions are: Virtual Machines, Databases and BitTorrents.
-        # The first two use large single files and write to them often and in same
-        # sizes (like 64K for KVM). This causes huge write amplification.
-        # For BitTorrent clients on the other hand i'm not sure: it's either
+        # value-sized blocks. Writing more to small files also increase their block
+        # size up to this recordsize, and single file's blocks are always the
+        # same size.
+        # Big values like 1M are fine for most files in general as most of them
+        # are written once, overwritten in whole and read in whole/as fast as
+        # possible or written rarily and also in whole.
+        # However besides exceptions below you should still consider reading
+        # parts of files, which will always read at least the current block
+        # size bytes. This is relevant for file managers (that read embedded
+        # file metadata) and for example if you scan your filesystem with
+        # something like `find -type f | xargs file`.
+        # The crucial exceptions are: Virtual Machines, Databases, BitTorrents
+        # and log files:
+        # - The last one just does a lot of small writes at the end of a
+        # potentially large file.
+        # - The first two use large single files and read & write to them often
+        # and always in same sizes (like 64K for KVM). This causes huge read &
+        # write amplification.
+        # - For BitTorrent clients on the other hand i'm not sure: it's either
         # they have have the same issue but only for reads (thus only relevant
         # for seeding and the read amplification is not as bad as write
-        # anyway), or it's relevant for writes too, in which case the files
-        # will be fragmented and separate download and finished datasets with
-        # move after completion would be required.
-        # NOTE: for SSDs, the fragmentation bit miight be not relevant and it's
-        #       might be fine to just leave it 16K.
-        # NOTE: this might be mitigated by disabling pre-allocation in the BT
-        #       client.
-        # NOTE: sequential download option might help (BT downloads random
-        #       pieces by default).
-        recordsize = "1M";
+        # anyway), or it's relevant for writes too, in which case the
+        # recordsize needs to match the BT chunk size (which is 16K the OpenZFS
+        # docs suggest), and as a result the files will be 8/64 times more
+        # fragmented as compared to 128k/1M record size, so a separate
+        # 'download' and 'finished' datasets with automatic move after
+        # completion would be required.
+        # NOTE(BT): for SSDs, the fragmentation bit might be not relevant and
+        #           it might be fine to just leave it a 16K.
+        # NOTE(BT): write amplification might only be relevant if the BT client
+        #           pre-allocates the files. Some (all?) of them can disable it for
+        #           filesystems that support sparse files (which ZFS does).
+        #           ...Now that i think of it more, it can't be. After first M
+        #           (or whatever big recordsize it) is the file gets it will be
+        #           the the same anyway.
+        # NOTE(BT): sequential download option might help (BT downloads random
+        #           pieces by default). Or might not. Depends on a definition
+        #           of 'sequential' read. In case of a spinning hard drive, is
+        #           it better to have the data fragmented but close and in
+        #           order (if something else is written to the FS apart from
+        #           the file while the download is in the process), or is it
+        #           same as completely fragmented? Physically better. Actually?
+        # NOTE: leave this to default because of reasons described at the start
+        #       of this wall of comment, tune per-dataset below.
+        recordsize = "128K";
 
         # Compression should be handled per-dataset with none by default
         compression = "off";
@@ -217,15 +249,12 @@ in
         #zfs list -t snapshot -H -o name | grep -E '^${zpool-name}/${system-name}/home@blank$' || zfs snapshot ${zpool-name}/${system-name}/home@blank
       ";
 
-      # TODO: persist/impermanence
-      # TODO: google tutorials. One of them had better solution, like local,
-      #       persist and another one or something
-      #       volatile datasets: zpool-name/local/NAME
-      #           safe datasets: zpool-name/persist/NAME
       datasets = let
         # Helper with defaults
         mkZfsFs = args: lib.recursiveUpdate {
           type = "zfs_fs";
+          mountOptions = defaultMountOptions;
+
           options.mountpoint = "legacy";
           options.compression = "zstd";
         } args;
@@ -238,6 +267,11 @@ in
         # We don't nuke that
         "${system-name}/nix" = mkZfsFs {
           mountpoint = "/nix";
+
+          # The files in /nix/store are literally never changed, only created
+          # and deleted. They're also not really read in part, i think. So it's
+          # totally fine
+          options.recordsize = "1M";
         };
         "${system-name}/persist/data" = mkZfsFs {
           mountpoint = "/persist/data";
@@ -260,7 +294,7 @@ in
         # (docker seem to shit gazillions of datasets,
         # podman doesn't support rootless... or does it?
         # apparently it does)
-        # (TODO: test both ways anyway)
+        # (TODO: test both ways anyhow)
         "${system-name}/persist/state/var/lib/docker" = mkZfsFs {
           mountpoint = "/persist/state/var/lib/docker";
         };

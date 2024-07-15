@@ -44,6 +44,10 @@ let
 
   # Layout
 
+  # End positions are useless. It misaligns for 4096 (alignment is 512
+  # instead).
+  # I don't know why. But using `size` instead of `end` fixes the issue.
+
   # Start alignment offset -> zpool size.
   zpool-luks-start = start-offset-size+1;
   zpool-luks-end = start-offset-size + zpool-luks-size;
@@ -123,8 +127,8 @@ boot-end         = "${builtins.toString(boot-end)}"
           priority = 2;
           name = "boot";
           start = "${builtins.toString boot-start}M";
-          #size = "${builtins.toString boot-size}M";
-          end = "${builtins.toString boot-end}M";
+          size = "${builtins.toString boot-size}M";
+          #end = "${builtins.toString boot-end}M";
           # bootable = true;
           content = {
             type = "filesystem";
@@ -137,8 +141,8 @@ boot-end         = "${builtins.toString(boot-end)}"
           priority = 3;
           type = "EF00";
           start = "${builtins.toString esp-start}M";
-          #size = "${builtins.toString esp-size}M";
-          end = "${builtins.toString esp-end}M";
+          size = "${builtins.toString esp-size}M";
+          #end = "${builtins.toString esp-end}M";
           name = "ESP";
           # bootable = true;
           content = {

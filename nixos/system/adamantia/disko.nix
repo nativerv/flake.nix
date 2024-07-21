@@ -1,12 +1,19 @@
-{ disks ? [ "/dev/disk/by-id/does-not-exist2" ], lib, ... }:
-let
+{
+  disks ? [ "/dev/disk/by-id/does-not-exist2" ],
+  lib,
+
+  # FIXME: WARNING: only works for `postCreateHook`. Does not affect `disko`'s
+  # `rootMountPoint`. I don't know how to fix this
+  rootMountPoint ? "/mnt",
+  ...
+}: let
   # Use folder name as name of this system
   system-name = builtins.baseNameOf ./.;
 
   # Name of the pool.
   # Note that this gets interpolated into strings and scripts AS IS.
   # Be careful with names
-  zpool-name = "shitpile";
+  zpool-name = "mythos";
 
   # Size of your drive
   # 1 TeraByte is equal to:
@@ -37,7 +44,7 @@ let
   # suffer that much on 100% load.
   end-offset-size = gibi 1;
 
-  esp-size = mebi 512;
+  esp-size = gibi 4;
   boot-size = gibi 4;
   zpool-luks-size = gibi 600;
   #swap-size = gibi 2;
@@ -92,6 +99,9 @@ boot-end         = "${builtins.toString(boot-end)}"
 ''
 
 {
+  # FIXME: For some unimaginable reason `rootMountPoint` returns "" here:
+  #disko.rootMountPoint = lib.trace "${rootMountPoint}" rootMountPoint;
+
   disko.devices.disk = lib.genAttrs disks (device: {
     type = "disk";
     name = lib.replaceStrings [ "/" ] [ "_" ] device;
@@ -123,20 +133,38 @@ boot-end         = "${builtins.toString(boot-end)}"
             };
           };
         };
-        boot = {
-          priority = 2;
-          name = "boot";
-          start = "${builtins.toString boot-start}M";
-          size = "${builtins.toString boot-size}M";
-          #end = "${builtins.toString boot-end}M";
-          # bootable = true;
-          content = {
-            type = "filesystem";
-            format = "ext4";
-            mountpoint = "/boot";
-            mountOptions = [ "defaults" "noatime" ];
-          };
-        };
+        # Legacy boot /boot: actually, maybe i'll make that later when i need it.
+        # boot = {
+        #   priority = 2;
+        #   name = "boot";
+        #   start = "${builtins.toString boot-start}M";
+        #   size = "${builtins.toString boot-size}M";
+        #   #end = "${builtins.toString boot-end}M";
+        #   # bootable = true;
+        #   content = {
+        #     type = "filesystem";
+        #     format = "ext4";
+        #     mountpoint = "/boot";
+        #     mountOptions = [ "defaults" "noatime" ];
+        #   };
+        # };
+        # ESP = {
+        #   priority = 3;
+        #   type = "EF00";
+        #   start = "${builtins.toString esp-start}M";
+        #   size = "${builtins.toString esp-size}M";
+        #   #end = "${builtins.toString esp-end}M";
+        #   name = "ESP";
+        #   # bootable = true;
+        #   content = {
+        #     type = "filesystem";
+        #     format = "vfat";
+        #     mountpoint = "/boot";
+        #     mountOptions = [ "defaults" "noatime" ];
+        #   };
+        # };
+
+        # For now i'll use only a single EFI partition
         ESP = {
           priority = 3;
           type = "EF00";
@@ -148,10 +176,11 @@ boot-end         = "${builtins.toString(boot-end)}"
           content = {
             type = "filesystem";
             format = "vfat";
-            mountpoint = "/boot/efi";
-            mountOptions = [ "defaults" ];
+            mountpoint = "/boot";
+            mountOptions = [ "defaults" "noatime" ];
           };
         };
+
 
         # {
         #   name = "swap";
@@ -193,7 +222,12 @@ boot-end         = "${builtins.toString(boot-end)}"
         #       See: https://github.com/nix-community/disko/issues/703
         mountpoint = "legacy";
         # This is redundant with mountpoint=legacy but why not
-        canmount = "off";
+        # XXX: And here we go... Attempted to set mountpoint for root dataset below,
+        #      and got on `disko`'s check for this. Why it works like that with
+        #      `legacy`? I don't know. definitely NOT what it does in ZFS
+        #      (disables auto mount but still leaves mountpoint for children to
+        #      inherit)
+        #canmount = "off";
 
         # Quota: 10% free + 5% free for metadata: prevent permanently
         # degrading/fragmenting pool due to low space available.
@@ -249,6 +283,8 @@ boot-end         = "${builtins.toString(boot-end)}"
         #           same as completely fragmented? Physically better. Actually?
         # NOTE: leave this to default because of reasons described at the start
         #       of this wall of comment, tune per-dataset below.
+        # NOTE: Links:
+        #       - https://old.reddit.com/r/zfs/comments/tmio9p/recordsize_1m_ok_for_generaluse_datasets_for_home/
         recordsize = "128K";
 
         # Compression should be handled per-dataset with none by default
@@ -277,22 +313,36 @@ boot-end         = "${builtins.toString(boot-end)}"
         "com.sun:auto-snapshot" = "false";
       };
 
-      # Don't mount the root dataset - use child dataset for root.
-      mountpoint = null;
+      # Mount the root dataset -- however it's directory is read-only and used
+      # only to get to children datasets.
+      mountpoint = "/media/pool/${zpool-name}";
 
       # Create snapshot of the initial empty state. This is free.
       postCreateHook = "
         # Just in case
-        zfs list -t snapshot -H -o name | grep -E '^${zpool-name}/${system-name}@blank$' || zfs snapshot ${zpool-name}/${system-name}@blank
-        zfs list -t snapshot -H -o name | grep -E '^${zpool-name}/${system-name}/persist@blank$' || zfs snapshot ${zpool-name}/${system-name}/persist@blank
+        zfs list -t snapshot -H -o name | grep -E '^${zpool-name}/sys/${system-name}@blank$' || zfs snapshot ${zpool-name}/sys/${system-name}@blank
+        ds_name='persist'; zfs list -t snapshot -H -o name | grep -E '^${zpool-name}/sys/${system-name}/$ds_name@blank$' || zfs snapshot ${zpool-name}/sys/${system-name}/$ds_name@blank
+        ds_name='nix'; zfs list -t snapshot -H -o name | grep -E '^${zpool-name}/sys/${system-name}/$ds_name@blank$' || zfs snapshot ${zpool-name}/sys/${system-name}/$ds_name@blank
 
         # For the impermanence setup - to reset root every reboot.
-        zfs list -t snapshot -H -o name | grep -E '^${zpool-name}/${system-name}/local@blank$' || zfs snapshot ${zpool-name}/${system-name}/local@blank
+        ds_name='local'; zfs list -t snapshot -H -o name | grep -E '^${zpool-name}/sys/${system-name}/$ds_name@blank$' || zfs snapshot ${zpool-name}/sys/${system-name}/$ds_name@blank
 
         # For the impermanence setup - to reset home every reboot.
         # (not for right now - let it be on root)
-        #zfs list -t snapshot -H -o name | grep -E '^${zpool-name}/${system-name}/home@blank$' || zfs snapshot ${zpool-name}/${system-name}/home@blank
+        ds_name='local/home'; zfs list -t snapshot -H -o name | grep -E '^${zpool-name}/sys/${system-name}/$ds_name@blank$' || zfs snapshot ${zpool-name}/sys/${system-name}/$ds_name@blank
+
+        echo ==================
+        echo CREATE HOOK
+        df
+        echo ==================
+
+        echo PWD: $PWD
+        ls -la /
       ";
+
+      # This runs after EVERY SINGLE mount of every thing.
+      # Moved to postAllMountsHook.nix
+      postMountHook = "";
 
       datasets = let
         # Helper with defaults
@@ -305,12 +355,15 @@ boot-end         = "${builtins.toString(boot-end)}"
         } args;
       in {
         # We nuke this
-        "${system-name}/local" = mkZfsFs {
+        "sys/${system-name}/local" = mkZfsFs {
           mountpoint = "/";
+        };
+        "sys/${system-name}/local/home" = mkZfsFs {
+          mountpoint = "/home";
         };
 
         # We don't nuke that
-        "${system-name}/nix" = mkZfsFs {
+        "sys/${system-name}/nix" = mkZfsFs {
           mountpoint = "/nix";
 
           # The files in /nix/store are literally never changed, only created
@@ -318,21 +371,21 @@ boot-end         = "${builtins.toString(boot-end)}"
           # totally fine
           options.recordsize = "1M";
         };
-        "${system-name}/persist/data" = mkZfsFs {
+        "sys/${system-name}/persist/data" = mkZfsFs {
           mountpoint = "/persist/data";
           options.recordsize = "1M";
         };
-        "${system-name}/persist/log" = mkZfsFs {
+        "sys/${system-name}/persist/log" = mkZfsFs {
           mountpoint = "/persist/log";
           #options.recordsize = "32K";
         };
-        "${system-name}/persist/state" = mkZfsFs {
+        "sys/${system-name}/persist/state" = mkZfsFs {
           mountpoint = "/persist/state";
         };
-        "${system-name}/persist/cache" = mkZfsFs {
+        "sys/${system-name}/persist/cache" = mkZfsFs {
           mountpoint = "/persist/cache";
         };
-        "${system-name}/persist/cred" = mkZfsFs {
+        "sys/${system-name}/persist/cred" = mkZfsFs {
           mountpoint = "/persist/cred";
         };
         # probably want zvols for docker & podman
@@ -340,13 +393,14 @@ boot-end         = "${builtins.toString(boot-end)}"
         # podman doesn't support rootless... or does it?
         # apparently it does)
         # (TODO: test both ways anyhow)
-        "${system-name}/persist/state/var/lib/docker" = mkZfsFs {
+        "sys/${system-name}/persist/state/var/lib/docker" = mkZfsFs {
           mountpoint = "/persist/state/var/lib/docker";
         };
-        "${system-name}/persist/state/home/nrv/.local/state/containers" = mkZfsFs {
+        "sys/${system-name}/persist/state/home/nrv/.local/state/containers" = mkZfsFs {
           mountpoint = "/persist/state/home/nrv/.local/state/containers";
         };
-        # "${system-name}/persist/state/var/lib/docker" = {
+
+        # "sys/${system-name}/persist/state/var/lib/docker" = {
         #   type = "zfs_volume";
         #   size = "10G";
         #   content = {
@@ -358,100 +412,28 @@ boot-end         = "${builtins.toString(boot-end)}"
 
         # ===
 
-        # Impermanence draft
-
-        # /
-        # /home
-
-        # /persist/{data,log,state,cache,cred} - different backup & preservation policies.
-  
-        # This category is all the important stuff.
-        # All is either created by hand by me or manually saved.
-        # This all pretty much should be backed up.
-        # ---
-        # /persist/data/home/nrv/desk (xdg-user-dir)
-        # /persist/data/home/nrv/dl (xdg-user-dir)
-        # /persist/data/home/nrv/pub (xdg-user-dir)
-        # /persist/data/home/nrv/dox (xdg-user-dir)
-        # /persist/data/home/nrv/mus (xdg-user-dir)
-        # /persist/data/home/nrv/pix (xdg-user-dir)
-        # /persist/data/home/nrv/vid (xdg-user-dir)
-        # /persist/data/home/nrv/.local/share/templates (xdg-user-dir) (env var)
-        # /persist/data/home/nrv/pr
-        # /persist/data/home/nrv/dot
-        # /persist/data/home/nrv/.config/nvim/spell (env vars)
-        # /persist/data/home/nrv/.local/share/lyrics (env vars)
-
-        # Logs are logs. Sucks to lose for a system that is in use, but nothing
-        # critical. May backup for historical reasons. 
-        # ---
-        # /persist/log/nix/var/log
-        # /persist/log/var/log
-        # /persist/log/var/lib/systemd/coredump
-
-        # State is something that i can throw out but restoring (recreating) it
-        # will be a manual process.
-        # (interactive application settings, live-service content
-        # (steam games), browser history & bookmarks, etc.)
-        # Some of this needs to be backed up granularly, like game saves and
-        # browser history, for which it's isn't really feasible to create
-        # separate bind mounts. On top of that i don't know what such category
-        # should be called.
-        # ---
-        # /persist/state/var/lib/bluetooth
-        # /persist/state/var/lib/nixos
-        # /persist/state/var/lib/docker
-        # /persist/state/var/lib/mlocate
-        # /persist/state/home/nrv/.mozilla
-        # /persist/state/home/nrv/.local/state/sandbox (env vars)
-        # # this is a maybe (save them in config if permanent or bookmark the snapshot of it)
-        # /persist/state/etc/NetworkManager/system-connections
-
-        # Cache is something that can be thrown out carelessly and only hit
-        # application performance as a result.
-        # Stuff like `NODE_PATH` and `CARGO_TARGET_DIR` should also go there
-        # if/when i figure it out (proper project sandboxing + separate dirs,
-        # that is).
-        # ---
-        # /persist/cache/home/nrv/.cache
-
-        # Self-explanatory.
-        # ---
-        # /persist/cred/etc/machine-id
-        # /persist/cred/etc/ssh/moduli (?)
-        # /persist/cred/etc/ssh/ssh_host_dsa_key
-        # /persist/cred/etc/ssh/ssh_host_dsa_key.pub
-        # /persist/cred/etc/ssh/ssh_host_ecdsa_key
-        # /persist/cred/etc/ssh/ssh_host_ecdsa_key.pub
-        # /persist/cred/etc/ssh/ssh_host_ed25519_key
-        # /persist/cred/etc/ssh/ssh_host_ed25519_key.pub
-        # /persist/cred/etc/ssh/ssh_host_rsa_key
-        # /persist/cred/etc/ssh/ssh_host_rsa_key.pub
-        # /persist/cred/home/nrv/.ssh
-        # /persist/cred/home/nrv/.config/sops (env vars)
-        # /persist/cred/home/nrv/.config/rclone (env vars)
-        # /persist/cred/home/nrv/.local/share/pass (env vars)
-        # /persist/cred/home/nrv/.local/share/gnupg (env vars)
-        # /persist/cred/home/nrv/.local/share/rustu2f (env vars)
-
-        # Maybe some of these? (persist & datasets)
-        # /srv
-        # /usr
-        # /usr/local
-        # /var
-        # /var/games
-        # /var/lib
-        # /var/lib/AccountsService
-        # /var/lib/NetworkManager
-        # /var/lib/apt
-        # /var/lib/dpkg
-        # /var/log
-        # /var/mail
-        # /var/snap
-        # /var/spool
-        # /var/www
-        # /home/user
-        # /home/root
+        "media" = mkZfsFs {
+          mountpoint = "/media/pool/${zpool-name}/media";
+        };
+        "media/store" = mkZfsFs {
+          mountpoint = "/media/pool/${zpool-name}/media/store";
+        };
+        "vg/steam" = mkZfsFs {
+          mountpoint = "/media/pool/${zpool-name}/vg/steam";
+          options.casesensitivity = "insensitive";
+        };
+        "vg/owned" = mkZfsFs {
+          mountpoint = "/media/pool/${zpool-name}/vg/owned";
+        };
+        "db" = mkZfsFs {
+          mountpoint = "/media/pool/${zpool-name}/db";
+        };
+        "vm" = mkZfsFs {
+          mountpoint = "/media/pool/${zpool-name}/vm";
+        };
+        "bak" = mkZfsFs {
+          mountpoint = "/media/pool/${zpool-name}/bak";
+        };
 
         # ===
 

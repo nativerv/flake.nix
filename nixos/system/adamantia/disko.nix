@@ -1,5 +1,5 @@
 {
-  disks ? [ "/dev/disk/by-id/does-not-exist2" ],
+  disks ? [ "/dev/disk/by-id/does-not-exist" ],
   lib,
 
   # FIXME: WARNING: only works for `postCreateHook`. Does not affect `disko`'s
@@ -126,7 +126,7 @@ boot-end         = "${builtins.toString(boot-end)}"
             name = "${zpool-name}-crypted";
             settings.allowDiscards = true;
             settings.bypassWorkqueues = true;
-            passwordFile = "/tmp/secret.key";
+            passwordFile = "/tmp/${zpool-name}.key";
             content = {
               type = "zfs";
               pool = "${zpool-name}";
@@ -215,12 +215,10 @@ boot-end         = "${builtins.toString(boot-end)}"
 
       # This is inherited to everything below
       rootFsOptions = {
-        # Means that ZFS won't mount the datasets automatically but NixOS will
-        # using standard Unix facilities, read: the `mount` command
-        # NOTE: Currently this is not considered by `disko` for descendants.
-        #       This option needs to be dupped for each dataset individually.
-        #       See: https://github.com/nix-community/disko/issues/703
-        mountpoint = "legacy";
+        # NOTE: Currently a value of 'legacy' is not considered by `disko` for
+        #       descendants. This option needs to be dupped for each dataset
+        #       individually. See: https://github.com/nix-community/disko/issues/703
+        mountpoint = "/media/pool/${zpool-name}";
         # This is redundant with mountpoint=legacy but why not
         # XXX: And here we go... Attempted to set mountpoint for root dataset below,
         #      and got on `disko`'s check for this. Why it works like that with
@@ -350,7 +348,7 @@ boot-end         = "${builtins.toString(boot-end)}"
           type = "zfs_fs";
           mountOptions = defaultMountOptions;
 
-          options.mountpoint = "legacy";
+          #options.mountpoint = "legacy";
           options.compression = "zstd";
         } args;
       in {
@@ -414,16 +412,19 @@ boot-end         = "${builtins.toString(boot-end)}"
 
         "media" = mkZfsFs {
           mountpoint = "/media/pool/${zpool-name}/media";
+          options.recordsize = "1M";
         };
         "media/store" = mkZfsFs {
           mountpoint = "/media/pool/${zpool-name}/media/store";
         };
         "vg/steam" = mkZfsFs {
           mountpoint = "/media/pool/${zpool-name}/vg/steam";
+          options.recordsize = "1M";
           options.casesensitivity = "insensitive";
         };
         "vg/owned" = mkZfsFs {
           mountpoint = "/media/pool/${zpool-name}/vg/owned";
+          options.recordsize = "1M";
         };
         "db" = mkZfsFs {
           mountpoint = "/media/pool/${zpool-name}/db";
@@ -433,6 +434,8 @@ boot-end         = "${builtins.toString(boot-end)}"
         };
         "bak" = mkZfsFs {
           mountpoint = "/media/pool/${zpool-name}/bak";
+          options.compression = "off";
+          options.recordsize = "1M";
         };
 
         # ===

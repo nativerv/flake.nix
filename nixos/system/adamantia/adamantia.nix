@@ -52,6 +52,7 @@
     writableStoreUseTmpfs = false;
     memorySize = 1024*3;
   };
+  disko.devices.disk.vdb.imageSize = "32G";
 
   #services.openssh.enable = true;
 
@@ -59,6 +60,13 @@
 
   # The name
   # networking.hostName = "seht";
+
+  # Required for ZFS
+  # for local disks that are not shared over the network, we don't need this to be random
+  networking.hostId = "8425e349";
+  boot.kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
+  boot.supportedFilesystems = [ "zfs" ];
+  boot.zfs.forceImportRoot = false;
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "23.11";
@@ -75,12 +83,6 @@
   # services.xserver.desktopManager.xfce.enable = true;
   # services.xserver.displayManager.lightdm.enable = true;
   # services.xserver.enable = true;
-
-  # Setup devices
-  # disko.devices = import ./seht-disks.nix {
-  #   inherit lib;
-  #   disks = [ "/dev/vda" ];
-  # };
 
   # Flatpak
   services.flatpak.enable = true;

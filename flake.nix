@@ -41,8 +41,8 @@
     deploy-rs.url = "github:serokell/deploy-rs";
     deploy-rs.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
-    # Pre-built configs for various hardware (laptops, etc.)
-    #hardware.url = "github:nixos/nixos-hardware";
+    # Pre-built configs for various hardware (cpus, gpus, laptops, etc.)
+    hardware.url = "github:nixos/nixos-hardware";
 
     # Don't remember from where i stole my initial config but this was there
     # maybe i'll use it later
@@ -67,6 +67,7 @@
     home-manager,
     deploy-rs,
     nixpak,
+    hardware,
     #microvm,
     ...
   } @ inputs: let

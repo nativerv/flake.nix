@@ -26,7 +26,7 @@
     self.nixosModules."platform.qemu"
 
     self.nixosModules."archetype.minimal"
-    self.nixosModules."archetype.sane"
+    self.nixosModules."archetype.default"
 
     #self.nixosModules."bootloader.grub"
 
@@ -73,6 +73,7 @@
 
   # Autologin nrv in the VM
   services.getty.autologinUser = "nrv";
+    
 
   # Set TERM to xterm so that i can use vim properly.
   # TODO: also fix it it mangling my terminal
@@ -125,27 +126,27 @@
   #     };
   #   };
   # };
-  services.desktopManager.plasma6.enable = true;
-  services.xserver = {
-    enable = true;
-    displayManager.autoLogin.enable = true;
-    displayManager.autoLogin.user = "nrv";
-    displayManager.sddm.enable = true;
-    displayManager.sddm.wayland.enable = true;
-  };
-  environment.plasma6.excludePackages = with pkgs.kdePackages; [
-    plasma-browser-integration
-    #konsole
-    (lib.getBin qttools) # Expose qdbus in PATH
+  #services.desktopManager.plasma6.enable = true;
+  #services.xserver = {
+  #  enable = true;
+  #  displayManager.autoLogin.enable = true;
+  #  displayManager.autoLogin.user = "nrv";
+  #  displayManager.sddm.enable = true;
+  #  displayManager.sddm.wayland.enable = true;
+  #};
+  #environment.plasma6.excludePackages = with pkgs.kdePackages; [
+  #  plasma-browser-integration
+  #  #konsole
+  #  (lib.getBin qttools) # Expose qdbus in PATH
 
-    ark
-    elisa
-    gwenview
-    okular
-    kate
-    khelpcenter
-    print-manager
-  ];
+  #  ark
+  #  elisa
+  #  gwenview
+  #  okular
+  #  kate
+  #  khelpcenter
+  #  print-manager
+  #];
 
   programs.hyprland.enable = true;
 

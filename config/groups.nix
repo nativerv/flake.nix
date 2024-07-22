@@ -1,5 +1,4 @@
 {
-  self,
   lib,
   ...
 }: let
@@ -33,6 +32,4 @@ in lib.listToAttrs [
   # sudo groupadd -g 1337010006 db
   # sudo groupadd -g 1337010007 steam
   # sudo groupadd -g 1337010008 backup
-
-
 ]

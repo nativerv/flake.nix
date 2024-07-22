@@ -348,20 +348,33 @@ boot-end         = "${builtins.toString(boot-end)}"
           type = "zfs_fs";
           mountOptions = defaultMountOptions;
 
-          #options.mountpoint = "legacy";
           options.compression = "zstd";
         } args;
+        mkZfsFsLegacy = args: lib.recursiveUpdate (mkZfsFs {
+          options.mountpoint = "legacy";
+        }) args;
       in {
+        # Systems toplevel dataset. Other toplevel datasets are at the end
+        # below
+        "sys" = mkZfsFsLegacy {
+          # mountpoint = "/media/pool/${zpool-name}/sys";
+        };
+        # Root dataset of this system on this pool
+        # (not to be confused with system's root, /, which is `local`)
+        "sys/${system-name}" = mkZfsFsLegacy {
+          # mountpoint = "/media/pool/${zpool-name}/sys/${system-name}";
+        };
+
         # We nuke this
-        "sys/${system-name}/local" = mkZfsFs {
+        "sys/${system-name}/local" = mkZfsFsLegacy {
           mountpoint = "/";
         };
-        "sys/${system-name}/local/home" = mkZfsFs {
+        "sys/${system-name}/local/home" = mkZfsFsLegacy {
           mountpoint = "/home";
         };
 
         # We don't nuke that
-        "sys/${system-name}/nix" = mkZfsFs {
+        "sys/${system-name}/nix" = mkZfsFsLegacy {
           mountpoint = "/nix";
 
           # The files in /nix/store are literally never changed, only created
@@ -369,21 +382,25 @@ boot-end         = "${builtins.toString(boot-end)}"
           # totally fine
           options.recordsize = "1M";
         };
-        "sys/${system-name}/persist/data" = mkZfsFs {
+        "sys/${system-name}/persist" = mkZfsFsLegacy {
+          mountpoint = "/persist";
+          # options.mountpoint = "/media/pool/${zpool-name}/sys/${system-name}/persist";
+        };
+        "sys/${system-name}/persist/data" = mkZfsFsLegacy {
           mountpoint = "/persist/data";
           options.recordsize = "1M";
         };
-        "sys/${system-name}/persist/log" = mkZfsFs {
+        "sys/${system-name}/persist/log" = mkZfsFsLegacy {
           mountpoint = "/persist/log";
           #options.recordsize = "32K";
         };
-        "sys/${system-name}/persist/state" = mkZfsFs {
+        "sys/${system-name}/persist/state" = mkZfsFsLegacy {
           mountpoint = "/persist/state";
         };
-        "sys/${system-name}/persist/cache" = mkZfsFs {
+        "sys/${system-name}/persist/cache" = mkZfsFsLegacy {
           mountpoint = "/persist/cache";
         };
-        "sys/${system-name}/persist/cred" = mkZfsFs {
+        "sys/${system-name}/persist/cred" = mkZfsFsLegacy {
           mountpoint = "/persist/cred";
         };
         # probably want zvols for docker & podman
@@ -391,10 +408,28 @@ boot-end         = "${builtins.toString(boot-end)}"
         # podman doesn't support rootless... or does it?
         # apparently it does)
         # (TODO: test both ways anyhow)
-        "sys/${system-name}/persist/state/var/lib/docker" = mkZfsFs {
+        "sys/${system-name}/persist/state/var" = mkZfsFsLegacy {
+          mountpoint = "/persist/state/var";
+        };
+        "sys/${system-name}/persist/state/var/lib" = mkZfsFsLegacy {
+          mountpoint = "/persist/state/var/lib";
+        };
+        "sys/${system-name}/persist/state/var/lib/docker" = mkZfsFsLegacy {
           mountpoint = "/persist/state/var/lib/docker";
         };
-        "sys/${system-name}/persist/state/home/nrv/.local/state/containers" = mkZfsFs {
+        "sys/${system-name}/persist/state/home" = mkZfsFsLegacy {
+          mountpoint = "/persist/state/home";
+        };
+        "sys/${system-name}/persist/state/home/nrv" = mkZfsFsLegacy {
+          mountpoint = "/persist/state/home/nrv";
+        };
+        "sys/${system-name}/persist/state/home/nrv/.local" = mkZfsFsLegacy {
+          mountpoint = "/persist/state/home/nrv/.local";
+        };
+        "sys/${system-name}/persist/state/home/nrv/.local/state" = mkZfsFsLegacy {
+          mountpoint = "/persist/state/home/nrv/.local/state";
+        };
+        "sys/${system-name}/persist/state/home/nrv/.local/state/containers" = mkZfsFsLegacy {
           mountpoint = "/persist/state/home/nrv/.local/state/containers";
         };
 
@@ -410,6 +445,8 @@ boot-end         = "${builtins.toString(boot-end)}"
 
         # ===
 
+        # Other toplevel persistent datasets
+
         "media" = mkZfsFs {
           mountpoint = "/media/pool/${zpool-name}/media";
           options.recordsize = "1M";
@@ -417,15 +454,19 @@ boot-end         = "${builtins.toString(boot-end)}"
         "media/store" = mkZfsFs {
           mountpoint = "/media/pool/${zpool-name}/media/store";
         };
+
+        "vg" = mkZfsFs {
+          mountpoint = "/media/pool/${zpool-name}/vg";
+          options.recordsize = "1M";
+        };
         "vg/steam" = mkZfsFs {
           mountpoint = "/media/pool/${zpool-name}/vg/steam";
-          options.recordsize = "1M";
           options.casesensitivity = "insensitive";
         };
         "vg/owned" = mkZfsFs {
           mountpoint = "/media/pool/${zpool-name}/vg/owned";
-          options.recordsize = "1M";
         };
+
         "db" = mkZfsFs {
           mountpoint = "/media/pool/${zpool-name}/db";
         };

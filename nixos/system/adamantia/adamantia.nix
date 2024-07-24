@@ -13,6 +13,7 @@
 }: {
   # Modules of which this host consists
   imports = [
+    (import "${modulesPath}/installer/not-detected.nix")
     # If you want to use modules from other flakes (such as nixos-hardware):
     inputs.hardware.nixosModules.common-cpu-amd
     inputs.hardware.nixosModules.common-cpu-amd-pstate
@@ -23,9 +24,6 @@
     (import ./disko.nix { inherit lib; })
 
     inputs.sops-nix.nixosModules.sops
-
-    self.nixosModules."platform.nixos-shell"
-    self.nixosModules."platform.qemu"
 
     self.nixosModules."archetype.minimal"
     self.nixosModules."archetype.default"
@@ -45,37 +43,58 @@
     self.nixosModules."user.nrv"
   ];
 
-  virtualisation = {
-    forwardPorts = [
-      { from = "host"; host.port = 2223; guest.port = 22; }
+  virtualisation.vmVariant = {
+    virtualisation = {
+      forwardPorts = [
+        { from = "host"; host.port = 2223; guest.port = 22; }
+      ];
+      diskSize = 1024*10;
+      cores = 3;
+      writableStoreUseTmpfs = false;
+      memorySize = 1024*3;
+    };
+
+    imports = [
+      self.nixosModules."platform.qemu"
     ];
-    diskSize = 1024*10;
-    cores = 3;
-    writableStoreUseTmpfs = false;
-    memorySize = 1024*3;
+
+    # Autologin nrv in the VM
+    services.getty.autologinUser = "nrv";
   };
+
   disko.devices.disk.vdb.imageSize = "32G";
 
-  #services.openssh.enable = true;
-
-  sops.secrets."test".sopsFile = "${flake}/sus/nrv/test.yaml";
-
-  # The name
-  # networking.hostName = "seht";
-
   # Required for ZFS
-  # for local disks that are not shared over the network, we don't need this to be random
-  networking.hostId = "8425e349";
+  disko.extraRootModules = [ "zfs" ];
+  # Not really required to be unique if disks are not shared across network
+  networking.hostId = self.lib.fromJSONIfUnlockedOr
+    "8425e349"
+    "${flake}/sus/adamantia/hostid.json"; 
   boot.kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
   boot.supportedFilesystems = [ "zfs" ];
   boot.zfs.forceImportRoot = false;
 
-  # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
-  system.stateVersion = "23.11";
+  # Hardware config (nixos-generate-config)
+  boot.initrd.availableKernelModules = [ "nvme" "xhci_pci" "usb_storage" "usbhid" ];
+  boot.initrd.kernelModules = [ "dm-snapshot" ];
+  boot.kernelModules = [ "kvm-amd" ];
+  boot.extraModulePackages = [ ];
+  networking.useDHCP = lib.mkDefault true;
+  # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
+  # (the default) this is the recommended approach. When using systemd-networkd it's
+  # still possible to use this option, but it's recommended to use it in conjunction
+  # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
+  networking.useDHCP = lib.mkDefault true;
+  # networking.interfaces.enp42s0.useDHCP = lib.mkDefault true;
+  # networking.interfaces.umbriel-bfs.useDHCP = lib.mkDefault true;
+  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+  hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+  # ===
 
-  # Autologin nrv in the VM
-  services.getty.autologinUser = "nrv";
-    
+  sops.secrets."test".sopsFile = "${flake}/sus/nrv/test.yaml";
+
+  # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
+  system.stateVersion = "24.05";
 
   # Set TERM to xterm so that i can use vim properly.
   # TODO: also fix it it mangling my terminal

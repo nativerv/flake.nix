@@ -1,5 +1,5 @@
 {
-  disks ? [ "/dev/disk/by-id/does-not-exist" ],
+  disks ? [ "/dev/disk/by-id/specify-disks-as-cli-arg" ],
   lib,
 
   # FIXME: WARNING: only works for `postCreateHook`. Does not affect `disko`'s
@@ -90,22 +90,22 @@ in
   #assert zpool-luks-end < (total-size - boot-start);
 builtins.trace ''
 
-zpool-luks-start = "${builtins.toString(zpool-luks-start)}"
-zpool-luks-end   = "${builtins.toString(zpool-luks-end)}"
-esp-start        = "${builtins.toString(esp-start)}"
-esp-end          = "${builtins.toString(esp-end)}"
-boot-start       = "${builtins.toString(boot-start)}"
-boot-end         = "${builtins.toString(boot-end)}"
+zpool-luks-start = "${builtins.toString zpool-luks-start}"
+zpool-luks-end   = "${builtins.toString zpool-luks-end}"
+esp-start        = "${builtins.toString esp-start}"
+esp-end          = "${builtins.toString esp-end}"
+boot-start       = "${builtins.toString boot-start}"
+boot-end         = "${builtins.toString boot-end}"
 ''
 
 {
-  # FIXME: For some unimaginable reason `rootMountPoint` returns "" here:
+  # FIXME: For some unimaginable reason `rootMountPoint` returns "" for the string  trace:
   #disko.rootMountPoint = lib.trace "${rootMountPoint}" rootMountPoint;
 
-  disko.devices.disk = lib.genAttrs disks (device: {
+  disko.devices.disk.${zpool-name} = {
     type = "disk";
-    name = lib.replaceStrings [ "/" ] [ "_" ] device;
-    inherit device;
+    name = zpool-name; # Primary pool on disk is always named the same as the disk
+    device = builtins.head disks;
     content = {
       type = "gpt";
       partitions = {
@@ -195,7 +195,7 @@ boot-end         = "${builtins.toString(boot-end)}"
         # }
       };
     };
-  });
+  };
 
   disko.devices.zpool = let
     # "nodiratime" as well just to be sure

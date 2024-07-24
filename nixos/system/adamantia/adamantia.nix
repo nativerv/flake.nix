@@ -13,7 +13,7 @@
 }: {
   # Modules of which this host consists
   imports = [
-    (import "${modulesPath}/installer/not-detected.nix")
+    (import "${modulesPath}/installer/scan/not-detected.nix")
     # If you want to use modules from other flakes (such as nixos-hardware):
     inputs.hardware.nixosModules.common-cpu-amd
     inputs.hardware.nixosModules.common-cpu-amd-pstate
@@ -68,18 +68,27 @@
   disko.extraRootModules = [ "zfs" ];
   # Not really required to be unique if disks are not shared across network
   networking.hostId = self.lib.fromJSONIfUnlockedOr
-    "8425e349"
+    (lib.warn
+      "Repo is not unlocked! Will use default networking.hostId"
+      "8425e349")
     "${flake}/sus/adamantia/hostid.json"; 
   boot.kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
   boot.supportedFilesystems = [ "zfs" ];
   boot.zfs.forceImportRoot = false;
 
+  # User password
+  users.users.nrv.hashedPasswordFile = self.lib.ifUnlockedOr
+    (lib.warn "Repo is not unlocked! Will use default password, CHANGE IT!!!!!!"
+        "${pkgs.writeText
+          "le-secure-password"
+          "$6$FRXEt5XKYRw47Rql$siQrlRJJDjOiSlbChV5Te365XY2v5sKXRomsV90/iApy0kQlGbeFsgNeuL/DbJ7mnhZIoS82Fv6znvMClAh9B0"}")
+    config.sops.secrets."passwd/nrv".path;
+
   # Hardware config (nixos-generate-config)
-  boot.initrd.availableKernelModules = [ "nvme" "xhci_pci" "usb_storage" "usbhid" ];
+  boot.initrd.availableKernelModules = [ "nvme" "usbhid" "xhci_pci" "usb_storage" ];
   boot.initrd.kernelModules = [ "dm-snapshot" ];
   boot.kernelModules = [ "kvm-amd" ];
   boot.extraModulePackages = [ ];
-  networking.useDHCP = lib.mkDefault true;
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's
   # still possible to use this option, but it's recommended to use it in conjunction
@@ -91,7 +100,10 @@
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
   # ===
 
-  sops.secrets."test".sopsFile = "${flake}/sus/nrv/test.yaml";
+  # Secrets config
+  sops.gnupg.sshKeyPaths = [ ];
+  sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+  sops.secrets."passwd/nrv".sopsFile = "${flake}/sus/${config.networking.hostName}/passwd.yaml";
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "24.05";

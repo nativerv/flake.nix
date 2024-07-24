@@ -7,15 +7,18 @@
   /* For knowing if the repo is locked */
   isLocked = !(builtins.readFile ../locked == "0");
   ifUnlocked = lib.optional (!isLocked);
+  ifUnlockedOr = fallback: value: if !isLocked then value else fallback;
+  curPos = with __curPos; "${file}:${toString line}:${toString column}";
 
   /* Read secret file */
-  parseTOMLIfUnlocked = path: lib.pipe path [
-    builtins.readFile
-    builtins.fromTOML
-    self.lib.ifUnlocked
-    builtins.head
-    (toml: toml.address)
+  fromJSONIfUnlockedOr = with builtins; fallback: path: lib.pipe path [
+    readFile
+    (ifUnlockedOr (toJSON fallback))
+    fromJSON
   ];
+  fromJSONIfUnlocked = path: fromJSONIfUnlockedOr (abort
+    "The repo is not not unlocked, but is required to be unlocked for this value. See above."
+  ) path;
 
   /* Rename package */
   renamePackageBinary = pkgs: package: newName: with lib; let

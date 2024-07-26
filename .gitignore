@@ -1,18 +1,17 @@
-nohup.out
+/nohup.out
 
-result
-result.*
-result-*
-*-result
+/result
+/result.*
+/result-*
+/*-result
 
-*.qcow2
-*.qcow2.*
-key
+/*.qcow2
+/*.qcow2.*
+/key
 
-./adamantia
-./disko
-./disko-post-all-mounts-hok
-./disko-post-all-mounts-hook
-./diskoScript
-./vdb.raw
-./mythos.raw
+/adamantia
+/disko
+/disko-post-all-mounts-hok
+/disko-post-all-mounts-hook
+/diskoScript
+*.raw

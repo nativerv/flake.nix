@@ -46,12 +46,24 @@
   virtualisation.vmVariant = {
     virtualisation = {
       forwardPorts = [
-        { from = "host"; host.port = 2223; guest.port = 22; }
+        { from = "host"; host.port = 40500; guest.port = 22; }
       ];
       diskSize = 1024*10;
       cores = 3;
       writableStoreUseTmpfs = false;
       memorySize = 1024*3;
+      sharedDirectories = {
+        ssh-host-keys = {
+          source = ''/tmp/${config.networking.hostName}/ssh'';
+          securityModel = "none";
+          target = "/etc/ssh";
+        };
+        sops = {
+          source = ''/tmp/${config.networking.hostName}/sops'';
+          securityModel = "none";
+          target = "/etc/sops";
+        };
+      };
     };
 
     imports = [
@@ -60,7 +72,16 @@
 
     # Autologin nrv in the VM
     services.getty.autologinUser = "nrv";
+
+    # Backdoor for when ssh host keys are wrong
+    users.users.root.password = lib.mkForce "123";
+    users.users.root.hashedPassword = lib.mkForce null;
+    users.users.root.hashedPasswordFile = lib.mkForce null;
+    users.users.root.initialPassword = lib.mkForce null;
+    users.users.root.passwordFile = lib.mkForce null;
   };
+
+  users.mutableUsers = false;
 
   disko.devices.disk.vdb.imageSize = "32G";
 
@@ -94,16 +115,18 @@
   # still possible to use this option, but it's recommended to use it in conjunction
   # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
   networking.useDHCP = lib.mkDefault true;
-  # networking.interfaces.enp42s0.useDHCP = lib.mkDefault true;
-  # networking.interfaces.umbriel-bfs.useDHCP = lib.mkDefault true;
-  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+  hardware.enableRedistributableFirmware = false;
   # ===
 
   # Secrets config
-  sops.gnupg.sshKeyPaths = [ ];
-  sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-  sops.secrets."passwd/nrv".sopsFile = "${flake}/sus/${config.networking.hostName}/passwd.yaml";
+  sops = {
+    gnupg.sshKeyPaths = [ ];
+    age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+    defaultSopsFile = "/etc/sops/default.yaml";
+    validateSopsFiles = false;
+  };
+  sops.secrets."passwd/nrv".neededForUsers = true;
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "24.05";

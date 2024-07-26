@@ -21,6 +21,7 @@
     homeDirectory = "/home/nrv";
     packages = with pkgs; [
       hello
+      git-annex
     ];
 
     # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion

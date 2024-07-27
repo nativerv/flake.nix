@@ -43,6 +43,7 @@
     self.nixosModules."program.nix-index"
 
     self.nixosModules."user.nrv"
+    self.nixosModules."user.gamer"
   ];
 
   # Virtual machine-scoped config
@@ -71,6 +72,31 @@
           source = ''''${SECRET_DIR:-"/tmp/${config.networking.hostName}"}/sops'';
           securityModel = "none";
           target = "/etc/sops";
+        };
+        persist-data = {
+          source = ''/tmp/${config.networking.hostName}/persist/data'';
+          securityModel = "none";
+          target = "/persist/data";
+        };
+        persist-log = {
+          source = ''/tmp/${config.networking.hostName}/persist/log'';
+          securityModel = "none";
+          target = "/persist/log";
+        };
+        persist-state = {
+          source = ''/tmp/${config.networking.hostName}/persist/state'';
+          securityModel = "none";
+          target = "/persist/state";
+        };
+        persist-cache = {
+          source = ''/tmp/${config.networking.hostName}/persist/cache'';
+          securityModel = "none";
+          target = "/persist/cache";
+        };
+        persist-cred = {
+          source = ''/tmp/${config.networking.hostName}/persist/cred'';
+          securityModel = "none";
+          target = "/persist/cred";
         };
       };
     };
@@ -123,95 +149,97 @@
     }
   ];
   # TODO: fix env vars (xdg & otherwise)
-  environment.persistence."/persist/data" = {
-    enable = true;
-    hideMounts = true;
-    directories = [
-    ];
-    files = [
-    ];
-    users.nrv.directories = [
-      "desk"
-      "dl"
-      "pub"
-      "dox"
-      "mus"
-      "pix"
-      "vid"
-      ".local/share/templates"
-      "pr"
-      "dot"
-      ".config/nvim/spell"
-      ".local/share/lyrics"
-    ];
-    users.nrv.files = [
-    ];
-  };
-  environment.persistence."/persist/log" = {
-    enable = true;
-    hideMounts = true;
-    directories = [
-      "/nix/var/log"
-      "/var/log"
-      "/var/lib/systemd/coredump"
-    ];
-    files = [
-    ];
-    users.nrv.directories = [
-    ];
-    users.nrv.files = [
-    ];
-  };
-  environment.persistence."/persist/state" = {
-    enable = true;
-    hideMounts = true;
-    directories = [
-      "/var/lib/bluetooth"
-      "/var/lib/nixos"
-      "/var/lib/docker"
-      "/var/lib/mlocate"
-      "/var/lib/acme"
-    ];
-    files = [
-    ];
-    users.nrv.directories = [
-      ".mozilla"
-      ".local/state/sandbox"
-    ];
-    users.nrv.files = [
-    ];
-  };
-  environment.persistence."/persist/cache" = {
-    enable = true;
-    hideMounts = true;
-    directories = [
-    ];
-    files = [
-    ];
-    users.nrv.directories = [
-      ".cache"
-    ];
-    users.nrv.files = [
-    ];
-  };
-  environment.persistence."/persist/cred" = {
-    enable = true;
-    hideMounts = true;
-    directories = [
-    ];
-    files = [
-      "/etc/machine-id"
-    ];
-    users.nrv.directories = [
-      { directory = ".ssh"; mode = "0700"; }
-      { directory = ".config/sops"; mode = "0700"; }
-      { directory = ".config/rclone"; mode = "0700"; }
-      { directory = ".local/share/pass"; mode = "0700"; }
-      { directory = ".local/share/gnupg"; mode = "0700"; }
-      { directory = ".local/share/rustu2f"; mode = "0700"; }
-    ];
-    users.nrv.files = [
-    ];
+  environment.persistence = {
+    "/persist/data" = {
+      enable = true;
+      hideMounts = true;
+      directories = [
+      ];
+      files = [
+      ];
+      users.nrv.directories = [
+        "desk"
+        "dl"
+        "pub"
+        "dox"
+        "mus"
+        "pix"
+        "vid"
+        ".local/share/templates"
+        "pr"
+        "dot"
+        ".config/nvim/spell"
+        ".local/share/lyrics"
+      ];
+      users.nrv.files = [
+      ];
+    };
+    "/persist/log" = {
+      enable = true;
+      hideMounts = true;
+      directories = [
+        "/nix/var/log"
+        "/var/log"
+        "/var/lib/systemd/coredump"
+      ];
+      files = [
+      ];
+      users.nrv.directories = [
+      ];
+      users.nrv.files = [
+      ];
+    };
+    "/persist/state" = {
+      enable = true;
+      hideMounts = true;
+      directories = [
+        "/var/lib/bluetooth"
+        "/var/lib/nixos"
+        "/var/lib/docker"
+        "/var/lib/mlocate"
+        "/var/lib/acme"
+      ];
+      files = [
+      ];
+      users.nrv.directories = [
+        ".mozilla"
+        ".local/state/sandbox"
+      ];
+      users.nrv.files = [
+      ];
+    };
+    "/persist/cache" = {
+      enable = true;
+      hideMounts = true;
+      directories = [
+      ];
+      files = [
+      ];
+      users.nrv.directories = [
+        ".cache"
+      ];
+      users.nrv.files = [
+      ];
+    };
+    "/persist/cred" = {
+      enable = true;
+      hideMounts = true;
+      directories = [
+      ];
+      files = [
+        "/etc/machine-id"
+      ];
+      users.nrv.directories = [
+        { directory = ".ssh"; mode = "0700"; }
+        { directory = ".config/sops"; mode = "0700"; }
+        { directory = ".config/rclone"; mode = "0700"; }
+        { directory = ".local/share/pass"; mode = "0700"; }
+        { directory = ".local/share/gnupg"; mode = "0700"; }
+        { directory = ".local/share/rustu2f"; mode = "0700"; }
+      ];
+      users.nrv.files = [
+      ];
+    };
   };
 
   # User password
@@ -221,6 +249,13 @@
           "le-secure-password"
           "$6$FRXEt5XKYRw47Rql$siQrlRJJDjOiSlbChV5Te365XY2v5sKXRomsV90/iApy0kQlGbeFsgNeuL/DbJ7mnhZIoS82Fv6znvMClAh9B0"}")
     config.sops.secrets."passwd/nrv".path;
+  # Gamer password
+  users.users.gamer.hashedPasswordFile = self.lib.ifUnlockedOr
+    (lib.warn "Repo is not unlocked! Will use default password, CHANGE IT!!!!!!"
+        "${pkgs.writeText
+          "le-secure-password"
+          "$6$FRXEt5XKYRw47Rql$siQrlRJJDjOiSlbChV5Te365XY2v5sKXRomsV90/iApy0kQlGbeFsgNeuL/DbJ7mnhZIoS82Fv6znvMClAh9B0"}")
+    config.sops.secrets."passwd/gamer".path;
 
   # Hardware config (nixos-generate-config)
   boot.initrd.availableKernelModules = [ "nvme" "usbhid" "xhci_pci" "usb_storage" ];
@@ -244,6 +279,7 @@
     validateSopsFiles = false;
   };
   sops.secrets."passwd/nrv".neededForUsers = true;
+  sops.secrets."passwd/gamer".neededForUsers = true;
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "24.05";

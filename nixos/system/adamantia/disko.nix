@@ -403,6 +403,12 @@ boot-end         = "${builtins.toString boot-end}"
         "sys/${system-name}/persist/cred" = mkZfsFsLegacy {
           mountpoint = "/persist/cred";
         };
+
+        # for non-sandboxed steam
+        "sys/${system-name}/persist/data/home/gamer" = mkZfsFsLegacy {
+          mountpoint = "/persist/data/home/gamer";
+        };
+
         # probably want zvols for docker & podman
         # (docker seem to shit gazillions of datasets,
         # podman doesn't support rootless... or does it?

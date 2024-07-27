@@ -16,6 +16,9 @@
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
+    # Ephemeral/Impermanent root utility
+    impermanence.url = "github:nix-community/impermanence";
+
     # Command for searching files in nixpkgs, with per-built database
     nix-index-database.url = "github:Mic92/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs-unstable";

@@ -1,6 +1,7 @@
 { ... }:
 { ... }: {
   # This setups an SSH server. Very important if you're setting up a headless system.
+  # TODO: hardening
   services.openssh = {
     enable = true;
 
@@ -14,3 +15,4 @@
     };
   };
 }
+

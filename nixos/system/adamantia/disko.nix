@@ -102,7 +102,7 @@ boot-end         = "${builtins.toString boot-end}"
   # FIXME: For some unimaginable reason `rootMountPoint` returns "" for the string  trace:
   #disko.rootMountPoint = lib.trace "${rootMountPoint}" rootMountPoint;
 
-  disko.devices.disk.${zpool-name} = {
+  disko.devices.disk.main = {
     type = "disk";
     name = zpool-name; # Primary pool on disk is always named the same as the disk
     device = builtins.head disks;

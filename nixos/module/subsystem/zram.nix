@@ -1,5 +1,8 @@
 { ... }:
-{ ... }:
+{
+  lib,
+  ...
+}:
 
 # Storing Linux 5.9 rc4
 # on a compressed zram block device 
@@ -19,8 +22,8 @@
   zramSwap.enable = true;
   zramSwap.priority  = 100;
   zramSwap.memoryMax = null;
-  zramSwap.algorithm = "zstd"; # lzo
+  zramSwap.algorithm = lib.mkDefault "lz4"; # lzo
   #zramSwap.numDevices = 1; # no longer supported
-  zramSwap.swapDevices = 2;
-  zramSwap.memoryPercent = 50;
+  zramSwap.swapDevices = 1;
+  zramSwap.memoryPercent = 100;
 }

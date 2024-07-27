@@ -48,18 +48,23 @@
       forwardPorts = [
         { from = "host"; host.port = 40500; guest.port = 22; }
       ];
-      diskSize = 1024*10;
+      # diskSize = 1024*10;
+      diskImage = null;
       cores = 3;
       writableStoreUseTmpfs = false;
       memorySize = 1024*3;
       sharedDirectories = {
+        # FIXME: there seems to be race condition between mounting this and
+        #        sops activation script.
+        # NOTE: they're all set as `neededForBoot = true` by the module. I'm
+        #       confused now.
         ssh-host-keys = {
-          source = ''/tmp/${config.networking.hostName}/ssh'';
+          source = ''''${SECRET_DIR:-"/tmp/${config.networking.hostName}"}/ssh'';
           securityModel = "none";
           target = "/etc/ssh";
         };
         sops = {
-          source = ''/tmp/${config.networking.hostName}/sops'';
+          source = ''''${SECRET_DIR:-"/tmp/${config.networking.hostName}"}/sops'';
           securityModel = "none";
           target = "/etc/sops";
         };

@@ -43,6 +43,7 @@
     self.nixosModules."user.nrv"
   ];
 
+  # Virtual machine-scoped config
   virtualisation.vmVariant = {
     virtualisation = {
       forwardPorts = [
@@ -91,17 +92,34 @@
 
   # disko.devices.disk.vdb.imageSize = "32G";
 
-  # Required for ZFS
+  # Setup ZFS
   disko.extraRootModules = [ "zfs" ];
-  # Not really required to be unique if disks are not shared across network
   networking.hostId = self.lib.fromJSONIfUnlockedOr
     (lib.warn
       "Repo is not unlocked! Will use default networking.hostId"
+      # Not really required to be unique if disks are not shared across network
       "8425e349")
-    "${flake}/sus/adamantia/hostid.json"; 
+    "${flake}/sus/${config.networking.hostName}/hostid.json"; 
   boot.kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
   boot.supportedFilesystems.zfs = true;
   boot.zfs.forceImportRoot = false;
+
+  # Impermanence
+  boot.initrd.postDeviceCommands = lib.mkAfter ''
+    zfs rollback ${config.disko.devices.disk.main.name}/sys/${config.networking.hostName}/local@blank
+    zfs rollback ${config.disko.devices.disk.main.name}/sys/${config.networking.hostName}/local/home@blank
+  '';
+  services.openssh.hostKeys = [
+    {
+      path = "/persist/cred/etc/ssh/ssh_host_ed25519_key";
+      type = "ed25519";
+    }
+    {
+      path = "/persist/cred/etc/ssh/ssh_host_rsa_key";
+      type = "rsa";
+      bits = 4096;
+    }
+  ];
 
   # User password
   users.users.nrv.hashedPasswordFile = self.lib.ifUnlockedOr

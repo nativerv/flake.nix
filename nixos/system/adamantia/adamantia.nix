@@ -23,6 +23,8 @@
     inputs.disko.nixosModules.disko
     (import ./disko.nix { inherit lib; })
 
+    inputs.impermanence.nixosModules.impermanence
+
     inputs.sops-nix.nixosModules.sops
 
     self.nixosModules."archetype.minimal"
@@ -120,6 +122,97 @@
       bits = 4096;
     }
   ];
+  # TODO: fix env vars (xdg & otherwise)
+  environment.persistence."/persist/data" = {
+    enable = true;
+    hideMounts = true;
+    directories = [
+    ];
+    files = [
+    ];
+    users.nrv.directories = [
+      "desk"
+      "dl"
+      "pub"
+      "dox"
+      "mus"
+      "pix"
+      "vid"
+      ".local/share/templates"
+      "pr"
+      "dot"
+      ".config/nvim/spell"
+      ".local/share/lyrics"
+    ];
+    users.nrv.files = [
+    ];
+  };
+  environment.persistence."/persist/log" = {
+    enable = true;
+    hideMounts = true;
+    directories = [
+      "/nix/var/log"
+      "/var/log"
+      "/var/lib/systemd/coredump"
+    ];
+    files = [
+    ];
+    users.nrv.directories = [
+    ];
+    users.nrv.files = [
+    ];
+  };
+  environment.persistence."/persist/state" = {
+    enable = true;
+    hideMounts = true;
+    directories = [
+      "/var/lib/bluetooth"
+      "/var/lib/nixos"
+      "/var/lib/docker"
+      "/var/lib/mlocate"
+      "/var/lib/acme"
+    ];
+    files = [
+    ];
+    users.nrv.directories = [
+      ".mozilla"
+      ".local/state/sandbox"
+    ];
+    users.nrv.files = [
+    ];
+  };
+  environment.persistence."/persist/cache" = {
+    enable = true;
+    hideMounts = true;
+    directories = [
+    ];
+    files = [
+    ];
+    users.nrv.directories = [
+      ".cache"
+    ];
+    users.nrv.files = [
+    ];
+  };
+  environment.persistence."/persist/cred" = {
+    enable = true;
+    hideMounts = true;
+    directories = [
+    ];
+    files = [
+      "/etc/machine-id"
+    ];
+    users.nrv.directories = [
+      { directory = ".ssh"; mode = "0700"; }
+      { directory = ".config/sops"; mode = "0700"; }
+      { directory = ".config/rclone"; mode = "0700"; }
+      { directory = ".local/share/pass"; mode = "0700"; }
+      { directory = ".local/share/gnupg"; mode = "0700"; }
+      { directory = ".local/share/rustu2f"; mode = "0700"; }
+    ];
+    users.nrv.files = [
+    ];
+  };
 
   # User password
   users.users.nrv.hashedPasswordFile = self.lib.ifUnlockedOr

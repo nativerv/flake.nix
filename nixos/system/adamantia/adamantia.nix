@@ -58,6 +58,7 @@
         #        sops activation script.
         # NOTE: they're all set as `neededForBoot = true` by the module. I'm
         #       confused now.
+        # NOTE: maybe setting `diskImage` to `null` solved this?
         ssh-host-keys = {
           source = ''''${SECRET_DIR:-"/tmp/${config.networking.hostName}"}/ssh'';
           securityModel = "none";
@@ -88,7 +89,7 @@
 
   users.mutableUsers = false;
 
-  disko.devices.disk.vdb.imageSize = "32G";
+  # disko.devices.disk.vdb.imageSize = "32G";
 
   # Required for ZFS
   disko.extraRootModules = [ "zfs" ];
@@ -99,7 +100,7 @@
       "8425e349")
     "${flake}/sus/adamantia/hostid.json"; 
   boot.kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
-  boot.supportedFilesystems = [ "zfs" ];
+  boot.supportedFilesystems.zfs = true;
   boot.zfs.forceImportRoot = false;
 
   # User password
@@ -136,18 +137,9 @@
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "24.05";
 
-  # Set TERM to xterm so that i can use vim properly.
-  # TODO: also fix it it mangling my terminal
-  # (temporary fix is doing `&& reset`)
-  #boot.kernelParams = [ "TERM=xterm" ]; # thougth this would do the TODO.
-  environment.variables.TERM = "xterm";
-
-  # services.xserver.desktopManager.xfce.enable = true;
-  # services.xserver.displayManager.lightdm.enable = true;
-  # services.xserver.enable = true;
-
   # Flatpak
   services.flatpak.enable = true;
+  xdg.portal.enable = true;
   security.rtkit.enable = true;
 
   # GTK apps outside GNOME - cursor, theming & window decorations. 
@@ -167,6 +159,17 @@
     stow
     imv
     foot
+    kitty
+    rsync
+    restic
+    rclone
+    file
+    ranger
+    eza
+    ncdu
+    sops
+    calc
+    p7zip
 
     #self.packages.${system}.nixpak-test
     self.packages.${system}.firefox
@@ -187,43 +190,24 @@
   #     };
   #   };
   # };
-  #services.desktopManager.plasma6.enable = true;
-  #services.xserver = {
-  #  enable = true;
-  #  displayManager.autoLogin.enable = true;
-  #  displayManager.autoLogin.user = "nrv";
-  #  displayManager.sddm.enable = true;
-  #  displayManager.sddm.wayland.enable = true;
-  #};
-  #environment.plasma6.excludePackages = with pkgs.kdePackages; [
-  #  plasma-browser-integration
-  #  #konsole
-  #  (lib.getBin qttools) # Expose qdbus in PATH
-
-  #  ark
-  #  elisa
-  #  gwenview
-  #  okular
-  #  kate
-  #  khelpcenter
-  #  print-manager
-  #];
-
-  programs.hyprland.enable = true;
-
-  # Nicely reload system units when changing configs
-  #systemd.user.startServices = "sd-switch";
-
-  nixpkgs = {
-    # You can add overlays (package additions and overrides) here
-    overlays = [];
-
-    # Configure your nixpkgs instance.
-    # WARNING: This does not work when using `import nixpkgs { ... }`!
-    # WARNING: Provide this config when importing nixpkgs input.
-    # Failed assertions:
-    # - Your system configures nixpkgs with an externally created instance.
-    # `nixpkgs.config` options should be passed when creating the instance instead.
-    config = {};
+  services.desktopManager.plasma6.enable = true;
+  services = {
+    displayManager.autoLogin.enable = true;
+    displayManager.autoLogin.user = "nrv";
+    displayManager.sddm.enable = true;
+    displayManager.sddm.wayland.enable = true;
   };
+  environment.plasma6.excludePackages = with pkgs.kdePackages; [
+    plasma-browser-integration
+    #konsole
+    (lib.getBin qttools) # Expose qdbus in PATH
+
+    ark
+    elisa
+    gwenview
+    okular
+    kate
+    khelpcenter
+    print-manager
+  ];
 }

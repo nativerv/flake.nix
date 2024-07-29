@@ -1,5 +1,12 @@
 {
   disks ? [ "/dev/disk/by-id/specify-disks-as-cli-arg" ],
+
+  # Name of the pool.
+  # Note that this gets interpolated into strings and scripts AS IS.
+  # Be careful with names
+  zpool-name ? "mythos",
+  zpool-name-mount ? zpool-name,
+
   lib,
 
   # FIXME: WARNING: only works for `postCreateHook`. Does not affect `disko`'s
@@ -9,11 +16,6 @@
 }: let
   # Use folder name as name of this system
   system-name = builtins.baseNameOf ./.;
-
-  # Name of the pool.
-  # Note that this gets interpolated into strings and scripts AS IS.
-  # Be careful with names
-  zpool-name = "mythos";
 
   # Size of your drive
   # 1 TeraByte is equal to:
@@ -99,10 +101,24 @@ boot-end         = "${builtins.toString boot-end}"
 ''
 
 {
+  fileSystems."/persist/data".neededForBoot = true;
+  fileSystems."/persist/log".neededForBoot = true;
+  fileSystems."/persist/state".neededForBoot = true;
+  fileSystems."/persist/cache".neededForBoot = true;
+  fileSystems."/persist/cred".neededForBoot = true;
+  fileSystems."/".neededForBoot = true;
+  # FIXME: enable this - probably needed for impermanence
+  # fileSystems."/home".neededForBoot = true;
+
   # FIXME: For some unimaginable reason `rootMountPoint` returns "" for the string  trace:
   #disko.rootMountPoint = lib.trace "${rootMountPoint}" rootMountPoint;
-
   disko.devices.disk.main = {
+    # For debug mode
+    # Equal to the usual 1TB hardware disk (mythos, dawnstar),
+    # actually around 500 meg bigger than 1TB but still a lot
+    # smaller than 1TiB.
+    imageSize = "976762584K"; 
+
     type = "disk";
     name = zpool-name; # Primary pool on disk is always named the same as the disk
     device = builtins.head disks;
@@ -177,7 +193,7 @@ boot-end         = "${builtins.toString boot-end}"
             type = "filesystem";
             format = "vfat";
             mountpoint = "/boot";
-            mountOptions = [ "defaults" "noatime" ];
+            mountOptions = [ "defaults" "noatime" "umask=0077" ];
           };
         };
 

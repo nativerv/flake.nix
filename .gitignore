@@ -15,3 +15,6 @@
 /disko-post-all-mounts-hook
 /diskoScript
 *.raw
+
+/sus/*/pre
+/sus/*/post

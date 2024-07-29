@@ -47,78 +47,138 @@
   ];
 
   # Virtual machine-scoped config
-  virtualisation.vmVariant = {
-    virtualisation = {
-      forwardPorts = [
-        { from = "host"; host.port = 40500; guest.port = 22; }
+
+  virtualisation = let
+    vm-config = {
+      imports = [
+        self.nixosModules."platform.qemu"
       ];
-      # diskSize = 1024*10;
-      diskImage = null;
-      cores = 3;
-      writableStoreUseTmpfs = false;
-      memorySize = 1024*3;
-      sharedDirectories = {
-        # FIXME: there seems to be race condition between mounting this and
-        #        sops activation script.
-        # NOTE: they're all set as `neededForBoot = true` by the module. I'm
-        #       confused now.
-        # NOTE: maybe setting `diskImage` to `null` solved this?
-        ssh-host-keys = {
-          source = ''''${SECRET_DIR:-"/tmp/${config.networking.hostName}"}/ssh'';
-          securityModel = "none";
-          target = "/etc/ssh";
-        };
-        sops = {
-          source = ''''${SECRET_DIR:-"/tmp/${config.networking.hostName}"}/sops'';
-          securityModel = "none";
-          target = "/etc/sops";
-        };
-        persist-data = {
-          source = ''/tmp/${config.networking.hostName}/persist/data'';
-          securityModel = "none";
-          target = "/persist/data";
-        };
-        persist-log = {
-          source = ''/tmp/${config.networking.hostName}/persist/log'';
-          securityModel = "none";
-          target = "/persist/log";
-        };
-        persist-state = {
-          source = ''/tmp/${config.networking.hostName}/persist/state'';
-          securityModel = "none";
-          target = "/persist/state";
-        };
-        persist-cache = {
-          source = ''/tmp/${config.networking.hostName}/persist/cache'';
-          securityModel = "none";
-          target = "/persist/cache";
-        };
-        persist-cred = {
-          source = ''/tmp/${config.networking.hostName}/persist/cred'';
-          securityModel = "none";
-          target = "/persist/cred";
+
+      # FIXME: impermanence breaks VMs (stage-1 waiting for device /mnt-root/...
+      #        something)
+      environment.persistence = lib.mkForce {};
+
+      virtualisation = {
+        forwardPorts = [
+          # TODO: factor out the port to config/
+          { from = "host"; host.port = 40500; guest.port = 22; }
+        ];
+        # diskSize = 1024*10;
+        diskImage = null;
+        cores = 3;
+        writableStoreUseTmpfs = false;
+        memorySize = 1024*10;
+        qemu.drives = [
+          {
+            # FIXME: s/config.networking.hostName/config.system.name/g
+            name = config.networking.hostName;
+            file = "\${VM_DISK}";
+          }
+        ];
+        sharedDirectories = {
+          persist-data = {
+            source = ''/tmp/${config.networking.hostName}/persist/data'';
+            securityModel = "none";
+            target = "/persist/data";
+          };
+          persist-log = {
+            source = ''/tmp/${config.networking.hostName}/persist/log'';
+            securityModel = "none";
+            target = "/persist/log";
+          };
+          persist-state = {
+            source = ''/tmp/${config.networking.hostName}/persist/state'';
+            securityModel = "none";
+            target = "/persist/state";
+          };
+          persist-cache = {
+            source = ''/tmp/${config.networking.hostName}/persist/cache'';
+            securityModel = "none";
+            target = "/persist/cache";
+          };
+          persist-cred = {
+            source = ''/tmp/${config.networking.hostName}/persist/cred'';
+            securityModel = "none";
+            target = "/persist/cred";
+          };
+          # FIXME: there seems to be race condition between mounting this and
+          #        sops activation script.
+          # NOTE: they're all set as `neededForBoot = true` by the module. I'm
+          #       confused now.
+          # NOTE: maybe setting `diskImage` to `null` solved this?
+          ssh-host-keys = {
+            source = ''''${SECRET_DIR:-"/tmp/${config.networking.hostName}"}/ssh'';
+            securityModel = "none";
+            target = "/persist/cred/etc/ssh";
+          };
+          sops = {
+            source = ''''${SECRET_DIR:-"/tmp/${config.networking.hostName}"}/sops'';
+            securityModel = "none";
+            target = "/persist/cred/etc/sops";
+          };
         };
       };
+
+      # Autologin nrv in the VM
+      services.getty.autologinUser = "nrv";
+      services.displayManager.autoLogin.enable = lib.mkForce true;
+      services.displayManager.autoLogin.user = lib.mkForce "nrv";
+      services.displayManager.sddm.enable = lib.mkForce false;
+      services.displayManager.sddm.wayland.enable = lib.mkForce false;
+
+      # Backdoor for when ssh host keys are wrong
+      users.users.root.password = lib.mkForce "123";
+      users.users.root.hashedPassword = lib.mkForce null;
+      users.users.root.hashedPasswordFile = lib.mkForce null;
+      users.users.root.initialPassword = lib.mkForce null;
+      users.users.root.passwordFile = lib.mkForce null;
     };
-
-    imports = [
-      self.nixosModules."platform.qemu"
-    ];
-
-    # Autologin nrv in the VM
-    services.getty.autologinUser = "nrv";
-
-    # Backdoor for when ssh host keys are wrong
-    users.users.root.password = lib.mkForce "123";
-    users.users.root.hashedPassword = lib.mkForce null;
-    users.users.root.hashedPasswordFile = lib.mkForce null;
-    users.users.root.initialPassword = lib.mkForce null;
-    users.users.root.passwordFile = lib.mkForce null;
+  in {
+    # FIXME: still ERROR: cptofs failed. diskSize might be too small for closure.
+    vmVariantWithBootLoader = vm-config // {
+      virtualisation.diskSize = 1024*40;
+      virtualisation.diskImage = "./${config.system.name}.qcow";
+    };
+    vmVariant = vm-config;
   };
 
+  # FIXME: replace those specs with rd.systemd.debug_shell?
+  specialisation = let 
+    common-root-autologin = {
+      # Backdoor for easy debugging
+      users.users.root.password = lib.mkForce "123";
+      users.users.root.hashedPassword = lib.mkForce null;
+      users.users.root.hashedPasswordFile = lib.mkForce null;
+      users.users.root.initialPassword = lib.mkForce null;
+      users.users.root.passwordFile = lib.mkForce null;
+      services.displayManager.sddm.enable = lib.mkForce false;
+      services.xserver.displayManager.gdm.enable = lib.mkForce false;
+      services.xserver.displayManager.lightdm.enable = lib.mkForce false;
+      services.getty.autologinUser = lib.mkForce "root";
+    };
+  in {
+    root-autologin.configuration = common-root-autologin;
+    root-autologin-zfs-force.configuration = common-root-autologin // {
+      # FIXME: the pool should just be imported fine at the first boot without
+      #        intervention.
+      boot.kernelParams = [ "zfs_force=1" ];
+    };
+  };
+
+  # FIXME: move this somewhere
   users.mutableUsers = false;
 
-  # disko.devices.disk.vdb.imageSize = "32G";
+  # Secrets config
+  sops = {
+    gnupg.sshKeyPaths = [ ];
+    age.sshKeyPaths = [ "/persist/cred/etc/ssh/ssh_host_ed25519_key" ];
+    defaultSopsFile = "/persist/cred/etc/sops/default.yaml";
+    validateSopsFiles = false;
+  };
+  sops.secrets."passwd/root".neededForUsers = true;
+  sops.secrets."passwd/nrv".neededForUsers = true;
+  sops.secrets."passwd/gamer".neededForUsers = true;
+
 
   # Setup ZFS
   disko.extraRootModules = [ "zfs" ];
@@ -128,27 +188,47 @@
       # Not really required to be unique if disks are not shared across network
       "8425e349")
     "${flake}/sus/${config.networking.hostName}/hostid.json"; 
+  # FIXME: other kernel packages, also verify latest ZFS version
   boot.kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
   boot.supportedFilesystems.zfs = true;
   boot.zfs.forceImportRoot = false;
 
   # Impermanence
-  boot.initrd.postDeviceCommands = lib.mkAfter ''
-    zfs rollback ${config.disko.devices.disk.main.name}/sys/${config.networking.hostName}/local@blank
-    zfs rollback ${config.disko.devices.disk.main.name}/sys/${config.networking.hostName}/local/home@blank
-  '';
+  # rollback / and /home
+  # NOTE: doesn't exist with boot.initrd.systemd which i've enabled for some
+  #       reason when i couldn't boot with ZFS.
+  # TODO: investigate switching back to scripted initrd (or if it's worth it
+  #       for speed)
+  # boot.initrd.postDeviceCommands = lib.mkAfter ''
+  #   zfs rollback ${config.disko.devices.disk.main.name}/sys/${config.networking.hostName}/local@blank
+  #   zfs rollback ${config.disko.devices.disk.main.name}/sys/${config.networking.hostName}/local/home@blank
+  # '';
+  boot.initrd.systemd.services.rollback = {
+    description = "Rollback root filesystem to a pristine state on boot";
+    # "zfs.target"
+    wantedBy = [ "initrd.target" ];
+    after = [ "zfs-import-${config.disko.devices.disk.main.name}.service" ];
+    before = [ "sysroot.mount" ];
+    path = with pkgs; [
+      zfs
+    ];
+    unitConfig.DefaultDependencies = "no";
+    serviceConfig.Type = "oneshot";
+    script = ''
+      # zfs rollback ${config.disko.devices.disk.main.name}/sys/${config.networking.hostName}/local@blank && echo " === rm -rf /...Done. === "
+      # zfs rollback ${config.disko.devices.disk.main.name}/sys/${config.networking.hostName}/local/home@blank && echo " === rm -rf /home...Done. == "
+    '';
+  };
+  # FIXME: provisioned ssh host keys modified by NixOS at some point for some
+  #        reason - the comment among something else in the private key -
+  #        fingerprint changes.
   services.openssh.hostKeys = [
-    {
-      path = "/persist/cred/etc/ssh/ssh_host_ed25519_key";
-      type = "ed25519";
-    }
-    {
-      path = "/persist/cred/etc/ssh/ssh_host_rsa_key";
-      type = "rsa";
-      bits = 4096;
-    }
+    { path = "/persist/cred/etc/ssh/ssh_host_ed25519_key"; type = "ed25519"; }
+    { path = "/persist/cred/etc/ssh/ssh_host_rsa_key"; type = "rsa"; bits = 4096; }
   ];
+
   # TODO: fix env vars (xdg & otherwise)
+  # FIXME: /home/nrv are created wrong: root:root and 755.
   environment.persistence = {
     "/persist/data" = {
       enable = true;
@@ -198,6 +278,7 @@
         "/var/lib/docker"
         "/var/lib/mlocate"
         "/var/lib/acme"
+        "/var/db/sudo/lectured"
       ];
       files = [
       ];
@@ -225,6 +306,7 @@
       enable = true;
       hideMounts = true;
       directories = [
+        { directory = "/etc/sops"; mode = "0700"; }
       ];
       files = [
         "/etc/machine-id"
@@ -242,6 +324,14 @@
     };
   };
 
+  # Root
+  # FIXME: enable this back
+  # users.users.root.hashedPasswordFile = self.lib.ifUnlockedOr
+  #   (lib.warn "Repo is not unlocked! Will use default password, CHANGE IT!!!!!!"
+  #       "${pkgs.writeText
+  #         "le-secure-password"
+  #         "$6$FRXEt5XKYRw47Rql$siQrlRJJDjOiSlbChV5Te365XY2v5sKXRomsV90/iApy0kQlGbeFsgNeuL/DbJ7mnhZIoS82Fv6znvMClAh9B0"}")
+  #   config.sops.secrets."passwd/root".path;
   # User password
   users.users.nrv.hashedPasswordFile = self.lib.ifUnlockedOr
     (lib.warn "Repo is not unlocked! Will use default password, CHANGE IT!!!!!!"
@@ -257,9 +347,20 @@
           "$6$FRXEt5XKYRw47Rql$siQrlRJJDjOiSlbChV5Te365XY2v5sKXRomsV90/iApy0kQlGbeFsgNeuL/DbJ7mnhZIoS82Fv6znvMClAh9B0"}")
     config.sops.secrets."passwd/gamer".path;
 
+  # Bootloader
+  # FIXME: nodev?
+  boot.loader.grub.device = "/dev/vda";
+  boot.loader.grub.enable = true;
+  #boot.loader.grub.version = 2;
+  boot.loader.grub.efiSupport = true;
+  boot.loader.grub.efiInstallAsRemovable = true;
+  boot.initrd.systemd.enable = true;
+  
   # Hardware config (nixos-generate-config)
   boot.initrd.availableKernelModules = [ "nvme" "usbhid" "xhci_pci" "usb_storage" ];
+  # FIXME: why dm-snapshot is here?
   boot.initrd.kernelModules = [ "dm-snapshot" ];
+  # FIXME: why kvm-amd is here?
   boot.kernelModules = [ "kvm-amd" ];
   boot.extraModulePackages = [ ];
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
@@ -268,18 +369,9 @@
   # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
   networking.useDHCP = lib.mkDefault true;
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+  # FIXME: enable me pls
   hardware.enableRedistributableFirmware = false;
   # ===
-
-  # Secrets config
-  sops = {
-    gnupg.sshKeyPaths = [ ];
-    age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-    defaultSopsFile = "/etc/sops/default.yaml";
-    validateSopsFiles = false;
-  };
-  sops.secrets."passwd/nrv".neededForUsers = true;
-  sops.secrets."passwd/gamer".neededForUsers = true;
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "24.05";
@@ -317,6 +409,10 @@
     sops
     calc
     p7zip
+    openssl
+    transcrypt
+    # FIXME: vim only for xxd for transcrypt
+    vim 
 
     #self.packages.${system}.nixpak-test
     self.packages.${system}.firefox
@@ -327,6 +423,8 @@
     self.packages.${system}.vlc
     self.packages.${system}.zathura
   ];
+
+  # Firejail example for later
   # programs.firejail = {
   #   enable = true;
   #   wrappedBinaries = {
@@ -337,13 +435,10 @@
   #     };
   #   };
   # };
+
   services.desktopManager.plasma6.enable = true;
-  services = {
-    displayManager.autoLogin.enable = true;
-    displayManager.autoLogin.user = "nrv";
-    displayManager.sddm.enable = true;
-    displayManager.sddm.wayland.enable = true;
-  };
+  # services.displayManager.sddm.enable = true;
+  # services.displayManager.sddm.wayland.enable = true;
   environment.plasma6.excludePackages = with pkgs.kdePackages; [
     plasma-browser-integration
     #konsole

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# usage: ./scripts/disko-format-files path/to/secrets pre|post
+# spaces in the path are unsupported
+
+set -u
+source="${1}"
+type="${2}"
+find "${source}/${type}" -type f |
+  sed "s/^/--${type}-format-files /" |
+  sed -E "s| (${source}/${type})(.+)| \1\2 \2|" |
+  tr '\n' ' '

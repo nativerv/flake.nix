@@ -21,6 +21,7 @@ in {
     users.users.${name} = {
       uid = id;
       group = "${name}";
+      createHome = true;
       extraGroups = [
         "pool"
         "steam"

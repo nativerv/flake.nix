@@ -17,10 +17,12 @@
 
   # Symlink /etc/nixos to this flake.
   # NOTE: maybe not *that* sane? Let's see if this spits errors or overwrites the stateful/handwritten config or whatever.
-  system.activationScripts.symlinkFlakeToEtcNixos.text = /* bash */ ''
-    rmdir '/etc/nixos' || true
-    ln -s ${flake} '/etc/nixos'
-  '';
+  # WARNING: This was causing some (possibly critical) errors during initial
+  #          disko-impermanence setup... ditch for now.
+  # system.activationScripts.symlinkFlakeToEtcNixos.text = /* bash */ ''
+  #   rmdir '/etc/nixos' || true
+  #   ln -s ${flake} '/etc/nixos' || true
+  # '';
 
   # Nix (the thing) config
   nix = {

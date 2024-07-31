@@ -70,34 +70,33 @@
         memorySize = 1024*10;
         qemu.drives = [
           {
-            # FIXME: s/config.networking.hostName/config.system.name/g
-            name = config.networking.hostName;
+            name = config.system.name;
             file = "\${VM_DISK}";
           }
         ];
         sharedDirectories = {
           persist-data = {
-            source = ''/tmp/${config.networking.hostName}/persist/data'';
+            source = ''/tmp/${config.system.name}/persist/data'';
             securityModel = "none";
             target = "/persist/data";
           };
           persist-log = {
-            source = ''/tmp/${config.networking.hostName}/persist/log'';
+            source = ''/tmp/${config.system.name}/persist/log'';
             securityModel = "none";
             target = "/persist/log";
           };
           persist-state = {
-            source = ''/tmp/${config.networking.hostName}/persist/state'';
+            source = ''/tmp/${config.system.name}/persist/state'';
             securityModel = "none";
             target = "/persist/state";
           };
           persist-cache = {
-            source = ''/tmp/${config.networking.hostName}/persist/cache'';
+            source = ''/tmp/${config.system.name}/persist/cache'';
             securityModel = "none";
             target = "/persist/cache";
           };
           persist-cred = {
-            source = ''/tmp/${config.networking.hostName}/persist/cred'';
+            source = ''/tmp/${config.system.name}/persist/cred'';
             securityModel = "none";
             target = "/persist/cred";
           };
@@ -107,12 +106,12 @@
           #       confused now.
           # NOTE: maybe setting `diskImage` to `null` solved this?
           ssh-host-keys = {
-            source = ''''${SECRET_DIR:-"/tmp/${config.networking.hostName}"}/ssh'';
+            source = ''''${SECRET_DIR:-"/tmp/${config.system.name}"}/ssh'';
             securityModel = "none";
             target = "/persist/cred/etc/ssh";
           };
           sops = {
-            source = ''''${SECRET_DIR:-"/tmp/${config.networking.hostName}"}/sops'';
+            source = ''''${SECRET_DIR:-"/tmp/${config.system.name}"}/sops'';
             securityModel = "none";
             target = "/persist/cred/etc/sops";
           };
@@ -142,9 +141,9 @@
     vmVariant = vm-config;
   };
 
-  # FIXME: replace those specs with rd.systemd.debug_shell?
-  specialisation = let 
-    common-root-autologin = {
+  boot.kernelParams = [ "rd.systemd.debug_shell" ];
+  specialisation = {
+    root-autologin.configuration = {
       # Backdoor for easy debugging
       users.users.root.password = lib.mkForce "123";
       users.users.root.hashedPassword = lib.mkForce null;
@@ -156,11 +155,9 @@
       services.xserver.displayManager.lightdm.enable = lib.mkForce false;
       services.getty.autologinUser = lib.mkForce "root";
     };
-  in {
-    root-autologin.configuration = common-root-autologin;
-    root-autologin-zfs-force.configuration = common-root-autologin // {
+    zfs-force.configuration = {
       # FIXME: the pool should just be imported fine at the first boot without
-      #        intervention.
+      #        intervention of booting with this spec.
       boot.kernelParams = [ "zfs_force=1" ];
     };
   };
@@ -187,7 +184,7 @@
       "Repo is not unlocked! Will use default networking.hostId"
       # Not really required to be unique if disks are not shared across network
       "8425e349")
-    "${flake}/sus/${config.networking.hostName}/hostid.json"; 
+    "${flake}/sus/${config.system.name}/hostid.json"; 
   # FIXME: other kernel packages, also verify latest ZFS version
   boot.kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
   boot.supportedFilesystems.zfs = true;
@@ -200,11 +197,13 @@
   # TODO: investigate switching back to scripted initrd (or if it's worth it
   #       for speed)
   # boot.initrd.postDeviceCommands = lib.mkAfter ''
-  #   zfs rollback ${config.disko.devices.disk.main.name}/sys/${config.networking.hostName}/local@blank
-  #   zfs rollback ${config.disko.devices.disk.main.name}/sys/${config.networking.hostName}/local/home@blank
+  #   zfs rollback ${config.disko.devices.disk.main.name}/sys/${config.system.name}/local@blank
+  #   zfs rollback ${config.disko.devices.disk.main.name}/sys/${config.system.name}/local/home@blank
   # '';
   boot.initrd.systemd.services.rollback = {
-    description = "Rollback root filesystem to a pristine state on boot";
+    # Bruh this is boring >
+    # description = "Rollback root filesystem to a pristine state on boot";
+    description = "Execute: rm -rf /...";
     # "zfs.target"
     wantedBy = [ "initrd.target" ];
     after = [ "zfs-import-${config.disko.devices.disk.main.name}.service" ];
@@ -215,8 +214,9 @@
     unitConfig.DefaultDependencies = "no";
     serviceConfig.Type = "oneshot";
     script = ''
-      # zfs rollback ${config.disko.devices.disk.main.name}/sys/${config.networking.hostName}/local@blank && echo " === rm -rf /...Done. === "
-      # zfs rollback ${config.disko.devices.disk.main.name}/sys/${config.networking.hostName}/local/home@blank && echo " === rm -rf /home...Done. == "
+      # TODO: saving the previous state as readonly datasets.
+      zfs rollback ${config.disko.devices.disk.main.name}/sys/${config.system.name}/local@blank && echo " === rm -rf /...Done. === "
+      zfs rollback ${config.disko.devices.disk.main.name}/sys/${config.system.name}/local/home@blank && echo " === rm -rf /home...Done. == "
     '';
   };
   # FIXME: provisioned ssh host keys modified by NixOS at some point for some
@@ -227,11 +227,16 @@
     { path = "/persist/cred/etc/ssh/ssh_host_rsa_key"; type = "rsa"; bits = 4096; }
   ];
 
+  # FIXME: Permit for deployment while testing.
+  # TODO: Find a way to enable that on non-vm build, but which is in fact
+  #       running in a VM.
+  services.openssh.settings.PermitRootLogin = "yes";
+
   # TODO: fix env vars (xdg & otherwise)
-  # FIXME: /home/nrv are created wrong: root:root and 755.
   environment.persistence = {
     "/persist/data" = {
       enable = true;
+      enableDebugging = true;
       hideMounts = true;
       directories = [
       ];
@@ -256,6 +261,7 @@
     };
     "/persist/log" = {
       enable = true;
+      enableDebugging = true;
       hideMounts = true;
       directories = [
         "/nix/var/log"
@@ -271,6 +277,7 @@
     };
     "/persist/state" = {
       enable = true;
+      enableDebugging = true;
       hideMounts = true;
       directories = [
         "/var/lib/bluetooth"
@@ -291,6 +298,7 @@
     };
     "/persist/cache" = {
       enable = true;
+      enableDebugging = true;
       hideMounts = true;
       directories = [
       ];
@@ -304,6 +312,7 @@
     };
     "/persist/cred" = {
       enable = true;
+      enableDebugging = true;
       hideMounts = true;
       directories = [
         { directory = "/etc/sops"; mode = "0700"; }
@@ -325,13 +334,16 @@
   };
 
   # Root
-  # FIXME: enable this back
-  # users.users.root.hashedPasswordFile = self.lib.ifUnlockedOr
-  #   (lib.warn "Repo is not unlocked! Will use default password, CHANGE IT!!!!!!"
-  #       "${pkgs.writeText
-  #         "le-secure-password"
-  #         "$6$FRXEt5XKYRw47Rql$siQrlRJJDjOiSlbChV5Te365XY2v5sKXRomsV90/iApy0kQlGbeFsgNeuL/DbJ7mnhZIoS82Fv6znvMClAh9B0"}")
-  #   config.sops.secrets."passwd/root".path;
+  users.users.root.openssh.authorizedKeys.keys = [
+    # TODO: move the key to config/?
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE/EhBI6sJb2yHbTkqhZiCzUrsLE6t+CZe7RhS22z7w5 nrv@desktop"
+  ];
+  users.users.root.hashedPasswordFile = self.lib.ifUnlockedOr
+    (lib.warn "Repo is not unlocked! Will use default password, CHANGE IT!!!!!!"
+        "${pkgs.writeText
+          "le-secure-password"
+          "$6$FRXEt5XKYRw47Rql$siQrlRJJDjOiSlbChV5Te365XY2v5sKXRomsV90/iApy0kQlGbeFsgNeuL/DbJ7mnhZIoS82Fv6znvMClAh9B0"}")
+    config.sops.secrets."passwd/root".path;
   # User password
   users.users.nrv.hashedPasswordFile = self.lib.ifUnlockedOr
     (lib.warn "Repo is not unlocked! Will use default password, CHANGE IT!!!!!!"
@@ -348,19 +360,24 @@
     config.sops.secrets."passwd/gamer".path;
 
   # Bootloader
-  # FIXME: nodev?
-  boot.loader.grub.device = "/dev/vda";
+  # TODO: 1s delay
+  #       .5s?
+  boot.loader.grub.device = "nodev";
+  boot.loader.grub.devices = lib.mkForce [ "nodev" ];
   boot.loader.grub.enable = true;
-  #boot.loader.grub.version = 2;
+  # Install GRUB with EFI support
   boot.loader.grub.efiSupport = true;
+  # GRUB writes itself to a hardcoded EFI spec location that's always tried
+  # first, instead of relying on EFI NVRAM load order.
   boot.loader.grub.efiInstallAsRemovable = true;
+  # NOTE: This just makes things easier frankly... however i don't think it's
+  #       required for my config
   boot.initrd.systemd.enable = true;
   
   # Hardware config (nixos-generate-config)
   boot.initrd.availableKernelModules = [ "nvme" "usbhid" "xhci_pci" "usb_storage" ];
-  # FIXME: why dm-snapshot is here?
-  boot.initrd.kernelModules = [ "dm-snapshot" ];
-  # FIXME: why kvm-amd is here?
+  boot.initrd.kernelModules = [];
+  # TODO: test what happens when kvm-amd removed. Is it loaded anyway in lsmod?
   boot.kernelModules = [ "kvm-amd" ];
   boot.extraModulePackages = [ ];
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
@@ -410,9 +427,6 @@
     calc
     p7zip
     openssl
-    transcrypt
-    # FIXME: vim only for xxd for transcrypt
-    vim 
 
     #self.packages.${system}.nixpak-test
     self.packages.${system}.firefox
@@ -437,8 +451,12 @@
   # };
 
   services.desktopManager.plasma6.enable = true;
-  # services.displayManager.sddm.enable = true;
-  # services.displayManager.sddm.wayland.enable = true;
+  services.displayManager.sddm.enable = true;
+  services.displayManager.sddm.wayland.enable = true;
+  # FIXME: SDDM is broken (something related to themes?) and i need this to
+  #        login:
+  services.displayManager.autoLogin.enable = true;
+  services.displayManager.autoLogin.user = "nrv";
   environment.plasma6.excludePackages = with pkgs.kdePackages; [
     plasma-browser-integration
     #konsole

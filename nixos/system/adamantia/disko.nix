@@ -101,6 +101,22 @@ boot-end         = "${builtins.toString boot-end}"
 ''
 
 {
+  # NOTE: Without the "/persist".neededForBoot the permissions of user home
+  #       folders and their nested contents created by impermanence is wrong
+  #       (root). I've isolated this issue exactly to this, the other ones
+  #       below without it didn't help. Without this line the mounts are weird
+  #       and all over: /home/nrv/dox is mounted on
+  #       `mythos/sys/adamantia/persist` for example, instead of
+  #       `mythos/sys/adamantia/persist/data`.
+  #       Also the same for `mythos/../persist/cred/etc/sops`, it ends up on
+  #       `mythos/../persist` instead of `mythos/../persist/cred`.
+  #       Disko seems to have a lot of such mount shadowing/wrong mount
+  #       order/time-of-mount-time-of-usage issues with impermanence.
+  #       Self: see 20240731174051-disko-impermanence-mount-order.md for
+  #       `mount` command output
+  # TODO: Report all this to disko & impermanence
+  fileSystems."/persist".neededForBoot = true;
+
   fileSystems."/persist/data".neededForBoot = true;
   fileSystems."/persist/log".neededForBoot = true;
   fileSystems."/persist/state".neededForBoot = true;
@@ -108,7 +124,7 @@ boot-end         = "${builtins.toString boot-end}"
   fileSystems."/persist/cred".neededForBoot = true;
   fileSystems."/".neededForBoot = true;
   # FIXME: enable this - probably needed for impermanence
-  # fileSystems."/home".neededForBoot = true;
+  fileSystems."/home".neededForBoot = true;
 
   # FIXME: For some unimaginable reason `rootMountPoint` returns "" for the string  trace:
   #disko.rootMountPoint = lib.trace "${rootMountPoint}" rootMountPoint;
@@ -454,6 +470,7 @@ boot-end         = "${builtins.toString boot-end}"
         "sys/${system-name}/persist/state/home/nrv/.local/state/containers" = mkZfsFsLegacy {
           mountpoint = "/persist/state/home/nrv/.local/state/containers";
         };
+        # TODO: maybe a sync=disabled tmpfs? https://github.com/Mic92/dotfiles/blob/b2ff14454465c10d00c4239eea0785583ddf9a35/nixos/eve/modules/disko.nix#L82
 
         # "sys/${system-name}/persist/state/var/lib/docker" = {
         #   type = "zfs_volume";

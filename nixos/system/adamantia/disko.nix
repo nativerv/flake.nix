@@ -231,7 +231,7 @@ boot-end         = "${builtins.toString boot-end}"
 
   disko.devices.zpool = let
     # "nodiratime" as well just to be sure
-    defaultMountOptions = [ "noatime" "nodiratime" ];
+    defaultMountOptions = [ "noatime" "nodiratime" "nosuid" "nodev" ];
   in {
     ${zpool-name} = {
       type = "zpool";
@@ -330,6 +330,13 @@ boot-end         = "${builtins.toString boot-end}"
         # improvement
         acltype = "posixacl";
         xattr = "sa";
+
+        # SECURITY: nosuid & nodev by default to prevent shared-permissions
+        #           datasets abuse. This probably not needed anywhere on NixOS
+        #           anyway as all the suid binaries are put to /run/wrappers
+        #           and regenerated at each activation.
+        setuid = "off";
+        devices = "off";
 
         # `zfsprops(7)`: Consider setting dnodesize to auto if the dataset uses
         # the xattr=sa property setting and the workload makes heavy use of

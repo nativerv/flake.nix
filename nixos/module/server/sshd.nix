@@ -1,5 +1,9 @@
 { ... }:
-{ ... }: {
+{
+  lib,
+  ...
+}:
+{
   # This setups an SSH server. Very important if you're setting up a headless system.
   # TODO: hardening
   services.openssh = {
@@ -7,7 +11,8 @@
 
     settings = {
       # Forbid root login through SSH.
-      PermitRootLogin = "no";
+      # NOTE: required to be "yes" for `deploy-rs` deployments to this machine
+      PermitRootLogin = lib.mkDefault "no";
       # Use keys only. Remove if you want to SSH using password (not recommended)
       PasswordAuthentication = false;
       Port = 42069;

@@ -4,6 +4,9 @@
 # spaces in the path are unsupported
 
 set -u
+
+[ -z "${2-}" ] && "${0}" "${1}" pre && "${0}" "${1}" post && exit
+
 source="${1}"
 type="${2}"
 find "${source}/${type}" -type f |

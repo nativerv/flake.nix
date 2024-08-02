@@ -264,7 +264,7 @@
       enableDebugging = true;
       hideMounts = true;
       directories = [
-        "/nix/var/log"
+        # "/nix/var/log"
         "/var/log"
         "/var/lib/systemd/coredump"
       ];

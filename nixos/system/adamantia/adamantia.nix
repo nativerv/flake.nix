@@ -389,7 +389,7 @@
   networking.useDHCP = lib.mkDefault true;
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
   # FIXME: enable me pls
-  hardware.enableRedistributableFirmware = false;
+  hardware.enableRedistributableFirmware = true;
   # ===
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion

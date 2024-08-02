@@ -18,16 +18,26 @@
       self.overlays.default
     ];
     config = { pkgs }: {
-      allowUnfreePredicate = self.lib.unfreeWhiteList (with pkgs; [
-        linux-firmware
-
+      allowUnfreePredicate = pkg: builtins.elem (pkgs.lib.getName pkg) [
+        # Unfree Redistributable packages
         # TODO: disable some of this bullshit
-        intel2200BGFirmware
-        rtl8192su-firmware
-        rt5677-firmware
-        rtl8761b-firmware
-        rtw88-firmware
-      ]);
+        "linux-firmware"
+        "intel2200BGFirmware"
+        "rtl8192su-unstable"
+        "rtl8192su"
+        "rt5677-firmware-zstd"
+        "rt5677-firmware"
+        "rtl8761b-firmware-zstd"
+        "rtl8761b-firmware"
+        "rtw88-firmware-zstd"
+        "rtw88-firmware-unstable"
+        "rtw88-firmware"
+        "libreelec-dvb-firmware"
+        "libreelec-dvb-firmware"
+
+        # Microcode
+        "amd-ucode"
+      ];
     };
   };
 

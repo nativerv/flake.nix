@@ -123,7 +123,6 @@ boot-end         = "${builtins.toString boot-end}"
   fileSystems."/persist/cache".neededForBoot = true;
   fileSystems."/persist/cred".neededForBoot = true;
   fileSystems."/".neededForBoot = true;
-  # FIXME: enable this - probably needed for impermanence
   fileSystems."/home".neededForBoot = true;
 
   # FIXME: For some unimaginable reason `rootMountPoint` returns "" for the string  trace:
@@ -148,7 +147,7 @@ boot-end         = "${builtins.toString boot-end}"
           size = "${builtins.toString start-offset-size}M";
           type = "EF02"; # for grub MBR
         };
-        luks = {
+        crypted = {
           priority = 1;
           start = "${builtins.toString zpool-luks-start}M";
           # end = "${builtins.toString zpool-luks-end}M";
@@ -197,19 +196,19 @@ boot-end         = "${builtins.toString boot-end}"
         # };
 
         # For now i'll use only a single EFI partition
-        ESP = {
+        esp = {
           priority = 3;
           type = "EF00";
           start = "${builtins.toString esp-start}M";
           size = "${builtins.toString esp-size}M";
           #end = "${builtins.toString esp-end}M";
-          name = "ESP";
+          name = "esp";
           # bootable = true;
           content = {
             type = "filesystem";
             format = "vfat";
             mountpoint = "/boot";
-            mountOptions = [ "defaults" "noatime" "umask=0077" ];
+            mountOptions = [ "defaults" "noatime" "umask=0077" "nosuid" "nodev" ];
           };
         };
 

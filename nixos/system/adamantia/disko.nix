@@ -450,6 +450,7 @@ boot-end         = "${builtins.toString boot-end}"
         # for non-sandboxed steam
         "sys/${system-name}/persist/data/home/gamer" = mkZfsFsLegacy {
           mountpoint = "/persist/data/home/gamer";
+          options.recordsize = "128K";
         };
 
         # probably want zvols for docker & podman

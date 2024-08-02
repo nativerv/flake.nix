@@ -239,6 +239,7 @@
       enableDebugging = true;
       hideMounts = true;
       directories = [
+        "/home/gamer"
       ];
       files = [
       ];
@@ -285,6 +286,7 @@
         "/var/lib/docker"
         "/var/lib/mlocate"
         "/var/lib/acme"
+        "/var/lib/flatpak"
         "/var/db/sudo/lectured"
       ];
       files = [
@@ -397,6 +399,21 @@
   services.flatpak.enable = true;
   xdg.portal.enable = true;
   security.rtkit.enable = true;
+  # environment.etc."flatpak/remotes.d/flathub.flatpakrepo".source = pkgs.fetchurl {
+  #   url = "https://dl.flathub.org/repo/flathub.flatpakrepo";
+  #   # Let this run once and you will get the hash as an error.
+  #   hash = "";
+  # };
+  systemd.services.install-flatpak-repos = {
+    wantedBy = [ "multi-user.target" ];
+    wants = [ "network-online.target" ];
+    after = [ "network-online.target" ];
+    path = [ pkgs.flatpak ];
+    serviceConfig.Type = "oneshot";
+    script = ''
+      flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+    '';
+  };
 
   # GTK apps outside GNOME - cursor, theming & window decorations. 
   programs.dconf.enable = true;

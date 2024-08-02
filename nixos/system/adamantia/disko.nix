@@ -410,6 +410,11 @@ boot-end         = "${builtins.toString boot-end}"
         "sys/${system-name}/local/home" = mkZfsFsLegacy {
           mountpoint = "/home";
         };
+        "sys/${system-name}/local/tmp" = mkZfsFsLegacy {
+          mountpoint = "/tmp";
+          options.sync = "disabled";
+          options.compression = "lz4";
+        };
 
         # We don't nuke that
         "sys/${system-name}/nix" = mkZfsFsLegacy {
@@ -476,7 +481,6 @@ boot-end         = "${builtins.toString boot-end}"
         "sys/${system-name}/persist/state/home/nrv/.local/state/containers" = mkZfsFsLegacy {
           mountpoint = "/persist/state/home/nrv/.local/state/containers";
         };
-        # TODO: maybe a sync=disabled tmpfs? https://github.com/Mic92/dotfiles/blob/b2ff14454465c10d00c4239eea0785583ddf9a35/nixos/eve/modules/disko.nix#L82
 
         # "sys/${system-name}/persist/state/var/lib/docker" = {
         #   type = "zfs_volume";

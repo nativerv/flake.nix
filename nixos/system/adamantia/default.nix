@@ -10,7 +10,26 @@
   ...
 }: let
   # INFO: `nixpkgs-flake`: inserted with an overlay into `self.legacyPackages`.
-  inherit (self.legacyPackages."${system}") pkgs nixpkgs-flake;
+  inherit (pkgs) nixpkgs-flake;
+  pkgs = import inputs.nixpkgs-unstable {
+    inherit system;
+    overlays = [
+      (final: prev: { nixpkgs-flake = inputs.nixpkgs-unstable; })
+      self.overlays.default
+    ];
+    config = { pkgs }: {
+      allowUnfreePredicate = self.lib.unfreeWhiteList (with pkgs; [
+        linux-firmware
+
+        # TODO: disable some of this bullshit
+        intel2200BGFirmware
+        rtl8192su-firmware
+        rt5677-firmware
+        rtl8761b-firmware
+        rtw88-firmware
+      ]);
+    };
+  };
 
   # Use folder name as name of this system
   name = builtins.baseNameOf ./.;

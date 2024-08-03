@@ -124,6 +124,10 @@
         ./package
         { inherit flake self inputs; }
       );
+      apps = forAllSystems (system: {
+        disko-adamantia-image.type = "app";
+        disko-adamantia-image.program = "${self.nixosConfigurations.adamantia.config.system.build.diskoImagesScript}";
+      });
       
       # Configuration modules for NixOS systems
       # Declared in ./nixos/module/TYPE/NAME

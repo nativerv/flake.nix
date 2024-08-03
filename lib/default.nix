@@ -181,9 +181,11 @@
 
   readPackages = callPackage: path: extraArgs:
     with lib;
+    with builtins;
     pipe path [
-      builtins.readDir
+      readDir
       (filterAttrs (_: type: type == "directory"))
+      (filterAttrs (name: _: pathExists "${path}/${name}/default.nix"))
       (mapAttrs (name: _: callPackage "${path}/${name}" extraArgs))
     ];
 }

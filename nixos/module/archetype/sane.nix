@@ -15,6 +15,23 @@
   # Clean tmp just in case
   boot.tmp.cleanOnBoot = true;
 
+  # By default NixOS has /tmp on disk because Nix needs a lot of space here.
+  # This is bad because secrets usually go here not to mention the performance
+  # hit. This sets up a cache dir specifically for Nix instead
+  # Credit: https://lantian.pub/en/article/modify-computer/nixos-impermanence.lantian/
+  # TODO: is it cleaned between reboots?
+  systemd.services.nix-daemon = {
+    # Location for temporary files
+    environment.TMPDIR = "/var/cache/nix";
+    # Create /var/cache/nix automatically on Nix Daemon start
+    serviceConfig.CacheDirectory = "nix";
+  };
+  # However, this option does not apply to the root user. This is caused by the
+  # nix command handling the build request itself under root user, rather than
+  # passing it to the Nix Daemon. Therefore, we need to add an environment
+  # variable NIX_REMOTE=daemon, to force the nix command to call the daemon:
+  environment.variables.NIX_REMOTE = "daemon";
+
   # Symlink /etc/nixos to this flake.
   # NOTE: maybe not *that* sane? Let's see if this spits errors or overwrites the stateful/handwritten config or whatever.
   # WARNING: This was causing some (possibly critical) errors during initial

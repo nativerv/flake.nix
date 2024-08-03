@@ -176,6 +176,8 @@
   sops.secrets."passwd/nrv".neededForUsers = true;
   sops.secrets."passwd/gamer".neededForUsers = true;
 
+  # /tmp on tmpfs
+  boot.tmp.useTmpfs = true;
 
   # Setup ZFS
   disko.extraRootModules = [ "zfs" ];

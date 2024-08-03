@@ -184,7 +184,7 @@
       "Repo is not unlocked! Will use default networking.hostId"
       # Not really required to be unique if disks are not shared across network
       "8425e349")
-    "${flake}/sus/${config.system.name}/hostid.json"; 
+    "${flake}/sus/${config.system.name}/eval/hostid.json"; 
   # FIXME: other kernel packages, also verify latest ZFS version
   boot.kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
   boot.supportedFilesystems.zfs = true;

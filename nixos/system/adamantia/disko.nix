@@ -410,11 +410,11 @@ boot-end         = "${builtins.toString boot-end}"
         "sys/${system-name}/local/home" = mkZfsFsLegacy {
           mountpoint = "/home";
         };
-        "sys/${system-name}/local/tmp" = mkZfsFsLegacy {
-          mountpoint = "/tmp";
-          options.sync = "disabled";
-          options.compression = "lz4";
-        };
+        # "sys/${system-name}/local/tmp" = mkZfsFsLegacy {
+        #   mountpoint = "/tmp";
+        #   options.sync = "disabled";
+        #   options.compression = "lz4";
+        # };
 
         # We don't nuke that
         "sys/${system-name}/nix" = mkZfsFsLegacy {

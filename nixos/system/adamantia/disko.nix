@@ -88,6 +88,9 @@
   #                                  ||         esp-end = 44
   #                                  |esp-start = 35
   #                                  boot-end = 34 
+
+  # "nodiratime" as well just to be sure
+  defaultMountOptions = [ "noatime" "nodiratime" "nosuid" "nodev" ];
 in
   #assert zpool-luks-end < (total-size - boot-start);
 builtins.trace ''
@@ -124,6 +127,14 @@ boot-end         = "${builtins.toString boot-end}"
   fileSystems."/persist/cred".neededForBoot = true;
   fileSystems."/".neededForBoot = true;
   # fileSystems."/home".neededForBoot = lib.mkIf (config.fileSystems."/home" ? device);
+
+  fileSystems."/old/boot/00" = {
+    device = "${zpool-name}/sys/${system-name}/local/now";
+    fsType = "zfs";
+    # NOTE: tried to do ++ [ "ro" ] here but it seems that mountint ro at one
+    #       place makes it ro at them all
+    options = defaultMountOptions;
+  };
 
   # FIXME: For some unimaginable reason `rootMountPoint` returns "" for the string  trace:
   #disko.rootMountPoint = lib.trace "${rootMountPoint}" rootMountPoint;
@@ -208,7 +219,7 @@ boot-end         = "${builtins.toString boot-end}"
             type = "filesystem";
             format = "vfat";
             mountpoint = "/boot";
-            mountOptions = [ "defaults" "noatime" "umask=0077" "nosuid" "nodev" ];
+            mountOptions = [ "defaults" "umask=0077" ] ++ defaultMountOptions;
           };
         };
 
@@ -228,10 +239,7 @@ boot-end         = "${builtins.toString boot-end}"
     };
   };
 
-  disko.devices.zpool = let
-    # "nodiratime" as well just to be sure
-    defaultMountOptions = [ "noatime" "nodiratime" "nosuid" "nodev" ];
-  in {
+  disko.devices.zpool = {
     ${zpool-name} = {
       type = "zpool";
       mode = ""; # "" is stripe/single drive

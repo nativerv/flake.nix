@@ -67,11 +67,11 @@ zfs rename -u "${now_dataset}" "${old_boots_dataset}/01"
 zfs set readonly='on' "${old_boots_dataset}/01"
 # Reset mountpoint on the old one - so it can be inherited and auto-mounted.
 zfs inherit mountpoint "${old_boots_dataset}/01"
+# Umount it so it doesn't get in the way
 zfs umount "${old_boots_dataset}/01"
 
 # Clone the @blank to be a new /
 zfs clone "${old_boots_dataset}/01@blank" "${now_dataset}"
-# Umount it so it doesn't get in the way
 
 # Promote it because why not
 zfs promote "${now_dataset}"

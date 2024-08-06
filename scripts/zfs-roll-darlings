@@ -47,7 +47,7 @@ zfs create -up \
   "${old_boots_dataset}"
 
 # Roll out the oldest `/` dataset
-zfs destroy -r "${old_boots_dataset}/${ZRD_MAX}"
+zfs destroy -r "${old_boots_dataset}/$(printf '%02d\n' "${ZRD_MAX}")"
 
 # Shift all the other old `/` datasets
 for n in $(seq 2 "${ZRD_MAX}" | sort -rn); do

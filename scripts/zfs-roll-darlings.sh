@@ -1,41 +1,64 @@
 #!/bin/sh
 
+# Name: zfs-roll-darlings
+# Author: nrv
+# License: GPL-3.0-or-later 
+# Description:
+#   Performs a wipe of `/` dataset with rolling history. Rolls out the oldest &
+#   shifts intermediate, moves current `/` dataset to be most recent in
+#   history, clones @blank to be a new `/`.
+# Requirements:
+#  - `$ZRD_POOL/sys/$ZRD_SYSTEM/local/now` dataset used as `/`
+#  - @blank snapshot on `now to rollback to.
+#  - `/` or any of the old datasets is not mounted. Designed to be run from
+#    initrd after `zfs import` but before system mounts, for systemd initrd
+#    that's:
+#      wantedBy = [ "initrd.target" ];
+#      after = [ "zfs-import-$ZRD_POOL.service" ];
+#      before = [ "sysroot.mount" ];
+# Example state with this script as initrd service (for ZRD_MAX=3):
+#   "mythos/sys/adamantia/local/now"            -- current `/`
+#   "mythos/sys/adamantia/local/old/boot/01"    -- prev boot
+#   "mythos/sys/adamantia/local/old/boot/02"    -- prev prev boot
+#   "mythos/sys/adamantia/local/old/boot/03"    -- prev prev prev boot
+
+# TODO: corner case: out of space
+# TODO: corner case: no @blank
+# TODO: corner case: ZRD_MAX > 99 (sorting/zero-padding issue)
+# TODO: check for mounted `/` or `/old`
+
 set -u
 # set -x
 set +e
 
-max=10
-local_dataset="${pool}/sys/${system}/local"
+: "${ZRD_MAX:=10}"
+: "${ZRD_OLD_MOUNT:='/old'}"
+
+local_dataset="${ZRD_POOL}/sys/${ZRD_SYSTEM}/local"
 now_dataset="${local_dataset}/now"
 old_dataset="${local_dataset}/old"
 old_boots_dataset="${old_dataset}/boot"
 
 zfs create -up \
-  -o mountpoint="/old" \
-  -o canmount='noauto' \
+  -o mountpoint="${ZRD_OLD_MOUNT}" \
   "${old_dataset}"
 
 zfs create -up \
   "${old_boots_dataset}"
 
-# "mythos/sys/adamantia/local/now"
-# "mythos/sys/adamantia/local/old/boot/01"
-# "mythos/sys/adamantia/local/old/boot/02"
-# "mythos/sys/adamantia/local/old/boot/03"
+# Roll out the oldest `/` dataset
+zfs destroy -r "${old_boots_dataset}/${ZRD_MAX}"
 
-# Roll out the oldest / dataset
-zfs destroy -r "${old_boots_dataset}/${max}"
-
-# Shift all the other old / datasets
-for n in $(seq 2 "${max}" | sort -rn); do
+# Shift all the other old `/` datasets
+for n in $(seq 2 "${ZRD_MAX}" | sort -rn); do
   n_prev="$(printf '%02d\n' "$((n-1))")"
   n="$(printf '%02d\n' "${n}")"
   zfs rename -u "${old_boots_dataset}/${n_prev}" "${old_boots_dataset}/${n}"
 done
 
-# Then, we first snapshot the state of current / dataset.
+# Then, we first snapshot the state of current `/` dataset.
 zfs snapshot "${now_dataset}@boot"
-# Then move the current / to be boot/01 (older datasets were shifted by the
+# Then move the current `/` to be boot/01 (older datasets were shifted by the
 # loop above - the name boot/01 is free)
 zfs rename -u "${now_dataset}" "${old_boots_dataset}/01"
 # Then set it readonly - because it's basically a snapshot and should never be

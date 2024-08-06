@@ -202,25 +202,92 @@
   #   zfs rollback ${config.disko.devices.disk.main.name}/sys/${config.system.name}/local@blank
   #   zfs rollback ${config.disko.devices.disk.main.name}/sys/${config.system.name}/local/home@blank
   # '';
-  boot.initrd.systemd.services.rollback = {
-    # Bruh this is boring >
-    # description = "Rollback root filesystem to a pristine state on boot";
-    description = "Execute: rm -rf /...";
-    # "zfs.target"
-    wantedBy = [ "initrd.target" ];
-    after = [ "zfs-import-${config.disko.devices.disk.main.name}.service" ];
-    before = [ "sysroot.mount" ];
-    path = with pkgs; [
-      zfs
-    ];
-    unitConfig.DefaultDependencies = "no";
-    serviceConfig.Type = "oneshot";
-    script = ''
-      # TODO: saving the previous state as readonly datasets.
-      zfs rollback ${config.disko.devices.disk.main.name}/sys/${config.system.name}/local@blank && echo " === rm -rf /...Done. === "
-      zfs rollback ${config.disko.devices.disk.main.name}/sys/${config.system.name}/local/home@blank && echo " === rm -rf /home...Done. == "
-    '';
+  boot.initrd.systemd = let 
+    zfs-roll-darlings = (pkgs.writeShellScriptBin "zfs-roll-darlings" "exec ${flake}/scripts/zfs-roll-darlings.sh");
+  in {
+    enable = true;
+    extraBin.zfs-roll-darlings = "${flake}/scripts/zfs-roll-darlings.sh";
+    services.roll-darlings = {
+      # Bruh this is boring >
+      # description = "Rollback root filesystem to a pristine state on boot";
+      description = "Execute: rm -rf /...";
+      # "zfs.target"
+      wantedBy = [ "initrd.target" ];
+      after = [ "zfs-import-${config.disko.devices.disk.main.name}.service" ];
+      before = [ "sysroot.mount" ];
+      path = with pkgs; [
+        zfs
+        coreutils
+        util-linux
+        zfs-roll-darlings
+        # config.boot.initrd.systemd.package.util-linux
+      ];
+      unitConfig.DefaultDependencies = "no";
+      serviceConfig.Type = "oneshot";
+      script = with pkgs; ''
+        set -ux
+        set +e
+
+        prefix='${config.disko.devices.disk.main.name}/sys/${config.system.name}'
+        declare -a darlings=(
+          "local"
+          "local/home"
+        )
+        ls -la /
+        #findmnt
+        # cat /proc/mounts
+        
+        mount || true
+        export ZRD_POOL="${config.disko.devices.disk.main.name}"
+        export ZRD_SYSTEM="${config.system.name}"
+        export ZRD_MAX="31"
+        # exec zfs-roll-darlings
+        ${builtins.readFile "${flake}/scripts/zfs-roll-darlings"}
+
+        # zfs snapshot "$prefix/local@boot"
+        # zfs rename "$prefix/local" "$prefix/local.boot.1" 
+        # zfs clone "$prefix/local.boot.1@blank" "$prefix/local" 
+
+        # for darling in "''${darlings[@]}"; do
+        #   # Fuck all that shit. Just literally rm -rf fucking /. I don't care.
+        #   rm --one-file-system --no-preserve-root -vrf /home
+        #   rm --one-file-system --no-preserve-root -vrf /
+        # done
+
+        # # For fuck's sake. ZFS is extremely annoying to actually use.
+        # for darling in "''${darlings[@]}"; do
+        #   zfs snapshot "$prefix/$darling@boot"
+        #   zfs clone "$prefix/$darling@boot" "$prefix/$darling.boot.1"
+        #   zfs promote "$prefix/$darling.boot.1"
+        #   zfs set readonly=on "$prefix/$darling.boot.1"
+        #   zfs rollback -r "$prefix/$darling@blank"
+        # done
+
+        # # I'm having a fucking error 'mount' not found with this. this is insane.
+        # for darling in "''${darlings[@]}"; do
+        #   path="/tmp/darlings/$darling"
+        #   mkdir -p "$path"
+        #   echo $PATH
+        #   ls -la /
+        #   ls -laR ${util-linux.bin}
+        #   mount -t zfs -m "$prefix/$darling" "$path" || exit 1
+        #
+        #   # Safety measures: $path only contains / and . or is empty
+        #   [ -z "$(printf '%s' "$path" | sed 's|[/.]||g')" ] && exit 1
+        #
+        #   findmnt "$path"
+        #   ls -la "$path"
+        #
+        #   rm --one-file-system -vrf "$path" || exit 1
+        #
+        #   ls -la "$path"
+        #
+        #   umount "$path" || exit 1
+        # done
+      '';
+    };
   };
+
   # FIXME: provisioned ssh host keys modified by NixOS at some point for some
   #        reason - the comment among something else in the private key -
   #        fingerprint changes.
@@ -367,6 +434,7 @@
   # TODO: 1s delay
   #       .5s?
   boot.loader.grub.device = "nodev";
+  # boot.loader.grub.extraConfig
   boot.loader.grub.devices = lib.mkForce [ "nodev" ];
   boot.loader.grub.enable = true;
   # Install GRUB with EFI support
@@ -376,7 +444,9 @@
   boot.loader.grub.efiInstallAsRemovable = true;
   # NOTE: This just makes things easier frankly... however i don't think it's
   #       required for my config
-  boot.initrd.systemd.enable = true;
+  # NOTE: Moved below
+  # FIXME: You know... decouple this giant mess of a system config file
+  # boot.initrd.systemd.enable = true;
   
   # Hardware config (nixos-generate-config)
   boot.initrd.availableKernelModules = [ "nvme" "usbhid" "xhci_pci" "usb_storage" ];

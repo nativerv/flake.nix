@@ -123,7 +123,7 @@ boot-end         = "${builtins.toString boot-end}"
   fileSystems."/persist/cache".neededForBoot = true;
   fileSystems."/persist/cred".neededForBoot = true;
   fileSystems."/".neededForBoot = true;
-  fileSystems."/home".neededForBoot = true;
+  # fileSystems."/home".neededForBoot = lib.mkIf (config.fileSystems."/home" ? device);
 
   # FIXME: For some unimaginable reason `rootMountPoint` returns "" for the string  trace:
   #disko.rootMountPoint = lib.trace "${rootMountPoint}" rootMountPoint;
@@ -361,11 +361,7 @@ boot-end         = "${builtins.toString boot-end}"
         ds_name='nix'; zfs list -t snapshot -H -o name | grep -E '^${zpool-name}/sys/${system-name}/$ds_name@blank$' || zfs snapshot ${zpool-name}/sys/${system-name}/$ds_name@blank
 
         # For the impermanence setup - to reset root every reboot.
-        ds_name='local'; zfs list -t snapshot -H -o name | grep -E '^${zpool-name}/sys/${system-name}/$ds_name@blank$' || zfs snapshot ${zpool-name}/sys/${system-name}/$ds_name@blank
-
-        # For the impermanence setup - to reset home every reboot.
-        # (not for right now - let it be on root)
-        ds_name='local/home'; zfs list -t snapshot -H -o name | grep -E '^${zpool-name}/sys/${system-name}/$ds_name@blank$' || zfs snapshot ${zpool-name}/sys/${system-name}/$ds_name@blank
+        ds_name='local/now'; zfs list -t snapshot -H -o name | grep -E '^${zpool-name}/sys/${system-name}/$ds_name@blank$' || zfs snapshot ${zpool-name}/sys/${system-name}/$ds_name@blank
 
         echo ==================
         echo CREATE HOOK
@@ -405,16 +401,10 @@ boot-end         = "${builtins.toString boot-end}"
 
         # We nuke this
         "sys/${system-name}/local" = mkZfsFsLegacy {
+        };
+        "sys/${system-name}/local/now" = mkZfsFsLegacy {
           mountpoint = "/";
         };
-        "sys/${system-name}/local/home" = mkZfsFsLegacy {
-          mountpoint = "/home";
-        };
-        # "sys/${system-name}/local/tmp" = mkZfsFsLegacy {
-        #   mountpoint = "/tmp";
-        #   options.sync = "disabled";
-        #   options.compression = "lz4";
-        # };
 
         # We don't nuke that
         "sys/${system-name}/nix" = mkZfsFsLegacy {

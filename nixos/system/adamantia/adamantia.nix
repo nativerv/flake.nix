@@ -208,10 +208,7 @@
     enable = true;
     extraBin.zfs-roll-darlings = "${flake}/scripts/zfs-roll-darlings.sh";
     services.roll-darlings = {
-      # Bruh this is boring >
-      # description = "Rollback root filesystem to a pristine state on boot";
       description = "Execute: rm -rf /...";
-      # "zfs.target"
       wantedBy = [ "initrd.target" ];
       after = [ "zfs-import-${config.disko.devices.disk.main.name}.service" ];
       before = [ "sysroot.mount" ];
@@ -220,70 +217,17 @@
         coreutils
         util-linux
         zfs-roll-darlings
-        # config.boot.initrd.systemd.package.util-linux
       ];
       unitConfig.DefaultDependencies = "no";
       serviceConfig.Type = "oneshot";
       script = with pkgs; ''
-        set -ux
-        set +e
-
-        prefix='${config.disko.devices.disk.main.name}/sys/${config.system.name}'
-        declare -a darlings=(
-          "local"
-          "local/home"
-        )
-        ls -la /
-        #findmnt
-        # cat /proc/mounts
-        
-        mount || true
         export ZRD_POOL="${config.disko.devices.disk.main.name}"
         export ZRD_SYSTEM="${config.system.name}"
         export ZRD_MAX="31"
-        # exec zfs-roll-darlings
+        # FIXME: can't include dependencies in initrd no matter what i try, so
+        #        read & inline instead
+        #exec zfs-roll-darlings
         ${builtins.readFile "${flake}/scripts/zfs-roll-darlings"}
-
-        # zfs snapshot "$prefix/local@boot"
-        # zfs rename "$prefix/local" "$prefix/local.boot.1" 
-        # zfs clone "$prefix/local.boot.1@blank" "$prefix/local" 
-
-        # for darling in "''${darlings[@]}"; do
-        #   # Fuck all that shit. Just literally rm -rf fucking /. I don't care.
-        #   rm --one-file-system --no-preserve-root -vrf /home
-        #   rm --one-file-system --no-preserve-root -vrf /
-        # done
-
-        # # For fuck's sake. ZFS is extremely annoying to actually use.
-        # for darling in "''${darlings[@]}"; do
-        #   zfs snapshot "$prefix/$darling@boot"
-        #   zfs clone "$prefix/$darling@boot" "$prefix/$darling.boot.1"
-        #   zfs promote "$prefix/$darling.boot.1"
-        #   zfs set readonly=on "$prefix/$darling.boot.1"
-        #   zfs rollback -r "$prefix/$darling@blank"
-        # done
-
-        # # I'm having a fucking error 'mount' not found with this. this is insane.
-        # for darling in "''${darlings[@]}"; do
-        #   path="/tmp/darlings/$darling"
-        #   mkdir -p "$path"
-        #   echo $PATH
-        #   ls -la /
-        #   ls -laR ${util-linux.bin}
-        #   mount -t zfs -m "$prefix/$darling" "$path" || exit 1
-        #
-        #   # Safety measures: $path only contains / and . or is empty
-        #   [ -z "$(printf '%s' "$path" | sed 's|[/.]||g')" ] && exit 1
-        #
-        #   findmnt "$path"
-        #   ls -la "$path"
-        #
-        #   rm --one-file-system -vrf "$path" || exit 1
-        #
-        #   ls -la "$path"
-        #
-        #   umount "$path" || exit 1
-        # done
       '';
     };
   };
@@ -469,13 +413,6 @@
 
   # Flatpak
   services.flatpak.enable = true;
-  xdg.portal.enable = true;
-  security.rtkit.enable = true;
-  # environment.etc."flatpak/remotes.d/flathub.flatpakrepo".source = pkgs.fetchurl {
-  #   url = "https://dl.flathub.org/repo/flathub.flatpakrepo";
-  #   # Let this run once and you will get the hash as an error.
-  #   hash = "";
-  # };
   systemd.services.install-flatpak-repos = {
     wantedBy = [ "multi-user.target" ];
     wants = [ "network-online.target" ];
@@ -486,6 +423,8 @@
       flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
     '';
   };
+  xdg.portal.enable = true;
+  security.rtkit.enable = true;
 
   # GTK apps outside GNOME - cursor, theming & window decorations. 
   programs.dconf.enable = true;

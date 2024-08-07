@@ -478,6 +478,34 @@
   #   };
   # };
 
+  # Setup VPN
+  sops.secrets."wg/umbriel-bfs/private.key" = {};
+  networking.wg-quick.interfaces.umbriel-bfs = let
+    umbriel-bfs = self.lib.fromJSONIfUnlockedOr (
+      lib.warn "Repo is not unlocked! Wireguard will not work." {
+        interface = {
+          address = [ "10.0.0.2/32" ];
+        };
+        peer = {
+          publicKey = "0000000000000000000000000000000000000000000=";
+          endpoint = "127.0.0.1:51820";
+          allowedIPs = [ "0.0.0.1/32" "::1/128" ];
+          persistentKeepalive = 30;
+        };
+      })
+      "${flake}/sus/${config.system.name}/eval/wg/umbriel-bfs.json";
+  in {
+    autostart = !self.lib.isLocked;
+    privateKeyFile = config.sops.secrets."wg/umbriel-bfs/private.key".path;
+    dns = [ "127.0.0.1" ];
+    peers = [ umbriel-bfs.peer ];
+    inherit (umbriel-bfs.interface) address;
+  };
+  # TODO: decouple wireguard from dnscrypt-proxy. The server should probably
+  #       have a DNS server anyway
+  services.dnscrypt-proxy2.enable = true;
+
+  # Setup Plasma
   services.desktopManager.plasma6.enable = true;
   services.displayManager.sddm.enable = true;
   services.displayManager.sddm.wayland.enable = true;

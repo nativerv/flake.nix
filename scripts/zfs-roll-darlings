@@ -39,12 +39,9 @@ now_dataset="${local_dataset}/now"
 old_dataset="${local_dataset}/old"
 old_boots_dataset="${old_dataset}/boot"
 
-zfs create -up \
-  -o mountpoint="${ZRD_OLD_MOUNT}" \
-  "${old_dataset}"
+zfs create -up -o mountpoint="${ZRD_OLD_MOUNT}" "${old_dataset}"
 
-zfs create -up \
-  "${old_boots_dataset}"
+zfs create -up "${old_boots_dataset}"
 
 # Roll out the oldest `/` dataset
 zfs destroy -r "${old_boots_dataset}/$(printf '%02d\n' "${ZRD_MAX}")"

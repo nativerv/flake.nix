@@ -13,7 +13,7 @@
     nixpak.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
     # Disk management & partitioning
-    disko.url = "github:nix-community/disko";
+    disko.url = "github:nativerv/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
     # Ephemeral/Impermanent root utility

@@ -30,6 +30,8 @@ in {
         "steam"
       ];
 
+      shell = pkgs.zsh;
+
       openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE/EhBI6sJb2yHbTkqhZiCzUrsLE6t+CZe7RhS22z7w5"
       ];

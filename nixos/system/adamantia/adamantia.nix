@@ -64,7 +64,9 @@
     font = "Lat2-Terminus16";
     keyMap = "us";
     # Use services.xserver.xkb.options in tty:
-    useXkbConfig = true;
+    # WARNING: this option is exclusive with console.keyMap without builting warning!
+    # TODO: maybe contribute a fix (console.useXkbConfig xor console.keyMap)
+    #useXkbConfig = true;
   };
 
   # Keyboard settings (mappings)

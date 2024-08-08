@@ -487,6 +487,8 @@
     calc
     p7zip
     openssl
+    transcrypt
+    vim
 
     #self.packages.${system}.nixpak-test
     self.packages.${system}.firefox

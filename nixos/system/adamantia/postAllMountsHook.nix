@@ -8,6 +8,7 @@
 in with gids; pkgs.writeShellScriptBin "disko-post-all-mounts" ''
   # Disk mountpoints directory
   # TODO: configure this in impermanence or systemd-tmpfiles or something
+  # FIXME: /persist/*/home/$USER is incorrectly root.
 
   location='${rootMountPoint}/media/disk'
   chmod o-rwx "$location"

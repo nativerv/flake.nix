@@ -71,6 +71,9 @@
 
   # Keyboard settings (mappings)
   services.keyd.enable = true;
+  systemd.services.keyd.restartTriggers = [
+    config.environment.etc."keyd/keyd.conf".source
+  ];
   environment.etc."keyd/keyd.conf".source = lib.mkForce
     "${flake}/nixos/module/program/keyd/keyd.conf";
 

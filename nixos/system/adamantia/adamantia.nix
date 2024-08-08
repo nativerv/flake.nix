@@ -5,9 +5,9 @@
   ...
 }:
 {
-  config ? null, 
-  pkgs ? null, 
-  lib ? null, 
+  config ? null,
+  pkgs ? null,
+  lib ? null,
   modulesPath ? null,
   ...
 }: {
@@ -46,8 +46,28 @@
     self.nixosModules."user.gamer"
   ];
 
-  # Virtual machine-scoped config
+  # System zone
+  # NOTE: setting time zone here actually matters
+  #       KDE spectale **segfaults** when this isn not set LUL
+  time.timeZone = let
+    # TODO: use default from `dream`
+    defaultTimeZone = "UTC";
+  in self.lib.fromJSONIfUnlockedOr (
+    lib.warn
+      "Repo is not unlocked! Will use default time zone: '${defaultTimeZone}'"
+      defaultTimeZone
+  ) "${flake}/sus/${config.system.name}/eval/timezone.json";
 
+  # System language
+  i18n.defaultLocale = "en_US.UTF-8";
+  console = {
+    font = "Lat2-Terminus16";
+    keyMap = "us";
+    # Use services.xserver.xkb.options in tty:
+    useXkbConfig = true;
+  };
+
+  # Virtual machine-scoped config
   virtualisation = let
     vm-config = {
       imports = [

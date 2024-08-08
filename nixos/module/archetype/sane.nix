@@ -74,6 +74,9 @@
       # WARNING: Setting this on `true` sometimes causes: `error: cached failure of attribute 'legacyPackages.x86_64-linux'`
       # NOTE: Docs: Whether to use the flake evaluation cache (in ~/.cache/nix)
       eval-cache = true;
+
+      # Lock down nix to sudoers
+      allowed-users = [ "@wheel" ];
     };
   };
 }

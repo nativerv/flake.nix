@@ -65,6 +65,19 @@
     # vim:ft=zsh
   '';
 
+  # GPG
+  programs.gpg = {
+    enable = true;
+    homedir = "${config.xdg.dataHome}/gnupg";
+  };
+  services.gpg-agent = {
+    enable = true;
+    # Type password from tty instead of the GUI - useful for SSH
+    enableZshIntegration = true;
+    defaultCacheTtl = 60*60; 
+    maxCacheTtl = 60*60*24; 
+  };
+
   # Password store
   programs.password-store = {
     enable = true;

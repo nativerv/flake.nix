@@ -64,4 +64,13 @@
     . "''${XDG_STATE_HOME}/nix/profiles/home-manager/home-path/etc/profile.d/hm-session-vars.sh"
     # vim:ft=zsh
   '';
+
+  # Password store
+  programs.password-store = {
+    enable = true;
+    package = pkgs.pass.withExtensions (exts: with exts; [
+      pass-otp
+    ]);
+    settings.PASSWORD_STORE_DIR = "${config.xdg.dataHome}/pass";
+  };
 }

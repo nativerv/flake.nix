@@ -67,6 +67,11 @@
     useXkbConfig = true;
   };
 
+  # Keyboard settings (mappings)
+  services.keyd.enable = true;
+  environment.etc."keyd/keyd.conf".source = lib.mkForce
+    "${flake}/nixos/module/program/keyd/keyd.conf";
+
   # Virtual machine-scoped config
   virtualisation = let
     vm-config = {

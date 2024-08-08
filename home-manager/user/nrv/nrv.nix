@@ -72,7 +72,9 @@
   };
   services.gpg-agent = {
     enable = true;
-    # Type password from tty instead of the GUI - useful for SSH
+    pinentryPackage = pkgs.pinentry-bemenu;
+    # NOTE: (that's what i've thought:) Type password from tty instead of the
+    #       GUI - useful for SSH
     enableZshIntegration = true;
     defaultCacheTtl = 60*60; 
     maxCacheTtl = 60*60*24; 
@@ -81,9 +83,20 @@
   # Password store
   programs.password-store = {
     enable = true;
-    package = pkgs.pass.withExtensions (exts: with exts; [
+    package = (pkgs.pass.override {
+      x11Support = false;
+      waylandSupport = false;
+      dmenuSupport = false;
+    }).withExtensions (exts: with exts; [
       pass-otp
     ]);
+    # package = (pkgs.pass.withExtensions (exts: with exts; [
+    #   pass-otp
+    # ])).override {
+    #   x11Support = false;
+    #   waylandSupport = false;
+    #   dmenuSupport = false;
+    # };
     settings.PASSWORD_STORE_DIR = "${config.xdg.dataHome}/pass";
   };
 }

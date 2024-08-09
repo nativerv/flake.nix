@@ -90,6 +90,7 @@ in {
     enable = true;
     homedir = "${config.xdg.dataHome}/gnupg";
   };
+  # Cache passpharses for some time
   services.gpg-agent = {
     enable = true;
     pinentryPackage = pkgs.pinentry-bemenu;
@@ -99,6 +100,9 @@ in {
     defaultCacheTtl = 60*60; 
     maxCacheTtl = 60*60*24; 
   };
+
+  # SSH agent - cache passphrases for some time
+  services.ssh-agent.enable = true;
 
   # Password store
   programs.password-store = {

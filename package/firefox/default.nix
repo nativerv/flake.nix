@@ -6,7 +6,7 @@
     config = { sloth, ... }: {
 
       # the application to isolate
-      app.package = pkgs.firefox;
+      app.package = pkgs.firefox-bin;
 
       # path to the executable to be wrapped
       # this is usually autodetected but

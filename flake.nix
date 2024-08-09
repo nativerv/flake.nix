@@ -129,6 +129,8 @@
       apps = forAllSystems (system: {
         disko-adamantia-image.type = "app";
         disko-adamantia-image.program = "${self.nixosConfigurations.adamantia.config.system.build.diskoImagesScript}";
+        disko-adamantia-post.type = "app";
+        disko-adamantia-post.program = "${self.legacyPackages.${system}.callPackage ./nixos/system/adamantia/postAllMountsHook.nix { zpool-name = "mythos"; rootMountPoint = "/"; }}/bin/disko-post-all-mounts";
       });
       
       # Configuration modules for NixOS systems

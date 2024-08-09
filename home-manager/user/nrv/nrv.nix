@@ -21,9 +21,24 @@ in {
   home = {
     username = "${name}";
     homeDirectory = "/home/${name}";
-    packages = with pkgs; [
+    packages = with pkgs; let 
+      pass = config.programs.password-store.package;
+    in [
       hello
       git-annex
+      delta
+      (pkgs.wrapPackages [ pkgs.restic ] {
+        environment = {
+	  RESTIC_PASSWORD_COMMAND = "${pass}/bin/pass show ${self.config.backups.restic.key.sk.pass-path or "dummy"}";
+	  RESTIC_COMPRESSION = "max";
+	  RCLONE_PASSWORD_COMMAND="${pass}/bin/pass show ${self.config.backups.rclone.key.adamantia.pass-path or "dummy"}";
+	};
+      })
+      (pkgs.wrapPackages [ pkgs.rclone ] {
+        environment = {
+	  RCLONE_PASSWORD_COMMAND="${pass}/bin/pass show ${self.config.backups.rclone.key.adamantia.pass-path or "dummy"}";
+	};
+      })
     ];
 
     # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion

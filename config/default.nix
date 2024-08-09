@@ -9,6 +9,7 @@
 {
   self,
   lib,
+  flake,
   ...
 }: let in {
   /* Default nixpkgs config */
@@ -19,4 +20,5 @@
   };
   groups = import ./groups.nix { inherit lib; };
   #users  = import ./users.nix { inherit lib; };
+  backups = self.lib.fromJSONIfUnlockedOr {} "${flake}/sus/common/backups.json";
 }

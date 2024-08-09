@@ -29,6 +29,7 @@
 
     self.nixosModules."archetype.minimal"
     self.nixosModules."archetype.default"
+    self.nixosModules."archetype.edge"
 
     #self.nixosModules."bootloader.grub"
 

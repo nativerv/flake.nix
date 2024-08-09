@@ -188,4 +188,36 @@
       (filterAttrs (name: _: pathExists "${path}/${name}/default.nix"))
       (mapAttrs (name: _: callPackage "${path}/${name}" extraArgs))
     ];
+
+  # Wrap package list into a single package where every binary has specified
+  # environment and flags.
+  # Most useful for configuring individual packages with env and flags.
+  # Overlay it on top of your nixpkgs to avoid 'pkgs' duplication below
+  # Example:
+  # restic = wrapPackage pkgs [ pkgs.restic ] {
+  #   flags = [ "--password-file" "/etc/restic/password" ];
+  #   environment = {
+  #     RESTIC_COMPRESSION = "max";
+  #     RCLONE_PASSWORD_COMMAND = "cat /etc/rclone/password";
+  #   };
+  # };
+  wrapPackages =
+    pkgs:
+    pkgsToWrap:
+    {
+      environment ? {},
+      flags ? []
+    }: with lib; (pkgs.symlinkJoin {
+      name = concatStringsSep "-" (map (pkg: pkg.name) pkgsToWrap);
+      paths = pkgsToWrap;
+      buildInputs = [ pkgs.makeWrapper ];
+      postBuild = ''
+        set -x
+        for bin in $out/bin/*; do
+          wrapProgram "$bin" \
+            ${concatStringsSep " \\\n" (mapAttrsToList (name: value: "--set ${name} \"${value}\"") environment)} \
+            ${concatStringsSep " \\\n" (map (flag: "--add-flags \"${flag}\"") flags)}
+        done
+      '';
+    });
 }

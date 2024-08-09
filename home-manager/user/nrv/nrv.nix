@@ -7,18 +7,20 @@
   ...
 }:
 {
-  lib,
-  config,
-  pkgs,
+  lib ? null,
+  config ? null,
+  pkgs ? null,
   ...
-}: {
+}: let
+  name = builtins.baseNameOf ./.;
+in {
   imports = [
   ];
 
   # For some reason they separate some stuff under `home.*`
   home = {
-    username = "nrv";
-    homeDirectory = "/home/nrv";
+    username = "${name}";
+    homeDirectory = "/home/${name}";
     packages = with pkgs; [
       hello
       git-annex
@@ -28,7 +30,22 @@
     stateVersion = "24.05";
   };
 
-  xdg.enable = true;
+  xdg = let
+    homeDir = "${config.home.homeDirectory}";
+  in {
+    enable = true;
+    userDirs = {
+      enable = true;
+      pictures = "${homeDir}/pix";
+      videos = "${homeDir}/vid";
+      music = "${homeDir}/mus";
+      documents = "${homeDir}/vid";
+      download = "${homeDir}/dl";
+      desktop = "${homeDir}/desk";
+      publicShare = "${homeDir}/pub";
+      templates = "${config.xdg.dataHome}/templates";
+    };
+  };
   programs.zsh.enable = true;
 
   # Add stuff for your user as you see fit:

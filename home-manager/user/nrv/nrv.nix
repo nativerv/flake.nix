@@ -62,11 +62,11 @@
   };
 
   # Source home manager session variables in ZSH config
-  xdg.configFile."zsh/home-manager".source = pkgs.writeText "home-manager" ''
-    # \'\' is multi-line string escape for... reasons
-    . "''${XDG_STATE_HOME}/nix/profiles/home-manager/home-path/etc/profile.d/hm-session-vars.sh"
-    # vim:ft=zsh
-  '';
+  #xdg.configFile."zsh/home-manager".source = pkgs.writeText "home-manager" ''
+  #  # \'\' is multi-line string escape for... reasons
+  #  . "''${XDG_STATE_HOME}/nix/profiles/home-manager/home-path/etc/profile.d/hm-session-vars.sh"
+  #  # vim:ft=zsh
+  #'';
 
   # GPG
   programs.gpg = {

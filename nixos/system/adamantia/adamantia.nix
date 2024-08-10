@@ -47,6 +47,7 @@
     self.nixosModules."user.gamer"
   ];
 
+  # FIXME(hardcoded): this whole thing
   systemd.services.home-manager-nrv = with lib; let
     # FIXME(hardcoded): option
     cfg = {
@@ -109,7 +110,16 @@
           exec "$1/activate"
         '';
       # FIXME(hardcoded): option
-      in "${setupEnv} ${self.homeConfigurations.${username}.activationPackage}";
+      in builtins.toString (pkgs.writeScript "hm-activate-standalone" ''
+        #! ${pkgs.runtimeShell} -el
+        
+        # FIXME(hardcoded): XDG dir, might be using legacy
+        standalone_activation_package="''${XDG_STATE_HOME:-"$HOME/.local/state"}/nix/profiles/home-manager"
+        activation_package="${self.homeConfigurations.${username}.activationPackage}"
+        [ -f "''${standalone_activation_package}/activate" ] &&
+          activation_package="''${standalone_activation_package}"
+        ${setupEnv} "''${activation_package}"
+      '');
     };
   };
 

@@ -47,6 +47,73 @@
     self.nixosModules."user.gamer"
   ];
 
+  systemd.services.home-manager-nrv = with lib; let
+    # FIXME(hardcoded): option
+    cfg = {
+      verbose = true;
+      backupFileExtension = "hm-bak";
+    };
+    username = "nrv";
+
+    serviceEnvironment = optionalAttrs (cfg.backupFileExtension != null) {
+      HOME_MANAGER_BACKUP_EXT = cfg.backupFileExtension;
+    } // optionalAttrs cfg.verbose { VERBOSE = "1"; };
+  in {
+    description = "Home Manager environment for ${username} (standalone)";
+    wantedBy = [ "multi-user.target" ];
+    wants = [ "nix-daemon.socket" ];
+    after = [ "nix-daemon.socket" ];
+    before = [ "systemd-user-sessions.service" ];
+
+    environment = serviceEnvironment;
+
+    # FIXME(hardcoded): option
+    unitConfig = { RequiresMountsFor = "/home/${username}"; };
+
+    stopIfChanged = false;
+
+    serviceConfig = {
+      # FIXME(hardcoded): option
+      User = username;
+      Type = "oneshot";
+      RemainAfterExit = "yes";
+      TimeoutStartSec = "5m";
+      # FIXME(hardcoded): option
+      SyslogIdentifier = "hm-activate-${username}";
+
+      ExecStart = let
+        systemctl =
+          "XDG_RUNTIME_DIR=\${XDG_RUNTIME_DIR:-/run/user/$UID} systemctl";
+
+        sed = "${pkgs.gnused}/bin/sed";
+
+        exportedSystemdVariables = concatStringsSep "|" [
+          "DBUS_SESSION_BUS_ADDRESS"
+          "DISPLAY"
+          "WAYLAND_DISPLAY"
+          "XAUTHORITY"
+          "XDG_RUNTIME_DIR"
+        ];
+        setupEnv = pkgs.writeScript "hm-setup-env" ''
+          #! ${pkgs.runtimeShell} -el
+
+          # The activation script is run by a login shell to make sure
+          # that the user is given a sane environment.
+          # If the user is logged in, import variables from their current
+          # session environment.
+          eval "$(
+            ${systemctl} --user show-environment 2> /dev/null \
+            | ${sed} -En '/^(${exportedSystemdVariables})=/s/^/export /p'
+          )"
+
+          exec "$1/activate"
+        '';
+      # FIXME(hardcoded): option
+      in "${setupEnv} ${self.homeConfigurations.${username}.activationPackage}";
+    };
+  };
+
+
   # System zone
   # NOTE: setting time zone here actually matters
   #       KDE spectale **segfaults** when this isn not set LUL

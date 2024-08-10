@@ -220,4 +220,7 @@
         done
       '';
     });
+    
+  # credit: https://gist.github.com/corpix/f761c82c9d6fdbc1b3846b37e1020e11
+  pow = with lib; base: exp: foldl' (a: x: x * a) 1 (genList (_: base) exp);
 }

@@ -61,7 +61,17 @@ in {
       templates = "${config.xdg.dataHome}/templates";
     };
   };
-  programs.zsh.enable = true;
+
+  programs.zsh = with self.lib; with lib; let
+    histSize = (pow 2 63) - 1;
+  in {
+    enable = true;
+
+    history = {
+      size = histSize;
+      save = histSize;
+      path = "${config.xdg.stateHome}/zsh/history";
+  };
 
   # Add stuff for your user as you see fit:
   # programs.neovim.enable = true;

@@ -67,10 +67,20 @@ in {
   in {
     enable = true;
 
+    dotDir = let
+      homeDir = config.home.homeDirectory;
+      configHome = config.xdg.configHome;
+    in 
+      if hasPrefix homeDir configHome
+      then "${removePrefix homeDir configHome}/zsh"
+      else "${homeDir}";
+
     history = {
       size = histSize;
       save = histSize;
       path = "${config.xdg.stateHome}/zsh/history";
+      extended = true;
+    };
   };
 
   # Add stuff for your user as you see fit:

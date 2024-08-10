@@ -414,7 +414,6 @@
       files = [
       ];
       users.nrv.directories = [
-        ".mozilla"
         ".local/state/sandbox"
         ".local/state/zsh"
         ".local/state/nvim"

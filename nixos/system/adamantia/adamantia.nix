@@ -409,6 +409,8 @@
         ".local/state/zsh"
         ".local/state/nvim"
         ".local/state/nix"
+        ".local/share/nix" # repl-history
+        ".local/share/home-manager" # news
       ];
       users.nrv.files = [
       ];

@@ -105,7 +105,7 @@ let
         # see "Sloth values" below
         bind.rw = with sloth; [
           [ (mkdir (concat [xdgStateHome "/sandbox/${name}/home"])) homeDir ]
-          [ (mkdir "/tmp/sandbox/${name}") "/tmp" ]
+          [ (mkdir (concat [runtimeDir "/sandbox/${name}"])) "/tmp" ]
           [ (concat [runtimeDir "/doc/by-app/${appId}"]) (concat [runtimeDir "/doc"]) ]
 
           (concat [xdgConfigHome "gtk-2.0"])

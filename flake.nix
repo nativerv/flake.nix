@@ -140,6 +140,13 @@
         ./nixos/module
         { inherit flake self inputs; };
 
+      # Configuration modules for Home Manager
+      # Declared in ./home-manager/module/TYPE/NAME
+      # Available through `self.homeManagerModules."module-type.module-name"`
+      homeManagerModules = self.lib.readModulesRecursive'
+        ./home-manager/module
+        { inherit flake self inputs; };
+
       # NixOS systems
       # Declared in ./nixos/system/NAME
       # Available through `nixos-install --impure --flake .#system-name`

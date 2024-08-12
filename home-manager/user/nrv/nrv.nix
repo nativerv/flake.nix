@@ -15,6 +15,7 @@
   name = builtins.baseNameOf ./.;
 in {
   imports = [
+    self.homeManagerModules."program.zsh"
   ];
 
   # For some reason they separate some stuff under `home.*`
@@ -60,27 +61,6 @@ in {
       desktop = "${homeDir}/desk";
       publicShare = "${homeDir}/pub";
       templates = "${config.xdg.dataHome}/templates";
-    };
-  };
-
-  programs.zsh = with self.lib; with lib; let
-    histSize = (pow 2 63) - 1;
-  in {
-    enable = true;
-
-    dotDir = let
-      homeDir = config.home.homeDirectory;
-      configHome = config.xdg.configHome;
-    in 
-      if hasPrefix homeDir configHome
-      then "${removePrefix homeDir configHome}/zsh"
-      else "${homeDir}";
-
-    history = {
-      size = histSize;
-      save = histSize;
-      path = "${config.xdg.stateHome}/zsh/history";
-      extended = true;
     };
   };
 

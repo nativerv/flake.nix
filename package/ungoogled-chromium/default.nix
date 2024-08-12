@@ -1,4 +1,4 @@
-{ pkgs, mkNixPak, ... }: let
+{ pkgs, mkNixPak, self, ... }: let
   name = "ungoogled-chromium";
   appId = "org.chromium.Chromium";
 
@@ -6,7 +6,9 @@
     config = { sloth, ... }: {
 
       # the application to isolate
-      app.package = pkgs.${name};
+      app.package = self.lib.wrapPackages pkgs [ pkgs.${name} ] {
+        flags = [ "--ozone-platform-hint=auto" ];
+      };
 
       # path to the executable to be wrapped
       # this is usually autodetected but

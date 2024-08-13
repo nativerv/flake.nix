@@ -18,6 +18,7 @@ in {
   programs.zsh = {
     enable = true;
 
+    # Directory where ZSH looks for it's config files, e.g. .zshrc.
     dotDir =
       if hasPrefix homeDir configHome
       then "${removePrefix homeDir configHome}/zsh"

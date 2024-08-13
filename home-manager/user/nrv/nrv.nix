@@ -16,6 +16,7 @@
 in {
   imports = [
     self.homeManagerModules."program.zsh"
+    self.homeManagerModules."program.tmux"
   ];
 
   # For some reason they separate some stuff under `home.*`
@@ -25,10 +26,10 @@ in {
     packages = with pkgs; let 
       pass = config.programs.password-store.package;
     in [
-      hello
       git-annex
       delta
       pulsemixer
+      inputs.tmux-sessionizer.packages.${system}.default
       (pkgs.wrapPackages [ pkgs.restic ] {
         environment = {
 	  RESTIC_PASSWORD_COMMAND = "${pass}/bin/pass show ${self.config.backups.restic.key.sk.pass-path or "dummy"}";

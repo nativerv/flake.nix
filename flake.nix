@@ -54,6 +54,10 @@
     # everything match nicely? Try nix-colors!
     #nix-colors.url = "github:misterio77/nix-colors";
 
+    # My stuff
+    tmux-sessionizer.url = "github:nativerv/tmux-sessionizer";
+    tmux-sessionizer.inputs.nixpkgs.follows = "nixpkgs-unstable";
+
     # This is here only to be pinned in the registry by
     # `nixos/module/archetype/sane.nix`
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";

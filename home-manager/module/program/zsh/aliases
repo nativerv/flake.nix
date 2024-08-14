@@ -1,0 +1,209 @@
+alias neofetch="neofetch \
+	--line_wrap off \
+	--bold on \
+	--uptime_shorthand on"
+
+# Shorthands for various commands
+alias clr="clear"
+alias cls="clear"
+alias nv="nvim"
+alias unstow="stow -D"
+alias restow="stow -R"
+alias lz="lazygit"
+alias muslyr="ncmpcpp --screen lyrics"
+alias musvis="ncmpcpp --screen visualizer"
+alias pac="pacman"
+alias pacown="pacman -Qo"
+alias pacname="pacman -F"
+alias pacinfo="pacman -Qi"
+alias bs="bullshit"
+alias r="ranger"
+alias nf="neofetch"
+alias pf="pfetch"
+alias af="afetch"
+alias nb="newsboat"
+alias zat="zathura"
+alias fj="firejail "
+alias nfj="firejail --noprofile "
+alias dfj="firejail --profile=default "
+alias pm="pulsemixer"
+alias tm="tmux"
+alias tmc="transmission-remote"
+alias tmd="transmission-daemon"
+alias ng="nvim +0G"
+alias sc="systemctl"
+alias scu="systemctl --user"
+alias jc="journalctl"
+alias jcu="journalctl --user"
+alias doc="docker"
+alias pod="podman"
+alias bj="bubblejail"
+alias dt="date +%F_%H-%M-%S | head -c-1"
+alias gr='grep --recursive --line-number'
+alias rtop='radeontop'
+alias open='xdg-open'
+alias tms='tmux-sessionizer'
+alias d='delta'
+alias rg='rg --vimgrep'
+
+# Noglobs
+alias tl='noglob tl'
+alias cl='noglob cl'
+alias mpv='noglob mpv'
+alias devour="noglob devour"
+alias ytmdl="noglob ytmdl"
+alias ytfzf="noglob ytfzf"
+
+# Mkdir and touch; also flag mkdir create nonexistent dirs
+alias md="mkdir -p"
+alias rd="rmdir"
+alias mt="touch"
+
+# Far better cd
+alias cd="pushd"
+alias dc="popd"
+
+# mkdir + cd; also change the mcd completion as mcd name is actually used by
+# the mtools package which has weird completion for it
+compdef '_mkdir' 'mcd' &&
+  mcd() { mkdir -p "$@" 2> >(sed s/mkdir/mcd/ 1>&2) && cd "$_"; }
+
+# Simulate plan9 `walk` util
+alias walk="find ."
+
+# Passthroughs
+alias sudo="sudo "
+
+# Fix lolcat to always output truecolor
+alias lolcat="lolcat --truecolor"
+
+# Fix yarn to use XDG directory
+alias yarn='yarn --use-yarnrc "${XDG_CONFIG_HOME}/yarn/config"'
+
+# Configure ncdu
+alias ncdu="ncdu -q --color dark --confirm-quit --exclude-kernfs"
+
+# Configure du
+alias du="du -h"
+
+# Configure free
+alias free="free -h"
+
+# Configure df
+alias df="df -h"
+
+# Configure watch
+alias watch="watch --color --interval 0.5 "
+
+# Configure mount
+# this sadly prevents stuff like `mount | grep`...
+#alias mount="mount -m "
+
+# Configure mitmproxy to use XDG
+alias mitmproxy="mitmproxy --set confdir=${XDG_CONFIG_HOME}/mitmproxy"
+alias mitmweb="mitmweb --set confdir=${XDG_CONFIG_HOME}/mitmproxy"
+
+# Aliases for Git
+alias git="git "
+alias g="git"
+alias gs="env GIT_PAGER= unbuffer git status --untracked-files=all --short"
+alias gl="env GIT_PAGER= unbuffer git log --show-signature"
+alias gll="env GIT_PAGER= unbuffer git log --pretty=oneline --abbrev-commit --all"
+alias gllg="env GIT_PAGER= unbuffer git log --graph --pretty=oneline --abbrev-commit --all"
+alias gd="git diff"
+alias ga="git add"
+alias gc="git commit"
+alias gcm="git commit -m"
+alias gca="git commit --amend"
+alias gst="git stash"
+alias gb="git branch"
+alias gch="git checkout"
+alias gp="git push"
+alias gw="git switch"
+alias gpall="git push origin --all"
+alias gpmaster="git --no-pager push origin master"
+
+# Aliases for updating environments
+alias renv="unset __HM_SESS_VARS_SOURCED; exec zsh"
+alias rs="reset"
+# alias zshplug="find "${ZDOTDIR}/plugins" -type d -exec test -e '{}/.git' ';' -print0 | xargs -I {} -0 git -C {} pull -q"
+
+alias hist="history"
+alias history="'${EDITOR:-vim}' '${HISTFILE}'"
+# Fucking hell, it highlights it wrong if i use the more robust variant below, bc it expands to not a command itself (highlighter is dumb):
+#alias history='"${EDITOR:-vim}" "${HISTFILE}"'
+
+# Aliases for ls
+# alias ls='ls --time-style=long-iso --color=auto --group-directories-first' 
+function ls() {
+  command 2>/dev/null >&2 -v unbuffer &&
+    unbuffer=unbuffer
+  ${unbuffer} exa \
+    --color='always' \
+    --group-directories-first \
+    --time-style=long-iso \
+    --git \
+    --icons \
+    --links \
+    --group \
+    --mounts \
+    --ignore-glob ".git|target|node_modules" \
+    --sort=modified \
+    "${@}" |
+    sed 's/^\./-/'
+}
+alias ll='ls -l'    # Table with file type indicators
+alias lla='ls -la'  # Table with all and file type indicators
+alias llat='ls -laT'  # Tree with all and file type indicators
+alias lld='ls -lad' # Table with exact file (for looking at directories, not their contents)
+alias la='ls -a'     # Simple with all 
+#alias l='ls -F'      # Simple with file type indicators
+
+# Aliases for tree
+alias t='tree -aAcC --dirsfirst' # Sort by modtime, show all, enable colors, fix lines
+
+# Colorize various commands
+alias grep='grep --color=auto'
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias ip='ip -color=auto'
+alias diff='diff --color'
+
+# Alias help for ZSH builtins
+unalias run-help
+autoload run-help
+HELPDIR=/usr/share/zsh/"${ZSH_VERSION}"/help
+alias help=run-help
+
+# Confirm before overwriting something
+alias cp="cp -iv"
+alias mv='mv -iv'
+alias rm='rm -iv'
+
+# Unsafe rm, mv and cp (no confirm)
+alias rmunsafe='rm'
+alias mvunsafe='mv'
+alias cpunsafe='cp'
+
+# Get top process eating memory
+alias psmem='ps aux | sort -nr -k 4 | head -5'
+
+# Get top process eating cpu ##
+alias pscpu='ps aux | sort -nr -k 3 | head -5'
+
+# systemd
+alias list_systemctl="systemctl list-unit-files --state=enabled"
+
+# Add an "alert" alias for long running commands.  Use like so:
+#   sleep 10; alert
+# WTH is that i didn't put that thehe
+# (probably was here since the time i stole this file from chris@machine lol)
+# look up my cool `alert` program that i wrote instead in my repos
+#alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+
+# function mov(){
+  # mkdir -p $2;
+  # mv $1 $2;
+# }
+
+# vim:ft=zsh

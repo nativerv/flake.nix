@@ -1,0 +1,46 @@
+### ZSH OPTIONS/SETTINGS FILE
+
+# some useful options (man zshoptions)
+setopt nomatch menucomplete notify incappendhistory sharehistory
+
+setopt interactive_comments
+
+# Don't paste first option automatically when autocompleting
+setopt nomenucomplete
+
+# Disable beep on error
+unsetopt beep
+
+# Disable cd by typing path only
+unsetopt autocd 
+
+# Disable ctrl-s to freeze terminal.
+stty stop undef
+#zle_highlight=('paste:none')
+
+# Enable completions
+autoload -Uz compinit
+autoload -Uz bashcompinit && bashcompinit
+
+#zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list '' \
+  'm:{a-z\-}={A-Z\_}' \
+  'r:[^[:alpha:]]||[[:alpha:]]=** r:|=* m:{a-z\-}={A-Z\_}' \
+  'r:|?=** m:{a-z\-}={A-Z\_}'
+#zstyle ':completion::complete:lsof:*' menu yes select
+zmodload zsh/complist
+compinit
+_comp_options+=(globdots)		# Include hidden files.
+
+autoload -U up-line-or-beginning-search
+autoload -U down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+
+# Enable colors
+autoload -Uz colors && colors
+
+# Edit line in vim with ctrl-e:
+#autoload edit-command-line;
+#zle -N edit-command-line
+#bindkey '^e' edit-command-line

@@ -1,0 +1,94 @@
+#!/bin/bash
+
+# Enable zsh's profiling module
+zmodload zsh/zprof
+
+# Create files by default with user permissions only (no group, no others)
+umask 077
+
+# WARNING: FIXME(XDG): this will override whatever Nix is doing
+: "${XDG_DATA_HOME:="${HOME}/.local/share"}"
+: "${XDG_STATE_HOME:="${HOME}/.local/state"}"
+: "${XDG_CACHE_HOME:="${HOME}/.cache"}"
+: "${XDG_CONFIG_HOME:="${HOME}/.config"}"
+
+### PEEPOS, first of all... (byproduct: load XDG user dir location vars)
+[ -f "${XDG_CONFIG_HOME}/user-dirs.dirs" ] && . "${XDG_CONFIG_HOME}/user-dirs.dirs"
+: "${XDG_PICTURES_DIR:="${HOME}/Pictures"}"
+: "${PEEPOS_LOCATION:="${XDG_PICTURES_DIR}/pepes"}"
+[[ -o login ]] && random-pepe 2>/dev/null
+
+### Source all config files
+
+# All of below depend on `functions`
+# Functions necessary to run this config
+source "${ZDOTDIR}/functions"
+zsh_add_file "exports"
+zsh_add_file "options"
+zsh_add_file "aliases"
+zsh_add_file "prompt"
+zsh_add_file "vim_mode"
+zsh_add_file "keybindings"
+# zsh_add_file "plugins"
+zsh_add_file "hooks"
+zsh_add_file "colors"
+# zsh_add_file "home-manager"
+
+### Start X on login
+
+RED='\033[0;31m' NC='\033[0m' # No Color 
+ERROR="${RED}ERROR${NC}"
+FATAL="${RED}FATAL${NC}"
+
+# Start X server if in tty1 and X server isn't running
+maybe_startx () {
+
+  # Continue to the terminal if in the pseudo terminal, not TTY
+  tty | grep -q '^/dev/pts' && return
+
+  DISPLAY_TRIMMED="$(printf '%s' "$DISPLAY" | tr -d ':')"
+
+  # If running under systemd, try to start X only if xorg@.target is enabled for current screen (base 0, so -1 from vt/tty number)
+  #command -v systemctl >/dev/null 2>&1 \
+  #  && ! systemctl --user is-enabled "xorg@$((${XDG_VTNR:-$(tty | tail -c2)} - 1)).target" >/dev/null 2>&1 \
+  #  && return
+  
+  if [ ! -d "/usr/lib/modules/$(uname -r)" ]; then
+    echo "${FATAL}: /usr/lib/modules/$(uname -r) not found! Dropping you to the shell." \
+    return
+  fi
+
+  echo "Starting X server...";
+
+  # Trow to shell if not on first TTY
+  #if [ ! "$(tty)" = '/dev/tty1' ]; then
+  #  echo "${ERROR}: You are not in the first TTY. X server won't start."
+  #  echo "Leaving you in the shell."
+  #  return;
+  #fi
+
+  # Throw to shell if `DISPLAY` is already set
+  # shellcheck disable=2237
+  if ! [ -z "${DISPLAY}" ]; then
+    echo "${ERROR}: \`DISPLAY\` is already set. X server already running on this TTY and you seeng this message. Something wrong."
+    echo "Leaving you in the shell."
+    return
+  fi
+
+  # Throw to shell if `startx` is missing
+  if [ ! -x /bin/startx ]; then
+    echo "${ERROR}: Seems like the X server is not installed or not properly installed: \`startx\` is not in your \`PATH\`. X server won't start."
+    echo "Leaving you in the shell."
+    return
+  fi
+
+  LOGDIR="${XDG_STATE_HOME}/xinitrc"
+
+  [ ! -d "${LOGDIR}" ] && (mkdir -p "${LOGDIR}"; echo 'This is a custom `.xinitrc` log location. See `maybe_startx` in `~/.config/zsh/zshrc`' > "${LOGDIR}/README.md")
+  startx "${XDG_CONFIG_HOME}/x11/xinitrc" >>"${LOGDIR}/xinitrc.error.log" 2>>"${LOGDIR}/xinitrc.error.log"
+}
+
+# Only start if `DISPLAY == "" && tty == tty1 && startx`
+#maybe_startx
+
+# vim:ft=zsh

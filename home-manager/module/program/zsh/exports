@@ -1,0 +1,108 @@
+#!/bin/zsh
+
+ensure_dir() {
+  [ ! -d "${1}" ] && mkdir -p "${1}"
+}
+
+if_bin_exists() {
+  command -v "${1}" >/dev/null 2>&1
+}
+
+# Ensure XDG vars
+XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-"${HOME}/.config"}"
+XDG_DATA_HOME="${XDG_DATA_HOME:-"${HOME}/.local/share"}"
+XDG_CACHE_HOME="${XDG_CACHE_HOME:-"${HOME}/.cache"}"
+XDG_BIN_HOME="${XDG_BIN_HOME:-"${HOME}/.local/bin"}"
+
+# Export environment.d env vars to zsh the hacky way
+source <(
+  find 2>/dev/null -L "${XDG_CONFIG_HOME}/environment.d/" -mindepth 1 -maxdepth 1 -type f -o -type l |
+    sort |
+    xargs cat |
+    sed -E "s/^([a-zA-Z])/export \1/g"
+)
+
+# Steal completions from the original things for mine wrappers for them
+# autoload -Uz compinit
+# compinit
+# compdef ytmdl=yt-dlp
+# for bin in $(find "${XDG_BIN_HOME}" -type f); do
+#   prefix='# completion: '
+#   line_2="$(sed '1d;q' < "${bin}")"
+#
+#   # guard for no completion setting requested
+#   printf '%s' "${line_2}" | grep -q "^${prefix}" || continue
+#
+#   comp_provider="${line_2#*: }"
+#   echo 'doing completion' "$(basename "${bin}")"="${comp_provider}"
+#   compdef "$(basename "${bin}")"="${comp_provider}"
+# done
+
+#### XDG stuff ====================================
+
+[ -n "${PREFIX}" ] && export XDG_RUNTIME_DIR="${PREFIX}/var/run/${UID}"
+
+### LC_* ===========================
+
+### Zsh history stuff ===========================
+
+HISTFILEDIR="${XDG_STATE_HOME}/zsh"
+export HISTFILE="${HISTFILEDIR}/history"
+ensure_dir "${HISTFILEDIR}"
+
+export HISTSIZE=100000000
+export SAVEHIST=100000000
+
+### Systemwide stuff        =======================
+
+# Default MANPAGER
+export MANWIDTH=999
+
+# Default EDITOR
+# (set in environment.d/25-programs.conf)
+#if_bin_exists 'nvim' && export EDITOR=/usr/bin/nvim
+
+# Less: enable color, disable history
+export LESS='--mouse -R --use-color -Dd+r$Du+b'
+export LESSOPEN='| /usr/bin/source-highlight-esc.sh %s'
+export LESSHISTSIZE=0
+
+### Move individual programs/applications' directories to XDG Base Dirs
+# Credit [ArchWiki](https://wiki.archlinux.org/title/XDG_Base_Directory)
+# for most of the following
+
+# OpenSSL
+if_bin_exists 'openssl' && ! [ -z "${OPENSSL_DATA_HOME+false}" ] && ensure_dir "${OPENSSL_DATA_HOME}"
+
+# NodeJS
+if_bin_exists 'node' && ! [ -z "${NODE_DATA_DIR+false}" ] && ensure_dir "${NODE_DATA_DIR}"
+# if_bin_exists 'npm' && ensure_dir "${NPM_PACKAGES}" && ensure_dir "${NPM_CONFIG_USERCONFIG}"
+
+# ELinks
+if_bin_exists 'elinks' && ensure_dir "${XDG_DATA_HOME}/elinks"
+
+# PostgreSQL
+if_bin_exists 'psql' && ensure_dir "${XDG_CONFIG_HOME}/pg" && ensure_dir "${XDG_CACHE_HOME}/pg"
+
+# Emacs 
+if_bin_exists 'emacs' && ensure_dir "${XDG_CONFIG_HOME}/emacs"
+
+# Calc
+if_bin_exists 'calc' && ! [ -z "${CALCHISTFILE+false}" ] && ensure_dir "${CALCHISTFILE%/*}"
+
+### Language-specific stuff =======================
+
+# Setup Rust
+[ -s "${CARGO_HOME}/env" -a ! -z "${CARGO_HOME+false}" ] && source "${CARGO_HOME}/env"
+
+# Setup NVM and NodeJS
+# export NVM_DIR="${XDG_DATA_HOME}/nvm"
+# [ -s "${NVM_DIR}/nvm.sh" ] && source "${NVM_DIR}/nvm.sh"  # This loads nvm
+# [ -s "${NVM_DIR}/bash_completion" ] && source "${NVM_DIR}/bash_completion"  # This loads nvm bash_completion
+
+# Setup PyEnv and Python
+#export PYENV_ROOT="${HOME}/.pyenv"
+#export PATH="${PYENV_ROOT}/bin:${PATH}"
+# eval "$(pip completion --zsh)" # Enable zsh completion for pip 
+
+# vim:ft=zsh

@@ -8,6 +8,12 @@
   # oom daemon - out of memory process killer
   systemd.oomd.enable = false;
 
+  environment.shellAliases = {
+    ls = null;
+    ll = null;
+    l = null;
+  };
+
   # environment.systemPackages = lib.mkForce (with pkgs; [
   #   # acl
   #   # attr

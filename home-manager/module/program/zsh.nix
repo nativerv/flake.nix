@@ -27,6 +27,8 @@ in {
     expect
   ];
 
+  # TODO(dream): dream.appearance.devicons or something like that which
+  #              toggless devicons across system
   home.file."${dotDir}/aliases".source = ./zsh/aliases;
   home.file."${dotDir}/colors".source = ./zsh/colors;
   home.file."${dotDir}/exports".source = ./zsh/exports;
@@ -103,13 +105,13 @@ in {
       # rec {
       #   name = "zsh-system-clipboard";
       #   src = pkgs.fetchFromGitHub {
-      # erit name;
+      #     inherit name;
       #     owner = "kutsan";
       #     repo = name;
       #     rev = "0f05d015b0dd8ba5f0fce2aafbf4e3c54b4bbec1";
       #     sha256 = "sha256-1QC2PjMvsaXWbiVJMxBGM9mCoEHdWzs8GH0stnnP2Nc=";
       #
-      # ativeBuildInputs = [ pkgs.wl-clipboard ];
+      #     nativeBuildInputs = [ pkgs.wl-clipboard ];
       #   };
       # }
     ];

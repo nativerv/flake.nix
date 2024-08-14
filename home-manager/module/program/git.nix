@@ -50,9 +50,9 @@ in {
     diff = {
       colorMoved = "default";
     };
-    credential = {
-      helper = "store";
-    };
+    # credential = {
+    #   helper = "store";
+    # };
     delta = {
       features = "collared-trogon";
     };

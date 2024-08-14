@@ -623,10 +623,6 @@
   # Setup zsh
   programs.zsh = {
     enable = true;
-    enableBashCompletion = true;
-    autosuggestions.enable = true;
-    syntaxHighlighting.enable = true;
-    syntaxHighlighting.highlighters = [ "main" "brackets" "pattern" "cursor" "regexp" "root" "line" ];
   };
 
   # Setup Plasma

@@ -48,6 +48,11 @@
     # Pre-built configs for various hardware (cpus, gpus, laptops, etc.)
     hardware.url = "github:nixos/nixos-hardware";
 
+    # Plasma Manager - configure Plasma with Nix
+    plasma-manager.url = "github:nix-community/plasma-manager";
+    plasma-manager.inputs.nixpkgs.follows = "nixpkgs-unstable";
+    plasma-manager.inputs.home-manager.follows = "home-manager";
+
     # Don't remember from where i stole my initial config but this was there
     # maybe i'll use it later
     # Shameless plug: looking for a way to nixify your themes and make
@@ -77,6 +82,7 @@
     deploy-rs,
     nixpak,
     hardware,
+    plasma-manager,
     #microvm,
     ...
   } @ inputs: let
@@ -97,6 +103,7 @@
         inherit system;
         overlays = [
           (final: prev: { nixpkgs-flake = nixpkgs-unstable; })
+          (final: prev: { plasma-manager = plasma-manager.packages.${system}; })
           self.overlays.default
         ];
         config = self.config.nixpkgs;

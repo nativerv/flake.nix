@@ -49,6 +49,32 @@ in {
 	  Use = true;
 	}
       ) "${flake}/sus/nrv/eval/plasma/kxkbrc-layout.json";
+
+      # Make the Overview menu and Krunner usable (does wrong things when you
+      # type fast by default)
+      krunnerrc."Plugins/Favorites"."plugins" = "krunner_services,krunner_systemsettings";
+      krunnerrc."Plugins" = {
+        "baloosearchEnabled" = false;
+        "calculatorEnabled" = true;
+        "helprunnerEnabled" = false;
+        "krunner_appstreamEnabled" = false;
+        "krunner_bookmarksrunnerEnabled" = false;
+        "krunner_charrunnerEnabled" = false;
+        "krunner_dictionaryEnabled" = false;
+        "krunner_katesessionsEnabled" = false;
+        "krunner_konsoleprofilesEnabled" = false;
+        "krunner_placesrunnerEnabled" = false;
+        "krunner_powerdevilEnabled" = false;
+        "krunner_recentdocumentsEnabled" = false;
+        "krunner_sessionsEnabled" = false;
+        "krunner_spellcheckEnabled" = false;
+        "krunner_systemsettingsEnabled" = false;
+        "krunner_webshortcutsEnabled" = false;
+        "locationsEnabled" = false;
+        "org.kde.activities2Enabled" = false;
+        "org.kde.datetimeEnabled" = false;
+        "unitconverterEnabled" = true;
+      };
     };
 
     # Screen locking manager

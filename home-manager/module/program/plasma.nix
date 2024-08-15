@@ -133,14 +133,27 @@ in {
 	# Cycle active input layout
         "Switch to Next Keyboard Layout" = "Meta+`";
       };
-      "kwin" = {
-	# Unbind Alt-` so my tmux prefix works (fuck the non-Meta binds that
-	# steal application bindings)
-        "Walk Through Windows of Current Application" = "";
-	# Let's go full ZOOM with this: all-in-one launcher, window search etc.
-	# instead of the usual dmenu-like lanucher
-        "Overview" = "Meta+P";
-      };
+      "kwin" = mkMerge [
+        {
+          # Unbind Alt-` so my tmux prefix works (fuck the non-Meta binds that
+          # steal application bindings)
+          "Walk Through Windows of Current Application" = "";
+          # Let's go full ZOOM with this: all-in-one launcher, window search etc.
+          # instead of the usual dmenu-like lanucher
+          "Overview" = "Meta+P";
+        }
+
+        # Workspace/Virtual desktop cycling
+        (pipe (range 1 9) [
+          (map (n: nameValuePair "Switch to Desktop ${toString n}" "Meta+${toString n}"))
+          listToAttrs
+        ])
+        {
+          "Switch to Next Desktop" = "Meta+O";
+          "Switch to Previous Desktop" = "Meta+I";
+        }
+      ];
+	
     };
 
     workspace = {

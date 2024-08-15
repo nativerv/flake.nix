@@ -113,7 +113,7 @@ in {
         "Walk Through Windows of Current Application" = "";
 	# Let's go full ZOOM with this: all-in-one launcher, window search etc.
 	# instead of the usual dmenu-like lanucher
-        "Toggle Overview" = "Meta+P";
+        "Overview" = "Meta+P";
       };
     };
 

@@ -37,7 +37,7 @@ in {
       baloofilerc."Basic Settings"."Indexing-Enabled" = false;
 
       # Always Translucent - instead of switching back and forth when adapting
-      # WARNING: why is this called Panel 2 out of the box in clean Plasma?
+      # WARNING: why is this called 'Panel 2' out of the box in clean Plasma?
       plasmashellrc."PlasmaViews/Panel 2".panelOpacity = 2;
 
       # Input languages
@@ -79,14 +79,8 @@ in {
           #idleTimeoutWhenLocked = "immediately";
         };
       };
-      # TODO: battery
-      # battery = {
-      #   powerButtonAction = "sleep";
-      #   whenSleepingEnter = "standbyThenHibernate";
-      # };
-      # lowBattery = {
-      #   whenLaptopLidClosed = "hibernate";
-      # };
+      # TODO: battery (steal from plasma-manager examples or history of this
+      #       file)
     };
 
     # Shortcuts: Custom actions (commands)
@@ -96,11 +90,11 @@ in {
         key = "Meta+Shift+Return";
         command = "kitty";
       };
-      "launch-bemenu" = {
-        name = "Open bemenu";
-        key = "Meta+P";
-        command = "bemenu-run";
-      };
+      # "launch-bemenu" = {
+      #   name = "Open bemenu";
+      #   key = "Meta+P";
+      #   command = "bemenu-run";
+      # };
     };
 
     # Shortcuts: Builtin actions
@@ -108,121 +102,29 @@ in {
     # duplicated twice in it
     shortcuts = {
       "KDE Keyboard Layout Switcher" = {
+	# Just because
         "Switch to Last-Used Keyboard Layout" = "";
+	# Cycle active input layout
         "Switch to Next Keyboard Layout" = "Meta+`";
       };
       "kwin" = {
+	# Unbind Alt-` so my tmux prefix works (fuck the non-Meta binds that
+	# steal application bindings)
         "Walk Through Windows of Current Application" = "";
-	# wut i thought this works
-	# "Switch to Next Keyboard Layout" = "Meta+`";
+	# Let's go full ZOOM with this: all-in-one launcher, window search etc.
+	# instead of the usual dmenu-like lanucher
+        "Toggle Overview" = "Meta+P";
       };
     };
 
     workspace = {
       # Dark theme
       lookAndFeel = "org.kde.breezedark.desktop";
-
       # Set to 'open' for the click-to-open default from Plasma 5
-      clickItemTo = "select"; 
-
-      # # Too big imo, default is fine
-      # cursor = {
-      #   theme = "Bibata-Modern-Ice";
-      #   size = 32;
-      # };
-      # # This makes the icons dark-on-dark
-      #iconTheme = "Papirus-Dark";
-      #wallpaper = "${pkgs.kdePackages.plasma-workspace-wallpapers}/share/wallpapers/Patak/contents/images/1080x1920.png";
+      clickItemTo = "select";
+      # You can click 'Open Containing Folder' in the wallpaper settings to get
+      # paths for the default ones
+      wallpaper = "${pkgs.plasma-workspace-wallpapers}/share/wallpapers/Mountain/contents/images_dark/5120x2880.png";
     };
-    # The panel config refused to work. Don't need it anyway ¯\_(ツ)_/¯
-    # panels = [
-    #   # Windows-like panel at the bottom
-    #   {
-    #     location = "bottom";
-    #     widgets = [
-    #       # We can configure the widgets by adding the name and config
-    #       # attributes. For example to add the the kickoff widget and set the
-    #       # icon to "nix-snowflake-white" use the below configuration. This will
-    #       # add the "icon" key to the "General" group for the widget in
-    #       # ~/.config/plasma-org.kde.plasma.desktop-appletsrc.
-    #       {
-    #         name = "org.kde.plasma.kickoff";
-    #         config = {
-    #           General = {
-    #             icon = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake-white.svg";
-    #             alphaSort = true;
-    #           };
-    #         };
-    #       }
-    #       # Or you can configure the widgets by adding the widget-specific options for it.
-    #       # See modules/widgets for supported widgets and options for these widgets.
-    #       # For example:
-    #       # {
-    #       #   kickoff = {
-    #       #     sortAlphabetically = true;
-    #       #     icon = "nix-snowflake-white";
-    #       #   };
-    #       # }
-    #       # Adding configuration to the widgets can also for example be used to
-    #       # pin apps to the task-manager, which this example illustrates by
-    #       # pinning dolphin and konsole to the task-manager by default with widget-specific options.
-    #       {
-    #         iconTasks = {
-    #           launchers = [
-    #             "applications:org.kde.dolphin.desktop"
-    #             "applications:org.kde.konsole.desktop"
-    #           ];
-    #         };
-    #       }
-    #       # Or you can do it manually, for example:
-    #       {
-    #         name = "org.kde.plasma.icontasks";
-    #         config = {
-    #           General = {
-    #             launchers = [
-    #               "applications:org.kde.dolphin.desktop"
-    #               "applications:org.kde.konsole.desktop"
-    #             ];
-    #           };
-    #         };
-    #       }
-    #       # If no configuration is needed, specifying only the name of the
-    #       # widget will add them with the default configuration.
-    #       "org.kde.plasma.marginsseparator"
-    #       # If you need configuration for your widget, instead of specifying the
-    #       # the keys and values directly using the config attribute as shown
-    #       # above, plasma-manager also provides some higher-level interfaces for
-    #       # configuring the widgets. See modules/widgets for supported widgets
-    #       # and options for these widgets. The widgets below shows two examples
-    #       # of usage, one where we add a digital clock, setting 12h time and
-    #       # first day of the week to Sunday and another adding a systray with
-    #       # some modifications in which entries to show.
-    #       {
-    #         digitalClock = {
-    #           calendar.firstDayOfWeek = "monday";
-    #           time.format = "24h";
-    #         };
-    #       }
-    #       # {
-    #       #   systemTray = {};
-    #       # }
-    #       # {
-    #       #   systemTray.items = {
-    #       #     # We explicitly show bluetooth and battery
-    #       #     shown = [
-    #       #       "org.kde.plasma.battery"
-    #       #       "org.kde.plasma.bluetooth"
-    #       #     ];
-    #       #     # And explicitly hide networkmanagement and volume
-    #       #     hidden = [
-    #       #       "org.kde.plasma.networkmanagement"
-    #       #       "org.kde.plasma.volume"
-    #       #     ];
-    #       #   };
-    #       # }
-    #     ];
-    #     #hiding = "autohide";
-    #   }
-    # ];
   };
 }

@@ -124,7 +124,8 @@ in {
       clickItemTo = "select";
       # You can click 'Open Containing Folder' in the wallpaper settings to get
       # paths for the default ones
-      wallpaper = "${pkgs.plasma-workspace-wallpapers}/share/wallpapers/Mountain/contents/images_dark/5120x2880.png";
+      wallpaper = "${pkgs.kdePackages.plasma-workspace-wallpapers}/share/wallpapers/Mountain/contents/images_dark/5120x2880.png";
     };
+    kscreenlocker.appearance.wallpaper = "${pkgs.kdePackages.plasma-workspace-wallpapers}/share/wallpapers/Mountain/contents/images_dark/5120x2880.png";
   };
 }

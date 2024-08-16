@@ -1,3 +1,8 @@
+# ZSH FUNCTIONS
+# Previously this had a lot more stuff in it,
+# now it's a lone function (which necessity is
+# at question too, but i don't care for now)
+
 # Function to source files if they exist
 function zsh_add_file() {
   if [ -f "$XDG_DATA_HOME/zsh/$1" ]; then
@@ -7,37 +12,4 @@ function zsh_add_file() {
   fi
 }
 
-function zsh_try_use_plugin() {
-  PLUGIN_NAME=$(echo $1 | cut -d "/" -f 2)
-  zsh_add_file "plugins/$PLUGIN_NAME/$PLUGIN_NAME.plugin.zsh" || \
-    zsh_add_file "plugins/$PLUGIN_NAME/$PLUGIN_NAME.zsh"
-}
-
-# function zsh_add_plugin() {
-#   PLUGIN_NAME=$(echo $1 | cut -d "/" -f 2)
-#   if [ -d "$XDG_DATA_HOME/zsh/plugins/$PLUGIN_NAME" ]; then
-#     # For plugins
-#     zsh_add_file "plugins/$PLUGIN_NAME/$PLUGIN_NAME.plugin.zsh" || \
-#     zsh_add_file "plugins/$PLUGIN_NAME/$PLUGIN_NAME.zsh"
-#   else
-#     git clone "https://github.com/$1.git" "$XDG_DATA_HOME/zsh/plugins/$PLUGIN_NAME"
-#   fi
-# }
-
-function zsh_add_completion() {
-  PLUGIN_NAME=$(echo $1 | cut -d "/" -f 2)
-  if [ -d "$XDG_DATA_HOME/zsh/plugins/$PLUGIN_NAME" ]; then 
-    # For completions
-    completion_file_path=$(ls $XDG_DATA_HOME/zsh/plugins/$PLUGIN_NAME/_*)
-    fpath+="$(dirname "${completion_file_path}")"
-    zsh_add_file "plugins/$PLUGIN_NAME/$PLUGIN_NAME.plugin.zsh"
-  else
-    git clone "https://github.com/$1.git" "$XDG_DATA_HOME/zsh/plugins/$PLUGIN_NAME"
-    fpath+=$(ls $XDG_DATA_HOME/zsh/plugins/$PLUGIN_NAME/_*)
-    rm $ZDOTDIR/.zccompdump
-  fi
-  completion_file="$(basename "${completion_file_path}")"
-  [ "$2" = true ] && compinit "${completion_file:1}"
-}
-
-# vim:sw=2 ts=2 ft=sh
+# vim:sw=2 ts=2 ft=bash

@@ -24,8 +24,9 @@ let
     else "";
 
   # FIXME: overridden by `exports`
-  histSize = (pow 2 31) - 1;
+  # histSize = (pow 2 31) - 1;
 
+  # Where to put plugins
   pluginsDir = "${dotDir}/plugins.d";
 
   # Bring plugin commits that i've used
@@ -87,6 +88,13 @@ let
     # }
   ];
 in {
+  assertions = [
+    {
+      assertion = !config.programs.zsh.enable;
+      message = "The module `program.zsh` is incompatible with Home Manager's `programs.zsh`";
+    }
+  ];
+
   # TODO(hardcoded): remove this from global env
   home.packages = with pkgs; [
     # For RPROMPT
@@ -123,39 +131,19 @@ in {
     }
 
     # Install plugins
-    (foldl' (a: b: a // b) {}
+    (mkMerge
       (map (plugin: { "${pluginsDir}/${plugin.name}".source = plugin.src; })
       plugins))
 
-    # My config files
-    {
-      "${dotDir}/aliases".source = ./zsh/aliases;
-      "${dotDir}/colors".source = ./zsh/colors;
-      "${dotDir}/exports".source = ./zsh/exports;
-      "${dotDir}/functions".source = ./zsh/functions;
-      "${dotDir}/hooks".source = ./zsh/hooks;
-      "${dotDir}/keybindings".source = ./zsh/keybindings;
-      "${dotDir}/options".source = ./zsh/options;
-      "${dotDir}/plugins".source = ./zsh/plugins;
-      "${dotDir}/prompt".source = ./zsh/prompt;
-      "${dotDir}/rc".source = ./zsh/rc;
-      "${dotDir}/vim_mode".source = ./zsh/vim_mode;
-    }
+    # Install my config files
+    # Which is uglier?
+    # (mkMerge (mapAttrsToList (name: _: { "${dotDir}/${name}".source = ./zsh/${name}; }) (builtins.readDir ./zsh)))
+    (pipe (builtins.readDir ./zsh) [
+      # Read dir & convert to HM .source's basically
+      (mapAttrsToList (name: _: {
+        "${dotDir}/${name}".source = ./zsh/${name};
+      }))
+      mkMerge
+    ])
   ];
-
-  programs.zsh = {
-    enable = false;
-
-    # Directory where ZSH looks for it's config files, e.g. .zshrc.
-    inherit dotDir;
-
-    history = {
-      size = histSize;
-      save = histSize;
-      path = "${config.xdg.stateHome}/zsh/history";
-      extended = true;
-    };
-
-    initExtraFirst = ''source "$ZDOTDIR/rc"'';
-  };
 }

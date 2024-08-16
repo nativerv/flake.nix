@@ -19,8 +19,8 @@ stty stop undef
 #zle_highlight=('paste:none')
 
 # Enable completions
-autoload -Uz compinit
-autoload -Uz bashcompinit && bashcompinit
+#autoload -Uz compinit
+#autoload -Uz bashcompinit && bashcompinit
 
 #zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list '' \
@@ -29,7 +29,7 @@ zstyle ':completion:*' matcher-list '' \
   'r:|?=** m:{a-z\-}={A-Z\_}'
 #zstyle ':completion::complete:lsof:*' menu yes select
 zmodload zsh/complist
-compinit
+# compinit
 _comp_options+=(globdots)		# Include hidden files.
 
 autoload -U up-line-or-beginning-search

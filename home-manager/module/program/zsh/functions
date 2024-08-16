@@ -7,16 +7,22 @@ function zsh_add_file() {
   fi
 }
 
-function zsh_add_plugin() {
+function zsh_try_use_plugin() {
   PLUGIN_NAME=$(echo $1 | cut -d "/" -f 2)
-  if [ -d "$XDG_DATA_HOME/zsh/plugins/$PLUGIN_NAME" ]; then 
-    # For plugins
-    zsh_add_file "plugins/$PLUGIN_NAME/$PLUGIN_NAME.plugin.zsh" || \
+  zsh_add_file "plugins/$PLUGIN_NAME/$PLUGIN_NAME.plugin.zsh" || \
     zsh_add_file "plugins/$PLUGIN_NAME/$PLUGIN_NAME.zsh"
-  else
-    git clone "https://github.com/$1.git" "$XDG_DATA_HOME/zsh/plugins/$PLUGIN_NAME"
-  fi
 }
+
+# function zsh_add_plugin() {
+#   PLUGIN_NAME=$(echo $1 | cut -d "/" -f 2)
+#   if [ -d "$XDG_DATA_HOME/zsh/plugins/$PLUGIN_NAME" ]; then
+#     # For plugins
+#     zsh_add_file "plugins/$PLUGIN_NAME/$PLUGIN_NAME.plugin.zsh" || \
+#     zsh_add_file "plugins/$PLUGIN_NAME/$PLUGIN_NAME.zsh"
+#   else
+#     git clone "https://github.com/$1.git" "$XDG_DATA_HOME/zsh/plugins/$PLUGIN_NAME"
+#   fi
+# }
 
 function zsh_add_completion() {
   PLUGIN_NAME=$(echo $1 | cut -d "/" -f 2)

@@ -21,7 +21,7 @@ umask 077
 ### Source all config files
 
 # All of below depend on `functions`
-# Functions necessary to run this config
+# (Functions necessary to run this config)
 source "${ZDOTDIR}/functions"
 zsh_add_file "exports"
 zsh_add_file "options"
@@ -29,7 +29,7 @@ zsh_add_file "aliases"
 zsh_add_file "prompt"
 zsh_add_file "vim_mode"
 zsh_add_file "keybindings"
-# zsh_add_file "plugins"
+zsh_add_file "plugins"
 zsh_add_file "hooks"
 zsh_add_file "colors"
 # zsh_add_file "home-manager"

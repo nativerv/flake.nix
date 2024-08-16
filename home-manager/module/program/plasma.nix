@@ -50,6 +50,26 @@ in {
 	}
       ) "${flake}/sus/nrv/eval/plasma/kxkbrc-layout.json";
 
+      # The default Plasma screenshot utility config
+      # This actually applies updates after rebuild without Plasma restart lul
+      spectaclerc = {
+        "General" = {
+          autoSaveImage = true;
+          clipboardGroup = "PostScreenshotCopyImage";
+          launchAction = "TakeScreenshot";
+          rememberSelectionRect = "Always";
+        };
+        "GuiConfig" = {
+          includePointer = true;
+        };
+        "ImageSave" = {
+          translatedScreenshotsFolder = "scr";
+        };
+        "VideoSave" = {
+          translatedScreencastsFolder = "scr";
+        };
+      };
+
       # Make the Overview menu and Krunner usable (does wrong things when you
       # type fast by default)
       krunnerrc."Plugins/Favorites"."plugins" = "krunner_services,krunner_systemsettings";

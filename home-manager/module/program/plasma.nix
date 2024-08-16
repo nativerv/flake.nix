@@ -95,6 +95,15 @@ in {
         "org.kde.datetimeEnabled" = false;
         "unitconverterEnabled" = true;
       };
+
+      kwinrc."Desktops"."Number" = {
+        value = 3;
+        # Forces kde to not change this value (even through the settings app).
+	# FIXME: does not work though, can still change them (should i not?)
+	#        and no mention of immutability in the config file (should
+	#        there be?)
+        immutable = true;
+      };
     };
 
     # Screen locking manager
@@ -185,7 +194,6 @@ in {
           "Window to Desktop 9" = "Meta+(";
         }
       ];
-	
     };
 
     workspace = {

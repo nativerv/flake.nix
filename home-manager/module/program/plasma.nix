@@ -98,6 +98,7 @@ in {
     };
 
     # Screen locking manager
+    # Hide screen at 00:09:00 and lock it at 00:09:30
     kscreenlocker = {
       autoLock = true;
 
@@ -108,21 +109,19 @@ in {
       passwordRequiredDelay = 30;
 
       # AFK minutes to lock screen
-      timeout = 10;
+      timeout = 9;
     };
 
     # Display on/off, Sleep, Hibernation and Shutdown manager
+    # Immediately turn off display at 00:09:30
     powerdevil = {
       AC = {
         powerButtonAction = "showLogoutScreen";
         autoSuspend = {
           action = "nothing";
-	  # Seconds
-          #idleTimeout = 60*30;
         };
         turnOffDisplay = {
-          idleTimeout = 60*9;
-          #idleTimeoutWhenLocked = "immediately";
+          idleTimeout = 60*9+30;
         };
       };
       # TODO: battery (steal from plasma-manager examples or history of this

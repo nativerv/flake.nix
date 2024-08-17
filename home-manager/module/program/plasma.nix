@@ -168,7 +168,9 @@ in {
           "Walk Through Windows of Current Application" = "";
           # Let's go full ZOOM with this: all-in-one launcher, window search etc.
           # instead of the usual dmenu-like lanucher
-          "Overview" = "Meta+P";
+          "Overview" = [ "Meta+W" "Meta+P" ];
+
+          "Window Maximize" = "Meta+Space";
         }
 
         # Workspace/Virtual desktop cycling

@@ -156,10 +156,14 @@ in {
     # duplicated twice in it
     shortcuts = {
       "KDE Keyboard Layout Switcher" = {
-	# Just because
+	# Disable this - don't bother me, but just because
         "Switch to Last-Used Keyboard Layout" = "";
 	# Cycle active input layout
         "Switch to Next Keyboard Layout" = "Meta+`";
+      };
+      "plasmashell" = {
+        # Unbind Meta
+        "activate application launcher" = "Meta+F1";
       };
       "kwin" = mkMerge [
         {

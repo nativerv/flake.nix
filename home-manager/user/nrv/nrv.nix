@@ -35,15 +35,15 @@ in {
       wl-clipboard
       (pkgs.wrapPackages [ pkgs.restic ] {
         environment = {
-	  RESTIC_PASSWORD_COMMAND = "${pass}/bin/pass show ${self.config.backups.restic.key.sk.pass-path or "dummy"}";
-	  RESTIC_COMPRESSION = "max";
-	  RCLONE_PASSWORD_COMMAND="${pass}/bin/pass show ${self.config.backups.rclone.key.adamantia.pass-path or "dummy"}";
-	};
+          RESTIC_PASSWORD_COMMAND = "${pass}/bin/pass show ${self.config.backups.restic.key.sk.pass-path or "dummy"}";
+          RESTIC_COMPRESSION = "max";
+          RCLONE_PASSWORD_COMMAND="${pass}/bin/pass show ${self.config.backups.rclone.key.adamantia.pass-path or "dummy"}";
+        };
       })
       (pkgs.wrapPackages [ pkgs.rclone ] {
         environment = {
-	  RCLONE_PASSWORD_COMMAND="${pass}/bin/pass show ${self.config.backups.rclone.key.adamantia.pass-path or "dummy"}";
-	};
+          RCLONE_PASSWORD_COMMAND="${pass}/bin/pass show ${self.config.backups.rclone.key.adamantia.pass-path or "dummy"}";
+        };
       })
     ];
 

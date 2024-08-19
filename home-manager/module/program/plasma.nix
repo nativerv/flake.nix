@@ -38,7 +38,10 @@ in {
 
       # Always Translucent - instead of switching back and forth when adapting
       # WARNING: why is this called 'Panel 2' out of the box in clean Plasma?
-      plasmashellrc."PlasmaViews/Panel 2".panelOpacity = 2;
+      plasmashellrc."PlasmaViews/Panel 2" = {
+        panelOpacity = 2;
+	floating = 0;
+      };
 
       # Input languages
       plasmarc.OSD.kbdLayoutChangedEnabled = false;
@@ -96,13 +99,14 @@ in {
         "unitconverterEnabled" = true;
       };
 
-      kwinrc."Desktops"."Number" = {
-        value = 3;
-        # Forces kde to not change this value (even through the settings app).
-	# FIXME: does not work though, can still change them (should i not?)
-	#        and no mention of immutability in the config file (should
-	#        there be?)
-        immutable = true;
+      kwinrc."Desktops" = {
+        "Rows" = 2;
+        "Number" = {
+          value = 4;
+	  # Forces kde to not change this value (or does it? it removes the
+	  # Desktops UI in the Overview certainly).
+          immutable = true;
+        };
       };
     };
 

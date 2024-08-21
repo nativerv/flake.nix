@@ -25,7 +25,7 @@ in {
   home = {
     username = "${name}";
     homeDirectory = "/home/${name}";
-    packages = with pkgs; let 
+    packages = with pkgs; let
       pass = config.programs.password-store.package;
     in [
       git-annex
@@ -74,7 +74,6 @@ in {
 
   # Enable home-manager and git
   programs.home-manager.enable = true;
-  #wayland.windowManager.hyprland.enable = true;
   #programs.git.enable = true;
 
   # Nicely reload system units when changing configs
@@ -117,8 +116,8 @@ in {
     # NOTE: (that's what i've thought:) Type password from tty instead of the
     #       GUI - useful for SSH
     enableZshIntegration = true;
-    defaultCacheTtl = 60*60; 
-    maxCacheTtl = 60*60*24; 
+    defaultCacheTtl = 60*60;
+    maxCacheTtl = 60*60*24;
   };
 
   # SSH agent - cache passphrases for some time

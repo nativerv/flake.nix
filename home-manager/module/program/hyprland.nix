@@ -63,7 +63,7 @@ in {
         ];
 
         # The primary modifier key
-        "$myMod" = "SUPER";
+        "$myMod" = "ALT";
 
         # Terminal that i use on this compositor
         "$myTerminal" = "${pkgs.kitty}/bin/kitty";
@@ -136,7 +136,7 @@ in {
           "$myMod SHIFT, 8, movetoworkspacesilent, 8"
           "$myMod SHIFT, 9, movetoworkspacesilent, 9"
           "$myMod SHIFT, 0, movetoworkspacesilent, 10"
-];
+        ];
       }
 
       {
@@ -220,13 +220,13 @@ in {
           "border_size" = "1"; # [int] [1] size of the border around windows
           "no_border_on_floating" = "false"; # [bool] [false] disable borders for floating windows
           "gaps_in" = "5"; # [int] [5] gaps between windows, also supports css style gaps (top, right, bottom, left -> 5,10,15,20)
-          "gaps_out" = "20"; # [int] [20] gaps between windows and monitor edges, also supports css style gaps (top, right, bottom, left -> 5,10,15,20)
+          "gaps_out" = "10"; # [int] [20] gaps between windows and monitor edges, also supports css style gaps (top, right, bottom, left -> 5,10,15,20)
           "gaps_workspaces" = "0"; # [int] [0] gaps between workspaces. Stacks with gaps_out.
-          "col.inactive_border" = "0xff444444"; # [gradient] [0xff444444] border color for inactive windows
+          "col.inactive_border" = "0x59595933"; # [gradient] [0xff444444] border color for inactive windows
           "col.active_border" = "0xffffffff"; # [gradient] [0xffffffff] border color for the active window
           "col.nogroup_border" = "0xffffaaff"; # [gradient] [0xffffaaff] inactive border color for window that cannot be added to a group (see denywindowfromgroup dispatcher)
           "col.nogroup_border_active" = "0xffff00ff"; # [gradient] [0xffff00ff] active border color for window that cannot be added to a group
-          "layout" = "dwindle"; # [str] [dwindle] which layout to use. [dwindle/master]
+          "layout" = "$myLayout"; # [str] [dwindle] which layout to use. [dwindle/master]
           "no_focus_fallback" = "false"; # [bool] [false] if true, will not fall back to the next available window when moving focus in a direction where no window was found
           "apply_sens_to_raw" = "false"; # [bool] [false] if on, will also apply the sensitivity to raw mouse output (e.g. sensitivity in games) NOTICE: really not recommended.
           "resize_on_border" = "false"; # [bool] [false] enables resizing windows by clicking and dragging on borders and gaps
@@ -245,7 +245,7 @@ in {
           "shadow_range" = "4"; # [int] [4] Shadow range (“size”) in layout px
           "shadow_render_power" = "3"; # [int] [3] in what power to render the falloff (more power, the faster the falloff) [1 - 4]
           "shadow_ignore_window" = "true"; # [bool] [true] if true, the shadow will not be rendered behind the window itself, only around it.
-          "col.shadow" = "0xee1a1a1a"; # [color] [0xee1a1a1a] shadow’s color. Alpha dictates shadow’s opacity.
+          "col.shadow" = "0x1a1a1aee"; # [color] [0xee1a1a1a] shadow’s color. Alpha dictates shadow’s opacity.
           #"col.shadow_inactive" = "unset"; # [color] [unset] inactive shadow color. (if not set, will fall back to col.shadow)
           "shadow_offset" = "0, 0"; # [vec2] [0, 0] shadow’s rendering offset.
           "shadow_scale" = "1.0"; # [float] [1.0] shadow’s scale. [0.0 - 1.0]
@@ -272,19 +272,22 @@ in {
           };
         };
         animations = {
-	  enabled = false;
-	};
+          enabled = false;
+        };
         input = {
           "kb_model" = ""; # [str] [] Appropriate XKB keymap parameter. See the note below.
-          "kb_layout" = "us"; # [str] [us] Appropriate XKB keymap parameter
+          "kb_layout" = fromJSONIfUnlockedOr (
+             warn "Repo is not unlocked! Hyprland will use EN layout only"
+	     "us"
+           ) "${flake}/sus/nrv/eval/hyprland/kb_layout.json"; # [str] [us] Appropriate XKB keymap parameter
           "kb_variant" = ""; # [str] [] Appropriate XKB keymap parameter
-          "kb_options" = ""; # [str] [] Appropriate XKB keymap parameter
+          "kb_options" = "caps:escape,grp:switch"; # [str] [] Appropriate XKB keymap parameter
           "kb_rules" = ""; # [str] [] Appropriate XKB keymap parameter
           "kb_file" = ""; # [str] [] If you prefer, you can use a path to your custom .xkb file.
           "numlock_by_default" = "false"; # [bool] [false] Engage numlock by default.
           "resolve_binds_by_sym" = "false"; # [bool] [false] Determines how keybinds act when multiple layouts are used. If false, keybinds will always act as if the first specified layout is active. If true, keybinds specified by symbols are activated when you type the respective symbol with the current layout.
-          "repeat_rate" = "25"; # [int] [25] The repeat rate for held-down keys, in repeats per second.
-          "repeat_delay" = "600"; # [int] [600] Delay before a held-down key is repeated, in milliseconds.
+          "repeat_rate" = "40"; # [int] [25] The repeat rate for held-down keys, in repeats per second.
+          "repeat_delay" = "400"; # [int] [600] Delay before a held-down key is repeated, in milliseconds.
           "sensitivity" = "0.0"; # [float] [0.0] Sets the mouse input sensitivity. Value is clamped to the range -1.0 to 1.0. libinput#pointer-acceleration
           "accel_profile" = ""; # [str] [] Sets the cursor acceleration profile. Can be one of adaptive, flat. Can also be custom, see below. Leave empty to use libinput’s default mode for your input device. libinput#pointer-acceleration [adaptive/flat/custom]
           "force_no_accel" = "false"; # [bool] [false] Force no cursor acceleration. This bypasses most of your pointer settings to get as raw of a signal as possible. Enabling this is not recommended due to potential cursor desynchronization.
@@ -355,32 +358,33 @@ in {
 	  };
 	};
 	misc = {
-	  "disable_hyprland_logo" = "false"; # [bool] [false] disables the random Hyprland logo / anime girl background. :(
-          "disable_splash_rendering" = "false"; # [bool] [false] disables the Hyprland splash rendering. (requires a monitor reload to take effect)
+	  "disable_hyprland_logo" = "true"; # [bool] [false] disables the random Hyprland logo / anime girl background. :(
+          "disable_splash_rendering" = "true"; # [bool] [false] disables the Hyprland splash rendering. (requires a monitor reload to take effect)
           "col.splash" = "0xffffffff"; # [color] [0xffffffff] Changes the color of the splash text (requires a monitor reload to take effect).
-          "font_family" = "Sans"; # [string] [Sans] Set the global default font to render the text including debug fps/notification, config error messages and etc., selected from system fonts.
+          "font_family" = "monospace"; # [string] [Sans] Set the global default font to render the text including debug fps/notification, config error messages and etc., selected from system fonts.
           "splash_font_family" = ""; # [string] [] Changes the font used to render the splash text, selected from system fonts (requires a monitor reload to take effect).
           "force_default_wallpaper" = "2"; # [int] [-1] Enforce any of the 3 default wallpapers. Setting this to 0 or 1 disables the anime background. -1 means “random”. [-1/0/1/2]
           "vfr" = "true"; # [bool] [true] controls the VFR status of Hyprland. Heavily recommended to leave enabled to conserve resources.
-          "vrr" = "0"; # [int] [0] controls the VRR (Adaptive Sync) of your monitors. 0 - off, 1 - on, 2 - fullscreen only [0/1/2]
-          "mouse_move_enables_dpms" = "false"; # [bool] [false] If DPMS is set to off, wake up the monitors if the mouse moves.
-          "key_press_enables_dpms" = "false"; # [bool] [false] If DPMS is set to off, wake up the monitors if a key is pressed.
+          "vrr" = "1"; # [int] [0] controls the VRR (Adaptive Sync) of your monitors. 0 - off, 1 - on, 2 - fullscreen only [0/1/2]
+          "mouse_move_enables_dpms" = "true"; # [bool] [false] If DPMS is set to off, wake up the monitors if the mouse moves.
+          "key_press_enables_dpms" = "true"; # [bool] [false] If DPMS is set to off, wake up the monitors if a key is pressed.
           "always_follow_on_dnd" = "true"; # [bool] [true] Will make mouse focus follow the mouse when drag and dropping. Recommended to leave it enabled, especially for people using focus follows mouse at 0.
           "layers_hog_keyboard_focus" = "true"; # [bool] [true] If true, will make keyboard-interactive layers keep their focus on mouse move (e.g. wofi, bemenu)
           "animate_manual_resizes" = "false"; # [bool] [false] If true, will animate manual window resizes/moves
           "animate_mouse_windowdragging" = "false"; # [bool] [false] If true, will animate windows being dragged by mouse, note that this can cause weird behavior on some curves
           "disable_autoreload" = "false"; # [bool] [false] If true, the config will not reload automatically on save, and instead needs to be reloaded with hyprctl reload. Might save on battery.
-          "enable_swallow" = "false"; # [bool] [false] Enable window swallowing
-          "swallow_regex" = ""; # [str] [] The class regex to be used for windows that should be swallowed (usually, a terminal). To know more about the list of regex which can be used use this cheatsheet.
-          "swallow_exception_regex" = ""; # [str] [] The title regex to be used for windows that should not be swallowed by the windows specified in swallow_regex (e.g. wev). The regex is matched against the parent (e.g. Kitty) window’s title on the assumption that it changes to whatever process it’s running.
+          "enable_swallow" = "true"; # [bool] [false] Enable window swallowing
+          "swallow_regex" = "^(footclient|foot|kitty|Alacritty)$"; # [str] [] The class regex to be used for windows that should be swallowed (usually, a terminal). To know more about the list of regex which can be used use this cheatsheet.
+          "swallow_exception_regex" = ''(^wev$|\[DEBUG\])''; # [str] [] The title regex to be used for windows that should not be swallowed by the windows specified in swallow_regex (e.g. wev). The regex is matched against the parent (e.g. Kitty) window’s title on the assumption that it changes to whatever process it’s running.
           "focus_on_activate" = "false"; # [bool] [false] Whether Hyprland should focus an app that requests to be focused (an activate request)
           "mouse_move_focuses_monitor" = "true"; # [bool] [true] Whether mouse moving into a different monitor should focus it
           "render_ahead_of_time" = "false"; # [bool] [false] [Warning: buggy] starts rendering before your monitor displays a frame in order to lower latency
           "render_ahead_safezone" = "1"; # [int] [1] how many ms of safezone to add to rendering ahead of time. Recommended 1-2.
           "allow_session_lock_restore" = "false"; # [bool] [false] if true, will allow you to restart a lockscreen app in case it crashes (red screen of death)
+	  # TODO: colors
           "background_color" = "0x111111"; # [color] [0x111111] change the background color. (requires enabled disable_hyprland_logo)
           "close_special_on_empty" = "true"; # [bool] [true] close the special workspace if the last window is removed
-          "new_window_takes_over_fullscreen" = "0"; # [int] [0] if there is a fullscreen or maximized window, decide whether a new tiled window opened should replace it, stay behind or disable the fullscreen/maximized state. 0 - behind, 1 - takes over, 2 - unfullscreen/unmaxize [0/1/2]
+          "new_window_takes_over_fullscreen" = "1"; # [int] [0] if there is a fullscreen or maximized window, decide whether a new tiled window opened should replace it, stay behind or disable the fullscreen/maximized state. 0 - behind, 1 - takes over, 2 - unfullscreen/unmaxize [0/1/2]
 	  # FIXME: reenable on 0.42
           #"exit_window_retains_fullscreen" = "false"; # [bool] [false] if true, closing a fullscreen window makes the next focused window fullscreen
           "initial_workspace_tracking" = "1"; # [int] [1] if enabled, windows will open on the workspace they were invoked on. 0 - disabled, 1 - single-shot, 2 - persistent (all children too)
@@ -388,10 +392,10 @@ in {
 	};
 	binds = {
           "pass_mouse_when_bound" = "false"; # [bool] [false] if disabled, will not pass the mouse events to apps / dragging windows around if a keybind has been triggered.
-          "scroll_event_delay" = "300"; # [int] [300] in ms, how many ms to wait after a scroll event to allow passing another one for the binds.
-          "workspace_back_and_forth" = "false"; # [bool] [false] If enabled, an attempt to switch to the currently focused workspace will instead switch to the previous workspace. Akin to i3’s auto_back_and_forth.
+          "scroll_event_delay" = "1"; # [int] [300] in ms, how many ms to wait after a scroll event to allow passing another one for the binds.
+          "workspace_back_and_forth" = "true"; # [bool] [false] If enabled, an attempt to switch to the currently focused workspace will instead switch to the previous workspace. Akin to i3’s auto_back_and_forth.
           "allow_workspace_cycles" = "false"; # [bool] [false] If enabled, workspaces don’t forget their previous workspace, so cycles can be created by switching to the first workspace in a sequence, then endlessly going to the previous workspace.
-          "workspace_center_on" = "0"; # [int] [0] Whether switching workspaces should center the cursor on the workspace (0) or on the last active window for that workspace (1)
+          "workspace_center_on" = "1"; # [int] [0] Whether switching workspaces should center the cursor on the workspace (0) or on the last active window for that workspace (1)
           "focus_preferred_method" = "0"; # [int] [0] sets the preferred focus finding method when using focuswindow/movewindow/etc with a direction. 0 - history (recent have priority), 1 - length (longer shared edges have priority)
           "ignore_group_lock" = "false"; # [bool] [false] If enabled, dispatchers like moveintogroup, moveoutofgroup and movewindoworgroup will ignore lock per group.
           "movefocus_cycles_fullscreen" = "true"; # [bool] [true] If enabled, when on a fullscreen window, movefocus will cycle fullscreen, if not, it will move the focus in a direction.
@@ -416,13 +420,13 @@ in {
 	  # FIXME: reenable on 0.42
           #"sync_gsettings_theme" = "true"; # [bool] [true] sync xcursor theme with gsettings, it applies cursor-theme and cursor-size on theme load to gsettings making most CSD gtk based clients use same xcursor theme and size.
           "no_hardware_cursors" = "false"; # [bool] [false] disables hardware cursors
-          "no_break_fs_vrr" = "false"; # [bool] [false] disables scheduling new frames on cursor movement for fullscreen apps with VRR enabled to avoid framerate spikes (requires no_hardware_cursors = true)
+          "no_break_fs_vrr" = "true"; # [bool] [false] disables scheduling new frames on cursor movement for fullscreen apps with VRR enabled to avoid framerate spikes (requires no_hardware_cursors = true)
           "min_refresh_rate" = "24"; # [int] [24] minimum refresh rate for cursor movement when no_break_fs_vrr is active. Set to minimum supported refresh rate or higher
-          "hotspot_padding" = "1"; # [int] [1] the padding, in logical px, between screen edges and the cursor
+          "hotspot_padding" = "0"; # [int] [1] the padding, in logical px, between screen edges and the cursor
           "inactive_timeout" = "0"; # [float] [0] in seconds, after how many seconds of cursor’s inactivity to hide it. Set to 0 for never.
           "no_warps" = "false"; # [bool] [false] if true, will not warp the cursor in many cases (focusing, keybinds, etc)
-          "persistent_warps" = "false"; # [bool] [false] When a window is refocused, the cursor returns to its last position relative to that window, rather than to the centre.
-          "warp_on_change_workspace" = "false"; # [bool] [false] If true, move the cursor to the last focused window after changing the workspace.
+          "persistent_warps" = "true"; # [bool] [false] When a window is refocused, the cursor returns to its last position relative to that window, rather than to the centre.
+          "warp_on_change_workspace" = "true"; # [bool] [false] If true, move the cursor to the last focused window after changing the workspace.
           "default_monitor" = ""; # [str] [] the name of a default monitor for the cursor to be set to on startup (see hyprctl monitors for names)
           "zoom_factor" = "1.0"; # [float] [1.0] the factor to zoom by around the cursor. Like a magnifying glass. Minimum 1.0 (meaning no zoom)
           "zoom_rigid" = "false"; # [bool] [false] whether the zoom should follow the cursor rigidly (cursor is always centered if it can be) or loosely
@@ -432,7 +436,7 @@ in {
 	  # FIXME: reenable on 0.42
           #"allow_dumb_copy" = "false"; # [bool] [false] Makes HW cursors work on Nvidia, at the cost of a possible hitch whenever the image changes
 	};
-	debug = {
+        debug = {
           "overlay" = "false"; # [bool] [false] print the debug performance overlay. Disable VFR for accurate results.
           "damage_blink" = "false"; # [bool] [false] (epilepsy warning!) flash areas updated with damage tracking
           "disable_logs" = "true"; # [bool] [true] disable logging to a file
@@ -446,7 +450,7 @@ in {
           "error_limit" = "5"; # [int] [5] limits the number of displayed config file parsing errors.
           "error_position" = "0"; # [int] [0] sets the position of the error bar. top - 0, bottom - 1
           "colored_stdout_logs" = "true"; # [bool] [true] enables colors in the stdout logs.
-	};
+        };
       }
     ];
   };

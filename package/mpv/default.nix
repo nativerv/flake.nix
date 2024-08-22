@@ -8,7 +8,9 @@ let
     config = { sloth, ... }: {
 
       # the application to isolate
-      app.package = pkgs.${name};
+      app.package = pkgs."${name}-unwrapped".override {
+        sixelSupport = true;
+      };
 
       # path to the executable to be wrapped
       # this is usually autodetected but

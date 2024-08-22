@@ -33,6 +33,9 @@ in {
       pulsemixer
       inputs.tmux-sessionizer.packages.${system}.default
       wl-clipboard
+      jq
+      ripgrep
+      sxiv
       (pkgs.wrapPackages [ pkgs.restic ] {
         environment = {
           RESTIC_PASSWORD_COMMAND = "${pass}/bin/pass show ${self.config.backups.restic.key.sk.pass-path or "dummy"}";

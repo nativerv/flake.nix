@@ -420,6 +420,7 @@
         ".local/state/nix"
         ".local/share/nix" # repl-history
         ".local/share/home-manager" # news
+        ".local/state/tmux" # plugins (resurrect)
       ];
       users.nrv.files = [
       ];

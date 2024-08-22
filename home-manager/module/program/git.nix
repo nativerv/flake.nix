@@ -14,6 +14,7 @@ with lib;
 let
 in {
   programs.git.enable = true;
+  programs.git.package = pkgs.gitFull;
   programs.git.extraConfig = {
     core = {
       autocrlf = false;

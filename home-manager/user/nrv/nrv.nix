@@ -20,6 +20,7 @@ in {
     self.homeManagerModules."program.git"
     self.homeManagerModules."program.plasma"
     self.homeManagerModules."program.hyprland"
+    self.homeManagerModules."program.kitty"
   ];
 
   # For some reason they separate some stuff under `home.*`
@@ -106,6 +107,8 @@ in {
   #  . "''${XDG_STATE_HOME}/nix/profiles/home-manager/home-path/etc/profile.d/hm-session-vars.sh"
   #  # vim:ft=zsh
   #'';
+
+  # Terminal
 
   # GPG
   programs.gpg = {

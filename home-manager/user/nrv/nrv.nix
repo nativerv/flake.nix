@@ -19,6 +19,7 @@ in {
     self.homeManagerModules."program.tmux"
     self.homeManagerModules."program.git"
     self.homeManagerModules."program.plasma"
+    self.homeManagerModules."program.hyprland"
   ];
 
   # For some reason they separate some stuff under `home.*`

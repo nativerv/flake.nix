@@ -59,6 +59,10 @@
     # everything match nicely? Try nix-colors!
     #nix-colors.url = "github:misterio77/nix-colors";
 
+    # Audio in screen sharing in Firefox
+    pipewire-screenaudio.url = "github:icedborn/pipewire-screenaudio";
+    pipewire-screenaudio.inputs.nixpkgs.follows = "nixpkgs-unstable";
+
     # My stuff
     tmux-sessionizer.url = "github:nativerv/tmux-sessionizer";
     tmux-sessionizer.inputs.nixpkgs.follows = "nixpkgs-unstable";

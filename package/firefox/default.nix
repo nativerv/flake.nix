@@ -1,12 +1,29 @@
-{ pkgs, mkNixPak, ... }: let
+{ pkgs, mkNixPak, inputs, ... }: let
   name = "firefox";
   appId = "org.mozilla.firefox";
+
+  package = pkgs.firefox-bin.override {
+    nativeMessagingHosts = [ inputs.pipewire-screenaudio.packages.${pkgs.system}.default ];
+  };
 
   sandboxed = mkNixPak {
     config = { sloth, ... }: {
 
       # the application to isolate
-      app.package = pkgs.firefox-bin;
+      # NOTE: Swap with this comment to test stuff:
+      # app.package = pkgs.writeShellScriptBin "${name}" ''
+      #   ${pkgs.findutils}/bin/find /nix/store/nkjz7cddzkbpssshwbdk1lhp1h5c3j22-pipewire-screenaudio
+      #   ${pkgs.coreutils}/bin/ls -la /nix/store/nkjz7cddzkbpssshwbdk1lhp1h5c3j22-pipewire-screenaudio/bin
+      #
+      #   echo
+      #   echo Current system
+      #   ${pkgs.findutils}/bin/find -L /run/current-system/sw/lib/mozilla
+      #   echo
+      #   ${pkgs.findutils}/bin/find -L / -maxdepth 2
+      #
+      #   # ${package}/bin/${name} ''${@}
+      # '';
+      app.package = package;
 
       # path to the executable to be wrapped
       # this is usually autodetected but
@@ -72,7 +89,7 @@
 
       bubblewrap = {
         # Bind only paths that app needs
-        bindEntireStore = false;
+        bindEntireStore = true;
 
         # network access
         network = true;
@@ -98,8 +115,8 @@
         ];
         bind.ro = with sloth; [
           (concat [runtimeDir "speech-dispatcher"]) # TODO: move that to Nixpak
-          # "/etc"
-          # "/run/current-system"
+          "/etc"
+          "/run/current-system"
         ];
         bind.dev = [
           "/dev/dri"

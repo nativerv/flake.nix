@@ -60,6 +60,7 @@
     #nix-colors.url = "github:misterio77/nix-colors";
 
     # Audio in screen sharing in Firefox
+    # pipewire-screenaudio.url = "git+file:///home/nrv/pr/pipewire-screenaudio";
     pipewire-screenaudio.url = "github:icedborn/pipewire-screenaudio";
     pipewire-screenaudio.inputs.nixpkgs.follows = "nixpkgs-unstable";
 

@@ -2,8 +2,9 @@
   name = "firefox";
   appId = "org.mozilla.firefox";
 
+  pw-sa = inputs.pipewire-screenaudio.packages.${pkgs.system}.default;
   package = pkgs.firefox-bin.override {
-    nativeMessagingHosts = [ inputs.pipewire-screenaudio.packages.${pkgs.system}.default ];
+    nativeMessagingHosts = [ pw-sa ];
   };
 
   sandboxed = mkNixPak {
@@ -11,18 +12,23 @@
 
       # the application to isolate
       # NOTE: Swap with this comment to test stuff:
-      # app.package = pkgs.writeShellScriptBin "${name}" ''
-      #   ${pkgs.findutils}/bin/find /nix/store/nkjz7cddzkbpssshwbdk1lhp1h5c3j22-pipewire-screenaudio
-      #   ${pkgs.coreutils}/bin/ls -la /nix/store/nkjz7cddzkbpssshwbdk1lhp1h5c3j22-pipewire-screenaudio/bin
+      # app.package = pkgs.symlinkJoin {
+      #   inherit name;
+      #   paths = [ (pkgs.writeShellScriptBin "${name}" ''
+      #     ${pkgs.coreutils}/bin/ls -la ~
+      #     ${pkgs.coreutils}/bin/ls -la ~/pr
+      #     ${pkgs.coreutils}/bin/ls -la /home/nrv/pr/pipewire-screenaudio/native/connector-rs/target/debug
+      #     ${pkgs.coreutils}/bin/cat ~/pr/pipewire-screenaudio/native/native-messaging-hosts/firefox.json
+      #     ${pkgs.coreutils}/bin/cat /usr/lib/mozilla/native-messaging-hosts/com.icedborn.pipewirescreenaudioconnector.json
+      #     # echo
+      #     # echo Current system
+      #     # ${pkgs.findutils}/bin/find -L /run/current-system/sw/lib/mozilla
+      #     # echo
+      #     # ${pkgs.findutils}/bin/find -L / -maxdepth 2
       #
-      #   echo
-      #   echo Current system
-      #   ${pkgs.findutils}/bin/find -L /run/current-system/sw/lib/mozilla
-      #   echo
-      #   ${pkgs.findutils}/bin/find -L / -maxdepth 2
-      #
-      #   # ${package}/bin/${name} ''${@}
-      # '';
+      #     ${package}/bin/${name} ''${@}
+      #   '') package ];
+      # };
       app.package = package;
 
       # path to the executable to be wrapped
@@ -115,8 +121,8 @@
         ];
         bind.ro = with sloth; [
           (concat [runtimeDir "speech-dispatcher"]) # TODO: move that to Nixpak
-          "/etc"
           "/run/current-system"
+          [ "/run/current-system/sw/lib/mozilla" "/usr/lib/mozilla" ]
         ];
         bind.dev = [
           "/dev/dri"

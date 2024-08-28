@@ -26,8 +26,8 @@ in mkMerge [
     home.activation."copy-${name}/${name}rc" = let
       storeFile = ./${name}/${name}rc;
     in lib.hm.dag.entryAfter ["writeBoundary"] ''
-      file="$XDG_CONFIG_HOME/${name}/${name}rc"
-      run mkdir --parents "$XDG_CONFIG_HOME/${name}"
+      file="${config.xdg.configHome}/${name}/${name}rc"
+      run mkdir --parents "${config.xdg.configHome}/${name}"
       [ -f "$file" ] &&
         echo "WARNING: file '$file' already exists! Backing up..." &&
         ! diff -q ${storeFile} "$file" &&

@@ -1,10 +1,16 @@
-{ pkgs, mkNixPak, inputs, ... }: let
+{
+  pkgs,
+  mkNixPak,
+  inputs,
+
+  nativeMessagingHosts ? [ ],
+  ...
+}: let
   name = "firefox";
   appId = "org.mozilla.firefox";
 
-  pw-sa = inputs.pipewire-screenaudio.packages.${pkgs.system}.default;
   package = pkgs.firefox-bin.override {
-    nativeMessagingHosts = [ pw-sa ];
+    inherit nativeMessagingHosts;
   };
 
   sandboxed = mkNixPak {
@@ -26,7 +32,10 @@
       #     # echo
       #     # ${pkgs.findutils}/bin/find -L / -maxdepth 2
       #
-      #     ${package}/bin/${name} ''${@}
+      #     echo
+      #     ${pkgs.findutils}/bin/find -L /usr
+      #
+      #     #${package}/bin/${name} ''${@}
       #   '') package ];
       # };
       app.package = package;
@@ -121,8 +130,12 @@
         ];
         bind.ro = with sloth; [
           (concat [runtimeDir "speech-dispatcher"]) # TODO: move that to Nixpak
-          "/run/current-system"
-          [ "/run/current-system/sw/lib/mozilla" "/usr/lib/mozilla" ]
+
+          # NOTE: The following is required for native-messaging-hosts to work,
+          # at least `pipewire-screenaudio`.
+          # TODO: restrict this further up to `bindEntireStore = false`
+          "/run/current-system/sw"
+          [ "${package}/lib/mozilla" "/usr/lib/mozilla" ]
         ];
         bind.dev = [
           "/dev/dri"

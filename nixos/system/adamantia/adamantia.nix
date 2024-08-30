@@ -42,6 +42,7 @@
     self.nixosModules."program.bash"
     self.nixosModules."program.sudo"
     self.nixosModules."program.nix-index"
+    self.nixosModules."program.keyd"
 
     self.nixosModules."user.nrv"
     self.nixosModules."user.gamer"
@@ -148,12 +149,6 @@
   };
 
   # Keyboard settings (mappings)
-  services.keyd.enable = true;
-  systemd.services.keyd.restartTriggers = [
-    config.environment.etc."keyd/keyd.conf".source
-  ];
-  environment.etc."keyd/keyd.conf".source = lib.mkForce
-    "${flake}/nixos/module/program/keyd/keyd.conf";
 
   # Virtual machine-scoped config
   virtualisation = let

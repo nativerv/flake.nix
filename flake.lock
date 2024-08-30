@@ -49,11 +49,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1725043577,
+        "lastModified": 1725059164,
         "narHash": "sha256-+T11eMoqUf3/WVw7ohhYz5pZ9ftxA0R0mVYpNfvKnIY=",
         "owner": "nativerv",
         "repo": "envrund",
-        "rev": "e74ca7965b071f853f222d428f0eb3ad12762960",
+        "rev": "328280a725d1b4fa8113582a47aee40bc614cd7b",
         "type": "github"
       },
       "original": {
@@ -375,11 +375,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1725053240,
+        "lastModified": 1725059439,
         "narHash": "sha256-5eaVwLzl3AQjbzfPHkLcPfhubWHWp2n/awcyTeIhGdg=",
         "owner": "nativerv",
         "repo": "session",
-        "rev": "fb9c972179349f5e132fc4fc22449fc76e286e7a",
+        "rev": "e7fe24fb8d85dd4f53d9f7028a672b57a338a623",
         "type": "github"
       },
       "original": {

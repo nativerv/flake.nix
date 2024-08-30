@@ -42,6 +42,26 @@
         "type": "github"
       }
     },
+    "envrund": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1725043577,
+        "narHash": "sha256-+T11eMoqUf3/WVw7ohhYz5pZ9ftxA0R0mVYpNfvKnIY=",
+        "owner": "nativerv",
+        "repo": "envrund",
+        "rev": "e74ca7965b071f853f222d428f0eb3ad12762960",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nativerv",
+        "repo": "envrund",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -327,6 +347,7 @@
       "inputs": {
         "deploy-rs": "deploy-rs",
         "disko": "disko",
+        "envrund": "envrund",
         "hardware": "hardware",
         "home-manager": "home-manager",
         "impermanence": "impermanence",
@@ -342,8 +363,29 @@
         "nixpkgs-unstable": "nixpkgs-unstable",
         "pipewire-screenaudio": "pipewire-screenaudio",
         "plasma-manager": "plasma-manager",
+        "session": "session",
         "sops-nix": "sops-nix",
         "tmux-sessionizer": "tmux-sessionizer"
+      }
+    },
+    "session": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1725053240,
+        "narHash": "sha256-5eaVwLzl3AQjbzfPHkLcPfhubWHWp2n/awcyTeIhGdg=",
+        "owner": "nativerv",
+        "repo": "session",
+        "rev": "fb9c972179349f5e132fc4fc22449fc76e286e7a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nativerv",
+        "repo": "session",
+        "type": "github"
       }
     },
     "sops-nix": {

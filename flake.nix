@@ -53,20 +53,32 @@
     plasma-manager.inputs.nixpkgs.follows = "nixpkgs-unstable";
     plasma-manager.inputs.home-manager.follows = "home-manager";
 
+    # Audio in Discord in browser
+    # pipewire-screenaudio.url = "git+file:///home/nrv/pr/pipewire-screenaudio";
+    pipewire-screenaudio.url = "github:icedborn/pipewire-screenaudio";
+    pipewire-screenaudio.inputs.nixpkgs.follows = "nixpkgs-unstable";
+
     # Don't remember from where i stole my initial config but this was there
     # maybe i'll use it later
     # Shameless plug: looking for a way to nixify your themes and make
     # everything match nicely? Try nix-colors!
     #nix-colors.url = "github:misterio77/nix-colors";
 
-    # Audio in screen sharing in Firefox
-    # pipewire-screenaudio.url = "git+file:///home/nrv/pr/pipewire-screenaudio";
-    pipewire-screenaudio.url = "github:icedborn/pipewire-screenaudio";
-    pipewire-screenaudio.inputs.nixpkgs.follows = "nixpkgs-unstable";
-
     # My stuff
-    tmux-sessionizer.url = "github:nativerv/tmux-sessionizer";
-    tmux-sessionizer.inputs.nixpkgs.follows = "nixpkgs-unstable";
+    tmux-sessionizer = {
+      url = "github:nativerv/tmux-sessionizer";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
+    session = {
+      url = "github:nativerv/session";
+      # url = "git+file:///home/nrv/pr/session?ref=HEAD";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
+    envrund = {
+      url = "github:nativerv/envrund";
+      # url = "git+file:///home/nrv/pr/envrund?ref=HEAD";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
 
     # This is here only to be pinned in the registry by
     # `nixos/module/archetype/sane.nix`

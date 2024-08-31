@@ -386,6 +386,7 @@
         "plasma-manager": "plasma-manager",
         "session": "session",
         "sops-nix": "sops-nix",
+        "tl": "tl",
         "tmux-sessionizer": "tmux-sessionizer"
       }
     },
@@ -444,6 +445,26 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "tl": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1725068592,
+        "narHash": "sha256-7EYOvK/SYqAydxZOnbaydrbHARrTuyVkWKVIzqtU0jY=",
+        "owner": "nativerv",
+        "repo": "tl",
+        "rev": "ab976a6250d6306db06c7406200436d885287d15",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nativerv",
+        "repo": "tl",
         "type": "github"
       }
     },

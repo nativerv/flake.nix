@@ -84,6 +84,11 @@
       # url = "git+file:///home/nrv/pr/clip?ref=HEAD";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+    tl = {
+      url = "github:nativerv/tl";
+      # url = "git+file:///home/nrv/pr/tl?ref=HEAD";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
 
     # This is here only to be pinned in the registry by
     # `nixos/module/archetype/sane.nix`

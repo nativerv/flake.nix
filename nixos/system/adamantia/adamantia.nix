@@ -326,7 +326,7 @@
       script = with pkgs; ''
         export ZRD_POOL="${config.disko.devices.disk.main.name}"
         export ZRD_SYSTEM="${config.system.name}"
-        export ZRD_MAX="31"
+        export ZRD_MAX="128"
         # FIXME: can't include dependencies in initrd no matter what i try, so
         #        read & inline instead
         #exec zfs-roll-darlings

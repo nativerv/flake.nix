@@ -42,6 +42,7 @@ in {
       ripgrep
       sxiv
       inputs.clip.packages.${system}.default
+      self.packages.${system}.hotkey-scripts
       inputs.tl.packages.${system}.default
       (pkgs.wrapPackages [ pkgs.restic ] {
         environment = {

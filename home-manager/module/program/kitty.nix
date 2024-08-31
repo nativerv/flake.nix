@@ -34,6 +34,15 @@ in {
       font_size = 10;
       initial_window_width = 1008;
       initial_window_height = 567;
+
+      # Bahavior
+      # Allow changing opacity at runtime with a key
+      dynamic_background_opacity = true;
+    };
+
+    keybindings = {
+      "ctrl+shift+[" = "set_background_opacity -0.1";
+      "ctrl+shift+]" = "set_background_opacity +0.1";
     };
 
     # FIXME: This won't work until i implement sourcing it in my config

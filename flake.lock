@@ -1,5 +1,25 @@
 {
   "nodes": {
+    "clip": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1725061851,
+        "narHash": "sha256-Mced5BlwGsOrgMNbf3W19bmy3s3BVODADzunGXWMkdw=",
+        "owner": "nativerv",
+        "repo": "clip",
+        "rev": "483d078be3f6367b57887418d79d5100113ec8d1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nativerv",
+        "repo": "clip",
+        "type": "github"
+      }
+    },
     "deploy-rs": {
       "inputs": {
         "flake-compat": "flake-compat",
@@ -345,6 +365,7 @@
     },
     "root": {
       "inputs": {
+        "clip": "clip",
         "deploy-rs": "deploy-rs",
         "disko": "disko",
         "envrund": "envrund",

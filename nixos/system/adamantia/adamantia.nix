@@ -21,7 +21,7 @@
     inputs.hardware.nixosModules.common-pc-ssd
 
     inputs.disko.nixosModules.disko
-    (import ./disko.nix { inherit lib; })
+    (import ./disko.nix { inherit self flake lib; })
 
     inputs.impermanence.nixosModules.impermanence
 
@@ -292,7 +292,6 @@
     "${flake}/sus/${config.system.name}/eval/hostid.json"; 
   # FIXME: other kernel packages, also verify latest ZFS version
   boot.kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
-  boot.supportedFilesystems.zfs = true;
   boot.zfs.forceImportRoot = false;
 
   # Impermanence

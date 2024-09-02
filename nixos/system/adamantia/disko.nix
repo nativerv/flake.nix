@@ -7,7 +7,9 @@
   zpool-name ? "mythos",
   zpool-name-mount ? zpool-name,
 
-  lib,
+  lib ? null,
+  flake ? null,
+  self ? null,
 
   # FIXME: WARNING: only works for `postCreateHook`. Does not affect `disko`'s
   # `rootMountPoint`. I don't know how to fix this
@@ -91,6 +93,17 @@
 
   # "nodiratime" as well just to be sure
   defaultMountOptions = [ "noatime" "nodiratime" "nosuid" "nodev" ];
+  defaultNtfsOptions = with builtins; defaultMountOptions ++ [
+    "ro" "nofail" "auto" "users" "exec" "umask=0007"
+    "uid=${toString ntfs-uid}" "gid=${toString ntfs-gid}" "blksize=4096"
+  ];
+  readOrDefault = self.lib.fromJSONIfUnlockedOr (
+    lib.warn
+    "Repo is not unlocked! System will fail to mount drives"
+    "00000000-0000-0000-0000-000000000000"
+  );
+  ntfs-uid = 0;
+  ntfs-gid = self.config.groups.media.gid;
 in
   #assert zpool-luks-end < (total-size - boot-start);
 builtins.trace ''
@@ -126,7 +139,6 @@ boot-end         = "${builtins.toString boot-end}"
   fileSystems."/persist/cache".neededForBoot = true;
   fileSystems."/persist/cred".neededForBoot = true;
   fileSystems."/".neededForBoot = true;
-  # fileSystems."/home".neededForBoot = lib.mkIf (config.fileSystems."/home" ? device);
 
   fileSystems."/old/boot/00" = {
     device = "${zpool-name}/sys/${system-name}/local/now";
@@ -134,6 +146,40 @@ boot-end         = "${builtins.toString boot-end}"
     # NOTE: tried to do ++ [ "ro" ] here but it seems that mountint ro at one
     #       place makes it ro at them all
     options = defaultMountOptions;
+  };
+
+  # Peripheral disks
+  # NOTE: has no effect with systemd stage 1.
+  # boot.initrd.luks.reusePassphrases = true;
+
+  # Dawnstar
+  fileSystems."/media/disk/dawnstar/c" = {
+    device = "UUID=${readOrDefault "${flake}/sus/${system-name}/eval/disk/dawnstar/c/uuid.json"}";
+    fsType = "ntfs-3g";
+    options = defaultNtfsOptions;
+  };
+  fileSystems."/media/disk/dawnstar/d" = {
+    device = "UUID=${readOrDefault "${flake}/sus/${system-name}/eval/disk/dawnstar/d/uuid.json"}";
+    fsType = "ntfs-3g";
+    options = defaultNtfsOptions;
+  };
+  # Nightcaller
+  boot.initrd.luks.devices."nightcaller-crypted" = let
+    id = readOrDefault "${flake}/sus/${system-name}/eval/disk/nightcaller/id.json";
+  in {
+    device = "/dev/disk/by-id/${id}-part2";
+    allowDiscards = true;
+    bypassWorkqueues = true;
+  };
+  fileSystems."/media/lvg/nightcaller/lv_root" = {
+    device = "UUID=${readOrDefault "${flake}/sus/${system-name}/eval/disk/nightcaller/lv_root/uuid.json"}";
+    fsType = "ext4";
+    options = defaultMountOptions ++ [ "nofail" ];
+  };
+  fileSystems."/media/lvg/nightcaller/lv_home" = {
+    device = "UUID=${readOrDefault "${flake}/sus/${system-name}/eval/disk/nightcaller/lv_home/uuid.json"}";
+    fsType = "ext4";
+    options = defaultMountOptions ++ [ "nofail" ];
   };
 
   # FIXME: For some unimaginable reason `rootMountPoint` returns "" for the string  trace:

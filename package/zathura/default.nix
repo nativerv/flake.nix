@@ -9,6 +9,18 @@ let
 
       # the application to isolate
       app.package = pkgs.${name};
+      # NOTE: uncomment to debug the sandbox
+      # app.package = pkgs.writeShellScriptBin "${name}" ''
+      #   folder=$HOME/.config/${name}
+      #   ${pkgs.coreutils}/bin/ls -la $folder
+      #   ${pkgs.coreutils}/bin/stat $folder/${name}rc
+      #   ${pkgs.coreutils}/bin/cat < $folder/${name}rc
+      #
+      #   ${pkgs.coreutils}/bin/ls -la /media
+      #   ${pkgs.coreutils}/bin/ls -la /media/all
+      #
+      #   ${pkgs.${name}}/bin/${name} ''${@}
+      # '';
 
       # path to the executable to be wrapped
       # this is usually autodetected but
@@ -58,16 +70,17 @@ let
           [ (mkdir (concat [xdgStateHome "/sandbox/${name}/home"])) homeDir ]
           [ (mkdir (concat [runtimeDir "/sandbox/${name}"])) "/tmp" ]
           [ (concat [runtimeDir "/doc/by-app/${appId}"]) (concat [runtimeDir "/doc"]) ]
-          
+
           # zathura puts state to XDG_DATA_HOME instead of XDG_STATE_HOME. Let it store it in the sandbox dir then
           # TODO: zathura: fork & fix 
           #(concat [xdgStateHome "${name}"])
         ];
         bind.ro = with sloth; [
           # FIXME: make arguments automatically document-portaled. This probably requires Nixpak launcher changes
-          (concat [xdgConfigHome "${name}"])
+          (concat [xdgConfigHome "/${name}"])
           xdgDocumentsDir
           "/srv/media/books"
+          "/media/all/media/books"
         ];
         bind.dev = [
           #"/dev/dri"

@@ -21,7 +21,7 @@
     inputs.hardware.nixosModules.common-pc-ssd
 
     inputs.disko.nixosModules.disko
-    (import ./disko.nix { inherit self flake lib; })
+    (import ./disko.nix { inherit self flake inputs; })
 
     inputs.impermanence.nixosModules.impermanence
 

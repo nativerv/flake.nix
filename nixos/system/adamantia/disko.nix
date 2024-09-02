@@ -7,7 +7,6 @@
   zpool-name ? "mythos",
   zpool-name-mount ? zpool-name,
 
-  lib ? null,
   flake ? null,
   self ? null,
 
@@ -15,7 +14,15 @@
   # `rootMountPoint`. I don't know how to fix this
   rootMountPoint ? "/mnt",
   ...
-}: let
+}:
+{
+  lib ? null,
+  pkgs ? null,
+  ...
+}:
+with lib;
+with builtins;
+let
   # Use folder name as name of this system
   system-name = builtins.baseNameOf ./.;
 
@@ -148,10 +155,26 @@ boot-end         = "${builtins.toString boot-end}"
     options = defaultMountOptions;
   };
 
+  # Readonly union of pools to read media from one place
+  environment.systemPackages = [ pkgs.mergerfs ];
+  fileSystems."/media/all" = {
+    fsType = "fuse.mergerfs";
+    device = "/media/pool/*";
+    options = [
+      "ro"
+      # FIXME: nofail spits error when using `mount -a`, but seemingly no boot
+      #        time or rebuild time errors (?)
+      "nofail"
+      "gid=${toString self.config.groups.pool.gid}"
+      "cache.files=partial"
+      "dropcacheonclose=true"
+      "category.create=mfs"
+    ];
+  };
+
   # Peripheral disks
   # NOTE: has no effect with systemd stage 1.
   # boot.initrd.luks.reusePassphrases = true;
-
   # Dawnstar
   fileSystems."/media/disk/dawnstar/c" = {
     device = "UUID=${readOrDefault "${flake}/sus/${system-name}/eval/disk/dawnstar/c/uuid.json"}";
@@ -182,6 +205,7 @@ boot-end         = "${builtins.toString boot-end}"
     options = defaultMountOptions ++ [ "nofail" ];
   };
 
+  # Main disk
   # FIXME: For some unimaginable reason `rootMountPoint` returns "" for the string  trace:
   #disko.rootMountPoint = lib.trace "${rootMountPoint}" rootMountPoint;
   disko.devices.disk.main = {

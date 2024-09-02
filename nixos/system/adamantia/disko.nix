@@ -22,9 +22,10 @@
 }:
 with lib;
 with builtins;
+with self.lib;
 let
   # Use folder name as name of this system
-  system-name = builtins.baseNameOf ./.;
+  system-name = baseNameOf ./.;
 
   # Size of your drive
   # 1 TeraByte is equal to:
@@ -42,7 +43,7 @@ let
 
   # Everything in the actual partitioning scheme below is in mebibytes.
   # Use the following helpers
-  mebi = lib.id;
+  mebi = id;
   gibi = n: 1024 * mebi n;
   tebi = n: 1024 * gibi n;
 
@@ -104,7 +105,7 @@ let
     "ro" "nofail" "auto" "users" "exec" "umask=0007"
     "uid=${toString ntfs-uid}" "gid=${toString ntfs-gid}" "blksize=4096"
   ];
-  readOrDefault = self.lib.fromJSONIfUnlockedOr (
+  readOrDefault = fromJSONIfUnlockedOr (
     lib.warn
     "Repo is not unlocked! System will fail to mount drives"
     "00000000-0000-0000-0000-000000000000"
@@ -113,16 +114,6 @@ let
   ntfs-gid = self.config.groups.media.gid;
 in
   #assert zpool-luks-end < (total-size - boot-start);
-builtins.trace ''
-
-zpool-luks-start = "${builtins.toString zpool-luks-start}"
-zpool-luks-end   = "${builtins.toString zpool-luks-end}"
-esp-start        = "${builtins.toString esp-start}"
-esp-end          = "${builtins.toString esp-end}"
-boot-start       = "${builtins.toString boot-start}"
-boot-end         = "${builtins.toString boot-end}"
-''
-
 {
   # NOTE: Without the "/persist".neededForBoot the permissions of user home
   #       folders and their nested contents created by impermanence is wrong
@@ -147,6 +138,7 @@ boot-end         = "${builtins.toString boot-end}"
   fileSystems."/persist/cred".neededForBoot = true;
   fileSystems."/".neededForBoot = true;
 
+  # Mount current root as 00th old boot
   fileSystems."/old/boot/00" = {
     device = "${zpool-name}/sys/${system-name}/local/now";
     fsType = "zfs";
@@ -217,22 +209,22 @@ boot-end         = "${builtins.toString boot-end}"
 
     type = "disk";
     name = zpool-name; # Primary pool on disk is always named the same as the disk
-    device = builtins.head disks;
+    device = head disks;
     content = {
       type = "gpt";
       partitions = {
         grub-mbr = {
           priority = 0;
           start = "1M";
-          #end = "${builtins.toString start-offset-size}M";
-          size = "${builtins.toString start-offset-size}M";
+          #end = "${toString start-offset-size}M";
+          size = "${toString start-offset-size}M";
           type = "EF02"; # for grub MBR
         };
         crypted = {
           priority = 1;
-          start = "${builtins.toString zpool-luks-start}M";
-          # end = "${builtins.toString zpool-luks-end}M";
-          size = "${builtins.toString zpool-luks-size}M";
+          start = "${toString zpool-luks-start}M";
+          # end = "${toString zpool-luks-end}M";
+          size = "${toString zpool-luks-size}M";
           content = {
             type = "luks";
             name = "${zpool-name}-crypted";
@@ -245,44 +237,14 @@ boot-end         = "${builtins.toString boot-end}"
             };
           };
         };
-        # Legacy boot /boot: actually, maybe i'll make that later when i need it.
-        # boot = {
-        #   priority = 2;
-        #   name = "boot";
-        #   start = "${builtins.toString boot-start}M";
-        #   size = "${builtins.toString boot-size}M";
-        #   #end = "${builtins.toString boot-end}M";
-        #   # bootable = true;
-        #   content = {
-        #     type = "filesystem";
-        #     format = "ext4";
-        #     mountpoint = "/boot";
-        #     mountOptions = [ "defaults" "noatime" ];
-        #   };
-        # };
-        # ESP = {
-        #   priority = 3;
-        #   type = "EF00";
-        #   start = "${builtins.toString esp-start}M";
-        #   size = "${builtins.toString esp-size}M";
-        #   #end = "${builtins.toString esp-end}M";
-        #   name = "ESP";
-        #   # bootable = true;
-        #   content = {
-        #     type = "filesystem";
-        #     format = "vfat";
-        #     mountpoint = "/boot";
-        #     mountOptions = [ "defaults" "noatime" ];
-        #   };
-        # };
 
         # For now i'll use only a single EFI partition
         esp = {
           priority = 3;
           type = "EF00";
-          start = "${builtins.toString esp-start}M";
-          size = "${builtins.toString esp-size}M";
-          #end = "${builtins.toString esp-end}M";
+          start = "${toString esp-start}M";
+          size = "${toString esp-size}M";
+          #end = "${toString esp-end}M";
           name = "esp";
           # bootable = true;
           content = {
@@ -292,19 +254,6 @@ boot-end         = "${builtins.toString boot-end}"
             mountOptions = [ "defaults" "umask=0077" ] ++ defaultMountOptions;
           };
         };
-
-
-        # {
-        #   name = "swap";
-        #   type = "partition";
-        #   start = "-${swap-size}M";
-        #   end = "100%";
-        #   part-type = "primary";
-        #   content = {
-        #     type = "swap";
-        #     randomEncryption = true;
-        #   };
-        # }
       };
     };
   };
@@ -342,7 +291,7 @@ boot-end         = "${builtins.toString boot-end}"
         # ZFS available space)
         # Maybe 5% is a bit much for it but fine for now, decrease if
         # needed.
-        quota = "${builtins.toString (zpool-luks-size * 0.85)}M";
+        quota = "${toString (zpool-luks-size * 0.85)}M";
 
         # Recordsize is the upper limit of logical block sizes.
         # Small files will get small blocks, large file will get up to this
@@ -456,13 +405,13 @@ boot-end         = "${builtins.toString boot-end}"
 
       datasets = let
         # Helper with defaults
-        mkZfsFs = args: lib.recursiveUpdate {
+        mkZfsFs = args: recursiveUpdate {
           type = "zfs_fs";
           mountOptions = defaultMountOptions;
 
           options.compression = "zstd";
         } args;
-        mkZfsFsLegacy = args: lib.recursiveUpdate (mkZfsFs {
+        mkZfsFsLegacy = args: recursiveUpdate (mkZfsFs {
           options.mountpoint = "legacy";
         }) args;
       in {
@@ -521,10 +470,9 @@ boot-end         = "${builtins.toString boot-end}"
           options.recordsize = "128K";
         };
 
-        # probably want zvols for docker & podman
-        # (docker seem to shit gazillions of datasets,
-        # podman doesn't support rootless... or does it?
-        # apparently it does)
+        # Probably want zvols for docker & podman
+        # (docker seem to shit gazillions of datasets, podman doesn't support
+        # rootless... or does it? apparently it does)
         # (TODO: test both ways anyhow)
         "sys/${system-name}/persist/state/var" = mkZfsFsLegacy {
           mountpoint = "/persist/state/var";
@@ -551,20 +499,7 @@ boot-end         = "${builtins.toString boot-end}"
           mountpoint = "/persist/state/home/nrv/.local/state/containers";
         };
 
-        # "sys/${system-name}/persist/state/var/lib/docker" = {
-        #   type = "zfs_volume";
-        #   size = "10G";
-        #   content = {
-        #     type = "filesystem";
-        #     format = "ext4";
-        #     mountpoint = "/persist/state/var/lib/docker";
-        #   };
-        # };
-
-        # ===
-
         # Other toplevel persistent datasets
-
         "media" = mkZfsFs {
           mountpoint = "/media/pool/${zpool-name}/media";
           options.recordsize = "1M";
@@ -588,48 +523,16 @@ boot-end         = "${builtins.toString boot-end}"
         "db" = mkZfsFs {
           mountpoint = "/media/pool/${zpool-name}/db";
         };
+
         "vm" = mkZfsFs {
           mountpoint = "/media/pool/${zpool-name}/vm";
         };
+
         "bak" = mkZfsFs {
           mountpoint = "/media/pool/${zpool-name}/bak";
           options.compression = "off";
           options.recordsize = "1M";
         };
-
-        # ===
-
-        # zfs_legacy_fs = {
-        #   type = "zfs_fs";
-        #   options.mountpoint = "legacy";
-        #   mountpoint = "/zfs_legacy_fs";
-        # };
-        # zfs_testvolume = {
-        #   type = "zfs_volume";
-        #   size = "10M";
-        #   content = {
-        #     type = "filesystem";
-        #     format = "ext4";
-        #     mountpoint = "/ext4onzfs";
-        #   };
-        # };
-        # encrypted = {
-        #   type = "zfs_fs";
-        #   options = {
-        #     mountpoint = "none";
-        #     encryption = "aes-256-gcm";
-        #     keyformat = "passphrase";
-        #     keylocation = "file:///tmp/secret.key";
-        #   };
-        #   # use this to read the key during boot
-        #   # postCreateHook = ''
-        #   #   zfs set keylocation="prompt" "zroot/$name";
-        #   # '';
-        # };
-        # "encrypted/test" = {
-        #   type = "zfs_fs";
-        #   mountpoint = "/zfs_crypted";
-        # };
       };
     };
   };

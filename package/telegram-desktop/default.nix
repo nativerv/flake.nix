@@ -6,6 +6,7 @@
     config = { sloth, ... }: {
 
       # the application to isolate
+      # TODO: look at available overrides
       app.package = pkgs.${name};
 
       # path to the executable to be wrapped
@@ -85,6 +86,7 @@
           [ (mkdir (concat [xdgStateHome "/sandbox/${name}/home"])) homeDir ]
           [ (mkdir (concat [runtimeDir "/sandbox/${name}"])) "/tmp" ]
           [ (concat [runtimeDir "/doc/by-app/${appId}"]) (concat [runtimeDir "/doc"]) ]
+          # (concat [xdgDownloadDir "/telegram"])
         ];
         bind.ro = [ ];
         bind.dev = [

@@ -13,12 +13,20 @@
 with self.lib;
 with lib;
 let
+  nvim-draft = "nvim-draft";
 in mkMerge [
   {
     programs.neovim = {
       enable = true;
       defaultEditor = mkDefault true;
     };
+
+    home.packages = with pkgs; [
+      (writeShellScriptBin "${nvim-draft}" ''
+        export NVIM_APPNAME="${nvim-draft}"
+        exec ${neovim}/bin/nvim "$@"
+      '')
+    ];
   }
 
   # Install plugins
@@ -33,6 +41,13 @@ in mkMerge [
     # Read dir & convert to HM .source's basically
     (mapAttrsToList (name: _: {
       xdg.configFile."nvim/${name}".source = ./neovim/${name};
+    }))
+    mkMerge
+  ])
+  (pipe (builtins.readDir ./neovim-draft) [
+    # Read dir & convert to HM .source's basically
+    (mapAttrsToList (name: _: {
+      xdg.configFile."${nvim-draft}/${name}".source = ./neovim-draft/${name};
     }))
     mkMerge
   ])

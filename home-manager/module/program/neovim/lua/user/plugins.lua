@@ -13,12 +13,12 @@ require("lazy").setup({
   --   config = require('user.plugin.hop').setup,
   -- },
   {
-    dir = plugin('bkad/camelcasemotion'),
+    dir = plugin 'bkad/camelcasemotion',
     keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.camel-case-motion').mappings, true),
     config = require('user.plugin.camel-case-motion').setup,
   }, -- Vimscript
   {
-    dir = plugin('aserowy/tmux.nvim'),
+    dir = plugin 'aserowy/tmux.nvim',
     keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.tmux').mappings, true),
     config = require('user.plugin.tmux').setup,
   },
@@ -32,7 +32,9 @@ require("lazy").setup({
   -- Telescope (generic picker/fuzzy finder)
   {
     dir = plugin 'nvim-telescope/telescope.nvim',
-    dependencies = { 'nvim-lua/plenary.nvim' },
+    dependencies = {
+      { dir = plugin 'nvim-lua/plenary.nvim', },
+    },
     keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.telescope').mappings, true),
     cmd = 'Telescope',
     config = require('user.plugin.telescope').setup,
@@ -197,13 +199,13 @@ require("lazy").setup({
   },
 
   -- Features
-  -- {
-  --   -- NOTE: the classic vimscript variant of neogit
-  --   'tpope/vim-fugitive',
-  --   keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.vim-fugitive').mappings, true),
-  --   cmd = { 'G' },
-  --   config = require('user.plugin.vim-fugitive').setup,
-  -- },
+  {
+    -- NOTE: the classic vimscript variant of neogit
+    dir = plugin 'tpope/vim-fugitive',
+    keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.vim-fugitive').mappings, true),
+    cmd = { 'G' },
+    config = require('user.plugin.vim-fugitive').setup,
+  },
   -- { 
   --  -- NOTE: lua variant of vim-fugitive
   --   'TimUntersberger/neogit', 
@@ -235,23 +237,25 @@ require("lazy").setup({
   --   },
   --   config = require('user.plugin.diffview').setup,
   -- },
-  -- {
-  --   'mbbill/undotree',
-  --   config = require('user.plugin.undotree').setup,
-  --   keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.undotree').mappings, true),
-  -- },
+  {
+    dir = plugin 'mbbill/undotree',
+    config = require('user.plugin.undotree').setup,
+    keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.undotree').mappings, true),
+  },
   -- {
   --   -- XXX: KILL KILL KILL 
   --   'seandewar/killersheep.nvim',
   --   cmd = 'KillKillKill',
   -- },
-  -- {
-  --   'lewis6991/gitsigns.nvim',
-  --   dependencies = { 'nvim-lua/plenary.nvim' },
-  --   event = { "BufReadPre", "BufNewFile" },
-  --   tag = 'release',
-  --   config = require('user.plugin.gitsigns').setup,
-  -- },
+  {
+    dir = plugin 'lewis6991/gitsigns.nvim',
+    dependencies = {
+      { dir = plugin 'nvim-lua/plenary.nvim', },
+    },
+    event = { "BufReadPre", "BufNewFile" },
+    tag = 'release',
+    config = require('user.plugin.gitsigns').setup,
+  },
   -- {
   --   'vhyrro/hologram.nvim',
   --   dependencies = { { 'nativerv/magick', branch = 'nrv' } },

@@ -49,6 +49,11 @@ let
     nvim-surround
     vim-visual-multi
 
+    # Features
+    vim-fugitive
+    gitsigns-nvim
+    undotree
+
     # QoL
     nvim-scrollview
     cyrillic-nvim

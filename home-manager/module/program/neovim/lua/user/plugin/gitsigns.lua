@@ -5,13 +5,12 @@ M.setup = function()
   local gitsigns_icon_remove = ''
   require('gitsigns').setup {
     signs = {
-      add = { hl = 'GitGutterAdd', text = gitsigns_icon_change },
-      change = { hl = 'GitGutterChange', text = gitsigns_icon_change },
-      changedelete = { hl = 'GitGutterChange', text = gitsigns_icon_change },
-      delete = { hl = 'GitGutterDelete', text = gitsigns_icon_remove },
-      topdelete = { hl = 'GitGutterDelete', text = gitsigns_icon_remove },
+      add = { text = gitsigns_icon_change, },
+      change = { text = gitsigns_icon_change, },
+      changedelete = { text = gitsigns_icon_change, },
+      delete = { text = gitsigns_icon_remove, },
+      topdelete = { text = gitsigns_icon_remove, },
     },
-    keymaps = {},
     -- Passed directly to `nvim_open_win`:
     preview_config = {
       border = 'rounded',

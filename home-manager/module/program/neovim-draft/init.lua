@@ -6,7 +6,7 @@
 --
 -- Description: A NeoVim configuration written in Lua
 -- Author: nrv
--- URL: https://github.com/nativerv/dotfiles
+-- URL: https://github.com/nativerv/flake.nix
 
 local SUPPORTED_VERSION = 10
 vim.g.bad_message = ''

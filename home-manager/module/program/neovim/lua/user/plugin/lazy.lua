@@ -1,7 +1,9 @@
 local M = {}
 
+local lazypath = "/var/empty"
+
 M.spec = {
-  root = vim.fn.stdpath("data") .. "/lazy", -- directory where plugins will be installed
+  root = lazypath, -- directory where plugins will be installed
   defaults = {
     lazy = true, -- should plugins be lazy-loaded?
     version = nil,
@@ -27,6 +29,7 @@ M.spec = {
   },
   dev = {
     -- directory where you store your local plugin projects
+    -- path = lazypath,
     path = "~/pr",
     ---@type string[] plugins that match these patterns will use your local versions instead of being fetched from GitHub
     patterns = {}, -- For example {"folke"}
@@ -34,7 +37,7 @@ M.spec = {
   },
   install = {
     -- install missing plugins on startup. This doesn't increase startup time.
-    missing = true,
+    missing = false,
     -- try to load one of these colorschemes when starting an installation during startup
     colorscheme = {}, -- "habamax"
   },
@@ -147,3 +150,4 @@ M.spec = {
 }
 
 return M
+

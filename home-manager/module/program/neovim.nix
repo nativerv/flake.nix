@@ -42,8 +42,6 @@ in mkMerge [
   #   plugins))
 
   # Install my config files
-  # Which is uglier?
-  # (mkMerge (mapAttrsToList (name: _: { "${configDir}/${name}".source = ./zsh/${name}; }) (builtins.readDir ./zsh)))
   (pipe (builtins.readDir ./neovim) [
     # Read dir & convert to HM .source's basically
     (mapAttrsToList (name: _: {
@@ -51,21 +49,36 @@ in mkMerge [
     }))
     mkMerge
   ])
-  # builtins.readDir ./neovim
-  #   # Read dir & convert to HM .source's basically
-  #   |> mapAttrsToList (name: _: {
-  #     xdg.configFile."nvim/${name}".source = ./neovim/${name};
-  #   })
-  #   |> mkMerge
+  # Install plugins for Lazy.nvim
+  # {
+  #   xdg.dataFile."nvim/lazy".source = pkgs.stdenv.mkDerivation {
+  #     name = "nvim-lazy-plugins";
+  #     src = ./.;
+  #     installPhase = ''
+  #       mkdir -p $out
+  #       ${pipe plugins [
+  #         (map (plugin:
+  #           ''ln -s "${plugin}" "$out/${plugin.src.repo}"''
+  #         ))
+  #         (concatStringsSep "\n")
+  #       ]}
+  #     '';
+  #   };
+  # }
+  # Equivalent to the above:
+  {
+    xdg.dataFile."nvim/lazy".source =
+      "${pkgs.vimUtils.packDir config.programs.neovim.finalPackage.passthru.packpathDirs}/pack/myNeovimPackages/start";
+  }
 
   # Draft
-  (pipe (builtins.readDir ./neovim-draft) [
-    # Read dir & convert to HM .source's basically
-    (mapAttrsToList (name: _: {
-      xdg.configFile."${nvim-draft}/${name}".source = ./neovim-draft/${name};
-    }))
-    mkMerge
-  ])
+  # (pipe (builtins.readDir ./neovim-draft) [
+  #   # Read dir & convert to HM .source's basically
+  #   (mapAttrsToList (name: _: {
+  #     xdg.configFile."${nvim-draft}/${name}".source = ./neovim-draft/${name};
+  #   }))
+  #   mkMerge
+  # ])
   # (pipe plugins [
   #   # Install (symlink) plugins to the custom dir - to source later with plugin
   #   # manager
@@ -74,19 +87,19 @@ in mkMerge [
   #   }))
   #   mkMerge
   # ])
-  {
-    xdg.dataFile."${nvim-draft}/lazy".source = pkgs.stdenv.mkDerivation {
-      name = "nvim-plugins";
-      src = ./.;
-      installPhase = ''
-        mkdir -p $out
-        ${pipe plugins [
-          (map (plugin:
-            ''ln -s "${plugin}" "$out/${plugin.src.repo}"''
-          ))
-          (concatStringsSep "\n")
-        ]}
-      '';
-    };
-  }
+  # {
+  #   xdg.dataFile."${nvim-draft}/lazy".source = pkgs.stdenv.mkDerivation {
+  #     name = "nvim-plugins";
+  #     src = ./.;
+  #     installPhase = ''
+  #       mkdir -p $out
+  #       ${pipe plugins [
+  #         (map (plugin:
+  #           ''ln -s "${plugin}" "$out/${plugin.src.repo}"''
+  #         ))
+  #         (concatStringsSep "\n")
+  #       ]}
+  #     '';
+  #   };
+  # }
 ]

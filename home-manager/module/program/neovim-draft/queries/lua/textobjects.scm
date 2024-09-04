@@ -1,3 +1,0 @@
-;; extends
-
-(comment)+ @comment.adjacent

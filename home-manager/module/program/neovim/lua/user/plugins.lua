@@ -31,7 +31,7 @@ require("lazy").setup({
 
   -- Telescope (generic picker/fuzzy finder)
   {
-    'nvim-telescope/telescope.nvim',
+    dir = plugin 'nvim-telescope/telescope.nvim',
     dependencies = { 'nvim-lua/plenary.nvim' },
     keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.telescope').mappings, true),
     cmd = 'Telescope',
@@ -72,30 +72,30 @@ require("lazy").setup({
   -- },
 
   -- Editing
-  -- {
-  --   'windwp/nvim-autopairs',
-  --   event = 'InsertEnter',
-  --   config = require('user.plugin.autopairs').setup
-  -- },
-  -- {
-  --   'tpope/vim-repeat',
-  --   keys = { { '.',  desc = 'Repeat last command' } },
-  -- }, -- Vimscript
-  -- {
-  --   'kylechui/nvim-surround',
-  --   keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.nvim-surround').mappings, true),
-  --   config = require('user.plugin.nvim-surround').setup,
-  -- },
+  {
+    dir = plugin 'windwp/nvim-autopairs',
+    event = 'InsertEnter',
+    config = require('user.plugin.autopairs').setup
+  },
+  {
+    'tpope/vim-repeat',
+    keys = { { '.',  desc = 'Repeat last command' } },
+  }, -- Vimscript
+  {
+    dir = plugin 'kylechui/nvim-surround',
+    keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.nvim-surround').mappings, true),
+    config = require('user.plugin.nvim-surround').setup,
+  },
   -- {
   --   'fedepujol/move.nvim',
   --   keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.move').mappings, true),
   --   config = require('user.plugin.move').setup,
   -- },
-  -- {
-  --   'mg979/vim-visual-multi',
-  --   keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.vim-visual-multi').mappings, true),
-  --   init = require('user.plugin.vim-visual-multi').init,
-  -- }, -- Vimscript
+  {
+    dir = plugin 'mg979/vim-visual-multi',
+    keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.vim-visual-multi').mappings, true),
+    init = require('user.plugin.vim-visual-multi').init,
+  }, -- Vimscript
   -- {
   --   'numToStr/Comment.nvim',
   --   keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.comment').mappings, false),
@@ -192,7 +192,7 @@ require("lazy").setup({
   },
   {
     dir = plugin 'bronson/vim-visual-star-search',
-    event = 'VeryLazy',
+    keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.vim-visual-star-search').mappings, true),
     pin = true,
   },
 

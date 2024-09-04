@@ -16,11 +16,14 @@ vim.g.bad_message = ''
 -- but the rest can still be run.
 function yell(...)
   vim.g.bad_message = 'ERROR: most likely you broke something in the config or your Neovim updated to a new version. Parts of your config will not work.'
-  --vim.notify(debug.traceback(...), vim.log.levels.OFF)
-  --vim.notify(
-  --  'Something went horribly wrong, most likely you broke something or your Neovim updated to a new version. Parts of your config will not work.', 
-  --  vim.log.levels.OFF
-  --)
+
+  if os.getenv('NVIM_DEBUG') ~= "1" then return end
+
+  vim.notify(debug.traceback(...), vim.log.levels.ERROR)
+  vim.notify(
+   'Something went horribly wrong, most likely you broke something or your Neovim updated to a new version. Parts of your config will not work.',
+   vim.log.levels.OFF
+  )
 end
 
 -- Customize built-in nvim settings
@@ -29,8 +32,8 @@ xpcall(require, yell, 'user.options')
 -- Set mappings for built-in stuff
 xpcall(require, yell, 'user.mappings')
 
--- Autocmds that do different handy things, 
--- all still only using built-in nvim stuff 
+-- Autocmds that do different handy things,
+-- all still only using built-in nvim stuff
 xpcall(require, yell, 'user.autocmds')
 
 -- Colorscheme - fallback for the following guard
@@ -39,7 +42,7 @@ xpcall(require, yell, 'user.colorscheme')
 -- Guard on nvim version -- has to be as specified by SUPPORTED_VERSION for the rest to work
 if not (vim.version().major == 0 and vim.version().minor == SUPPORTED_VERSION) then
   --vim.notify(
-  --  'You neovim must be of version 0.9. The config will not work, falling back to default.', 
+  --  'You neovim must be of version 0.9. The config will not work, falling back to default.',
   --  vim.log.levels.OFF
   --)
   vim.g.bad_message = 'ERROR: You neovim must be of version 0.9. Plugins will not work, falling back to vanilla.'

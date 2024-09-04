@@ -43,6 +43,12 @@ let
     nvim-treesitter-textobjects
     # vimPlugins.nvim-ts-context-commentstring
 
+    # Editing
+    nvim-autopairs
+    vim-repeat
+    nvim-surround
+    vim-visual-multi
+
     # QoL
     nvim-scrollview
     cyrillic-nvim

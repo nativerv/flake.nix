@@ -2,7 +2,7 @@
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy"
 function plugin(name)
-  return ("%s/%s"):format(lazypath, name)
+  return ("%s/%s"):format(lazypath, name:gsub("^.*/", ""))
 end
 
 require("lazy").setup({
@@ -13,12 +13,12 @@ require("lazy").setup({
   --   config = require('user.plugin.hop').setup,
   -- },
   {
-    dir = plugin('camelcasemotion'),
+    dir = plugin('bkad/camelcasemotion'),
     keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.camel-case-motion').mappings, true),
     config = require('user.plugin.camel-case-motion').setup,
   }, -- Vimscript
   {
-    dir = plugin('tmux.nvim'),
+    dir = plugin('aserowy/tmux.nvim'),
     keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.tmux').mappings, true),
     config = require('user.plugin.tmux').setup,
   },

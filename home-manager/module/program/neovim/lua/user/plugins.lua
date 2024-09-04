@@ -30,20 +30,22 @@ require("lazy").setup({
   -- },
 
   -- Telescope (generic picker/fuzzy finder)
-  -- {
-  --   'nvim-telescope/telescope.nvim',
-  --   dependencies = { 'nvim-lua/plenary.nvim' },
-  --   keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.telescope').mappings, true),
-  --   cmd = 'Telescope',
-  --   config = require('user.plugin.telescope').setup,
-  -- },
+  {
+    'nvim-telescope/telescope.nvim',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.telescope').mappings, true),
+    cmd = 'Telescope',
+    config = require('user.plugin.telescope').setup,
+  },
 
   -- UI
-  -- {
-  --   'nvim-telescope/telescope-ui-select.nvim',
-  --   dependencies = { 'nvim-telescope/telescope.nvim' },
-  --   init = require('user.plugin.telescope-ui-select').init
-  -- },
+  {
+    dir = plugin 'nvim-telescope/telescope-ui-select.nvim',
+    dependencies = {
+      { dir = plugin 'nvim-telescope/telescope.nvim', }
+    },
+    init = require('user.plugin.telescope-ui-select').init
+  },
   -- {
   --   'RRethy/vim-illuminate',
   --   event = { "VeryLazy" },

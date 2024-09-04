@@ -18,9 +18,13 @@ let
     # Core
     lazy-nvim
 
-    # Navigation
+    # Text Nav
     tmux-nvim
     camelcasemotion
+
+    # File Nav
+    telescope-nvim
+    telescope-ui-select-nvim
 
     # Parsing & Highlighting
     nvim-treesitter.withAllGrammars

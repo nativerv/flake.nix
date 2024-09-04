@@ -1,6 +1,6 @@
 -- Lazy.nvim init file
 
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+local lazypath = vim.fn.stdpath("data") .. "/lazy"
 function plugin(name)
   return ("%s/%s"):format(lazypath, name)
 end
@@ -12,11 +12,11 @@ require("lazy").setup({
   --   keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.hop').mappings, true),
   --   config = require('user.plugin.hop').setup,
   -- },
-  -- {
-  --   'bkad/CamelCaseMotion',
-  --   keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.camel-case-motion').mappings, true),
-  --   config = require('user.plugin.camel-case-motion').setup,
-  -- }, -- Vimscript
+  {
+    dir = plugin('camelcasemotion'),
+    keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.camel-case-motion').mappings, true),
+    config = require('user.plugin.camel-case-motion').setup,
+  }, -- Vimscript
   {
     dir = plugin('tmux.nvim'),
     keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.tmux').mappings, true),

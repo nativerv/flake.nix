@@ -17,6 +17,7 @@ let
   plugins = with pkgs; [
     vimPlugins.lazy-nvim
     vimPlugins.tmux-nvim
+    vimPlugins.camelcasemotion
   ];
 in mkMerge [
   {

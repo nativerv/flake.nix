@@ -20,7 +20,14 @@ M.mappings = {
 
 M.setup = function()
   -- This will enable the default mappings:
-  --vim.g.camelcasemotion_key = '<leader>'
+  vim.g.camelcasemotion_key = '<leader>'
+  -- vim.cmd [[ camelcasemotion#CreateMotionMappings('<leader>') ]]
+  -- vim.cmd [[
+  --   map <silent> <leader>w <Plug>CamelCaseMotion_w
+  --   map <silent> <leader>b <Plug>CamelCaseMotion_b
+  --   map <silent> <leader>e <Plug>CamelCaseMotion_e
+  --   map <silent> <leader>ge <Plug>CamelCaseMotion_ge
+  -- ]]
 end
 
 return M

@@ -99,8 +99,7 @@ let
   #                                  |esp-start = 35
   #                                  boot-end = 34 
 
-  # "nodiratime" as well just to be sure
-  defaultMountOptions = [ "noatime" "nodiratime" "nosuid" "nodev" ];
+  defaultMountOptions = [ "noatime" "nosuid" "nodev" ];
   defaultNtfsOptions = with builtins; defaultMountOptions ++ [
     "ro" "nofail" "auto" "users" "exec" "umask=0007"
     "uid=${toString ntfs-uid}" "gid=${toString ntfs-gid}" "blksize=4096"
@@ -152,7 +151,7 @@ in
   fileSystems."/media/all" = {
     fsType = "fuse.mergerfs";
     device = "/media/pool/*";
-    options = [
+    options = defaultMountOptions ++ [
       "ro"
       # FIXME: nofail spits error when using `mount -a`, but seemingly no boot
       #        time or rebuild time errors (?)

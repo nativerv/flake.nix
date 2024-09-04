@@ -168,11 +168,11 @@ require("lazy").setup({
   --   'folke/which-key.nvim',
   --   config = require('user.plugin.which-key').setup,
   -- },
-  -- {
-  --   'dstein64/nvim-scrollview',
-  --   event = { "VeryLazy" },
-  --   config = require('user.plugin.nvim-scrollview').setup,
-  -- },
+  {
+    dir = plugin 'dstein64/nvim-scrollview',
+    event = { "VeryLazy" },
+    config = require('user.plugin.nvim-scrollview').setup,
+  },
   -- {
   --   'ghillb/cybu.nvim',
   --   enabled = false,
@@ -185,18 +185,16 @@ require("lazy").setup({
   --   -- live-updated :g, etc. (errors out, unmaintained)
   --   'chentoast/live.nvim',
   -- },
-  -- {
-  --   -- 'powerman/vim-plugin-ruscmd',
-  --   'nativerv/cyrillic.nvim',
-  --   dir = '~/pr/cyrillic.nvim',
-  --   event = { 'VeryLazy' },
-  --   config = require('user.plugin.cyrillic').setup,
-  -- },
-  -- {
-  --   'bronson/vim-visual-star-search',
-  --   event = 'VeryLazy',
-  --   pin = true,
-  -- },
+  {
+    dir = plugin 'cyrillic.nvim',
+    event = { 'VeryLazy' },
+    config = require('user.plugin.cyrillic').setup,
+  },
+  {
+    dir = plugin 'bronson/vim-visual-star-search',
+    event = 'VeryLazy',
+    pin = true,
+  },
 
   -- Features
   -- {

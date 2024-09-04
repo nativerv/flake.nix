@@ -14,15 +14,27 @@ with self.lib;
 with lib;
 let
   nvim-draft = "nvim-draft";
+  cyrillic-nvim = pkgs.vimUtils.buildVimPlugin rec {
+    pname = "cyrillic.nvim";
+    version = "1";
+    src = pkgs.fetchFromGitHub {
+      name = "cyrillic.nvim";
+      owner = "nativerv";
+      repo = "cyrillic.nvim";
+      rev = "86186af29eed2af1a069f9e36140d116a2765c80";
+      sha256 = "sha256-B2NjvaKJbkih8HLgFAYVqmTuSKAj7XrCBPVoVpYCXXE=";
+    };
+  };
   plugins = with pkgs.vimPlugins; [
     # Core
     lazy-nvim
 
     # Text Nav
-    tmux-nvim
     camelcasemotion
+    vim-visual-star-search
 
     # File Nav
+    tmux-nvim
     telescope-nvim
     telescope-ui-select-nvim
 
@@ -30,6 +42,10 @@ let
     nvim-treesitter.withAllGrammars
     nvim-treesitter-textobjects
     # vimPlugins.nvim-ts-context-commentstring
+
+    # QoL
+    nvim-scrollview
+    cyrillic-nvim
   ];
 in mkMerge [
   {

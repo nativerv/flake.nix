@@ -114,19 +114,20 @@ require("lazy").setup({
   -- },
 
   -- Treesitter
+  {
+    dir = plugin 'nvim-treesitter/nvim-treesitter',
+    dependencies = {
+      { dir = plugin 'nvim-treesitter/nvim-treesitter-textobjects', },
+      -- { 'HiPhish/nvim-ts-rainbow2' },
+    },
+    event = { "VeryLazy", --[[ "BufReadPost", "BufNewFile" ]] },
+    config = require('user.plugin.treesitter').setup,
+  },
   -- {
-  --   'nvim-treesitter/nvim-treesitter',
-  --   dependencies = {
-  --     { 'nvim-treesitter/nvim-treesitter-textobjects', },
-  --     { 'HiPhish/nvim-ts-rainbow2' },
-  --   },
-  --   event = { "BufReadPost", "BufNewFile" },
-  --   config = require('user.plugin.treesitter').setup,
-  -- },
-  -- {
-  --   'JoosepAlviste/nvim-ts-context-commentstring',
+  --   -- WARNING: causes nvim 0.10 `gc` to not work
+  --   dir = plugin 'JoosepAlviste/nvim-ts-context-commentstring',
   --   keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.comment').mappings, false),
-  -- }, 
+  -- },
   -- {
   --   'nvim-treesitter/playground',
   --   cmd = { 'TSPlaygroundToggle', 'TSNodeUnderCursor', 'TSHighlightCapturesUnderCursor' },

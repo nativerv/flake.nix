@@ -5,7 +5,8 @@ M.setup = function()
   local configs = {}
 
   local captures = {}
-  -- | ensure_installed = 'all',
+  configs.ensure_installed = {}
+  configs.auto_install = false
   --{
   --  "bash",       "bibtex", "c",      "c_sharp",    "clojure", "cmake",   "comment",
   --  "commonlisp", "cpp",    "css",    "dockerfile", "dot",     "glsl",    "go",         "graphql",
@@ -15,7 +16,7 @@ M.setup = function()
   --  "ruby",       "rust",   "scheme", "scss",       "svelte",  "todotxt", "toml",       "tsx",
   --  "typescript", "vim",    "vue",    "wgsl",       "yaml",
   --}, -- one of "all", "maintained" (parsers with maintainers), or a list of languages
-  configs.parser_install_dir = require'user.utils'.XDG_DATA_HOME .. '/tree-sitter/parsers'
+  configs.parser_install_dir = require'user.utils'.XDG_DATA_HOME .. '/tree-sitter'
   configs.sync_install = true -- install languages synchronously (only applied to `ensure_installed`)
   configs.ignore_install = {} -- list of parsers to ignore installing
   configs.highlight = {
@@ -45,9 +46,9 @@ M.setup = function()
     },
   }
 
-  configs.context_commentstring = {
-    enable = true,
-  }
+  -- configs.context_commentstring = {
+  --   enable = true,
+  -- }
 
   configs.incremental_selection = {
     enable = true,
@@ -206,6 +207,10 @@ M.setup = function()
     local concatted_parsers = table.concat(wanted_parsers, ' ')
     vim.cmd(("TSInstall %s"):format(concatted_parsers))
   end, { nargs = 0, complete = nil, bar = true, })
+
+  -- Comments in injections
+  --require('ts_context_commentstring').setup {}
+  --vim.g.skip_ts_context_commentstring_module = true
 
   -- Actual treesitter setup executes here - above are just config tablese
   vim.opt.runtimepath:append(configs.parser_install_dir)

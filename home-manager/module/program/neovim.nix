@@ -14,10 +14,18 @@ with self.lib;
 with lib;
 let
   nvim-draft = "nvim-draft";
-  plugins = with pkgs; [
-    vimPlugins.lazy-nvim
-    vimPlugins.tmux-nvim
-    vimPlugins.camelcasemotion
+  plugins = with pkgs.vimPlugins; [
+    # Core
+    lazy-nvim
+
+    # Navigation
+    tmux-nvim
+    camelcasemotion
+
+    # Parsing & Highlighting
+    nvim-treesitter.withAllGrammars
+    nvim-treesitter-textobjects
+    # vimPlugins.nvim-ts-context-commentstring
   ];
 in mkMerge [
   {
@@ -64,11 +72,15 @@ in mkMerge [
   #       ]}
   #     '';
   #   };
+  #   xdg.dataFile."tree-sitter".source =
+  #     "${head pkgs.vimPlugins.nvim-treesitter.withAllGrammars.passthru.dependencies}";
   # }
   # Equivalent to the above:
   {
     xdg.dataFile."nvim/lazy".source =
       "${pkgs.vimUtils.packDir config.programs.neovim.finalPackage.passthru.packpathDirs}/pack/myNeovimPackages/start";
+    xdg.dataFile."tree-sitter".source =
+      "${head pkgs.vimPlugins.nvim-treesitter.withAllGrammars.passthru.dependencies}";
   }
 
   # Draft

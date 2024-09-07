@@ -53,6 +53,7 @@ let
     vim-fugitive
     gitsigns-nvim
     undotree
+    image-nvim
 
     # QoL
     nvim-scrollview
@@ -67,12 +68,12 @@ in mkMerge [
       inherit plugins;
     };
 
-    home.packages = with pkgs; [
-      (writeShellScriptBin "${nvim-draft}" ''
-        export NVIM_APPNAME="${nvim-draft}"
-        exec ${config.programs.neovim.finalPackage}/bin/nvim "$@"
-      '')
-    ];
+    # home.packages = with pkgs; [
+    #   (writeShellScriptBin "${nvim-draft}" ''
+    #     export NVIM_APPNAME="${nvim-draft}"
+    #     exec ${config.programs.neovim.finalPackage}/bin/nvim "$@"
+    #   '')
+    # ];
   }
 
   # Install plugins

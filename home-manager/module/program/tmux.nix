@@ -16,13 +16,13 @@
     plugins = with pkgs; [
       {
         plugin = tmuxPlugins.resurrect.overrideAttrs (old: {
-	  version = "6be2f34";
-	  src = fetchFromGitHub {
-	    inherit (old.src) owner repo;
-	    rev = "6be2f34b5f06c8a6a23dc3dc835e69c132d58a18";
-	    sha256 = "sha256-1NXk75eZbhLEq0KKpLaFegPj0xLvWnLrVVfPxK1mk18=";
-	  };
-	});
+          version = "6be2f34";
+          src = fetchFromGitHub {
+            inherit (old.src) owner repo;
+            rev = "6be2f34b5f06c8a6a23dc3dc835e69c132d58a18";
+            sha256 = "sha256-1NXk75eZbhLEq0KKpLaFegPj0xLvWnLrVVfPxK1mk18=";
+          };
+        });
         extraConfig = "set -g @resurrect-strategy-nvim 'session'";
       }
     ];

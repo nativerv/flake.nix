@@ -264,6 +264,14 @@ require("lazy").setup({
   --   enabled = false,
   --   config = require('user.plugin.hologram').setup,
   -- },
+  {
+    dir = plugin '3rd/image.nvim',
+    -- dependencies = { { 'nativerv/magick', branch = 'nrv' } },
+    ft = { 'markdown', },
+    -- NOTE: `hollogram.nvim` is not working as of right now
+    enabled = true,
+    config = require('user.plugin.image').setup,
+  },
 
   -- Language support
   -- APL

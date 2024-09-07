@@ -24,6 +24,7 @@ in {
     self.homeManagerModules."program.neovim"
     self.homeManagerModules."program.zathura"
     self.homeManagerModules."program.firefox"
+    self.homeManagerModules."program.readline"
   ];
 
   # For some reason they separate some stuff under `home.*`

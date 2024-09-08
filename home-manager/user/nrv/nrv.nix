@@ -48,6 +48,13 @@ in {
       inputs.clip.packages.${system}.default
       self.packages.${system}.hotkey-scripts
       inputs.tl.packages.${system}.default
+      playerctl
+      libnotify
+      lm_sensors
+      fastfetch
+      unzip
+      zip
+      chafa
       (pkgs.wrapPackages [ pkgs.restic ] {
         environment = {
           RESTIC_PASSWORD_COMMAND = "${pass}/bin/pass show ${self.config.backups.restic.key.sk.pass-path or "dummy"}";

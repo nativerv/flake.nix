@@ -25,7 +25,10 @@ in {
     self.homeManagerModules."program.zathura"
     self.homeManagerModules."program.firefox"
     self.homeManagerModules."program.readline"
+    inputs.envrund.homeManagerModules.default
   ];
+
+  services.envrund.enable = true;
 
   # For some reason they separate some stuff under `home.*`
   home = {

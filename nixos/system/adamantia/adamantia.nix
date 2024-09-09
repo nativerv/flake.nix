@@ -46,84 +46,15 @@
 
     self.nixosModules."user.nrv"
     self.nixosModules."user.gamer"
+    self.nixosModules."home-manager.standalone"
   ];
 
-  # FIXME(hardcoded): this whole thing
-  systemd.services.home-manager-nrv = with lib; let
-    # FIXME(hardcoded): option
-    cfg = {
-      verbose = true;
-      backupFileExtension = "hm-bak";
-    };
-    username = "nrv";
-
-    serviceEnvironment = optionalAttrs (cfg.backupFileExtension != null) {
-      HOME_MANAGER_BACKUP_EXT = cfg.backupFileExtension;
-    } // optionalAttrs cfg.verbose { VERBOSE = "1"; };
-  in {
-    description = "Home Manager environment for ${username} (standalone)";
-    wantedBy = [ "multi-user.target" ];
-    wants = [ "nix-daemon.socket" ];
-    after = [ "nix-daemon.socket" ];
-    before = [ "systemd-user-sessions.service" ];
-
-    environment = serviceEnvironment;
-
-    # FIXME(hardcoded): option
-    unitConfig = { RequiresMountsFor = "/home/${username}"; };
-
-    stopIfChanged = false;
-
-    serviceConfig = {
-      # FIXME(hardcoded): option
-      User = username;
-      Type = "oneshot";
-      RemainAfterExit = "yes";
-      TimeoutStartSec = "5m";
-      # FIXME(hardcoded): option
-      SyslogIdentifier = "hm-activate-${username}";
-
-      ExecStart = let
-        systemctl =
-          "XDG_RUNTIME_DIR=\${XDG_RUNTIME_DIR:-/run/user/$UID} systemctl";
-
-        sed = "${pkgs.gnused}/bin/sed";
-
-        exportedSystemdVariables = concatStringsSep "|" [
-          "DBUS_SESSION_BUS_ADDRESS"
-          "DISPLAY"
-          "WAYLAND_DISPLAY"
-          "XAUTHORITY"
-          "XDG_RUNTIME_DIR"
-        ];
-        setupEnv = pkgs.writeScript "hm-setup-env" ''
-          #! ${pkgs.runtimeShell} -el
-
-          # The activation script is run by a login shell to make sure
-          # that the user is given a sane environment.
-          # If the user is logged in, import variables from their current
-          # session environment.
-          eval "$(
-            ${systemctl} --user show-environment 2> /dev/null \
-            | ${sed} -En '/^(${exportedSystemdVariables})=/s/^/export /p'
-          )"
-
-          exec "$1/activate"
-        '';
-      # FIXME(hardcoded): option
-      in builtins.toString (pkgs.writeScript "hm-activate-standalone" ''
-        #! ${pkgs.runtimeShell} -el
-        
-        # FIXME(hardcoded): XDG dir, might be using legacy
-        standalone_activation_package="''${XDG_STATE_HOME:-"$HOME/.local/state"}/nix/profiles/home-manager"
-        activation_package="${self.homeConfigurations.${username}.activationPackage}"
-        [ -f "''${standalone_activation_package}/activate" ] &&
-          activation_package="''${standalone_activation_package}"
-        ${setupEnv} "''${activation_package}"
-      '');
-    };
+  home-manager.standalone.users.nrv = {
+    enable = true;
+    defaultConfiguration = self.homeConfigurations.nrv.activationPackage;
+    verbose = true;
+    backupFileExtension = "hm-bak";
   };
-
 
   # System zone
   # NOTE: setting time zone here actually matters

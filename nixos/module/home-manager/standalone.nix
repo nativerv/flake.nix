@@ -1,4 +1,6 @@
-# Hotkeys
+# This module defines options for activating home-manager standalone
+# installations along with the system activation, so that they're usable with
+# impermanent setups (you still need to persist the profile folder, obviously)
 {
   self,
   inputs,
@@ -40,69 +42,6 @@ let
       };
     };
   };
-  generateUnit = name: userCfg: nameValuePair
-    "home-manager-standalone-${utils.escapeSystemdPath name}"
-    {
-      description = "Home Manager environment for ${name} (standalone)";
-      wantedBy = [ "multi-user.target" ];
-      wants = [ "nix-daemon.socket" ];
-      after = [ "nix-daemon.socket" ];
-      before = [ "systemd-user-sessions.service" ];
-
-      environment = optionalAttrs (userCfg.backupFileExtension != null) {
-        HOME_MANAGER_BACKUP_EXT = userCfg.backupFileExtension;
-      } // optionalAttrs userCfg.verbose { VERBOSE = "1"; }; 
-
-      unitConfig = { RequiresMountsFor = "/home/${name}"; };
-
-      stopIfChanged = false;
-
-      serviceConfig = {
-        User = name;
-        Type = "oneshot";
-        RemainAfterExit = "yes";
-        TimeoutStartSec = "5m";
-        SyslogIdentifier = "hm-standalone-activate-${name}";
-
-        ExecStart = let
-          systemctl =
-            "XDG_RUNTIME_DIR=\${XDG_RUNTIME_DIR:-/run/user/$UID} systemctl";
-
-          sed = "${pkgs.gnused}/bin/sed";
-
-          exportedSystemdVariables = concatStringsSep "|" [
-            "DBUS_SESSION_BUS_ADDRESS"
-            "DISPLAY"
-            "WAYLAND_DISPLAY"
-            "XAUTHORITY"
-            "XDG_RUNTIME_DIR"
-          ];
-          setupEnv = pkgs.writeScript "hm-setup-env" ''
-            #! ${pkgs.runtimeShell} -el
-
-            # The activation script is run by a login shell to make sure
-            # that the user is given a sane environment.
-            # If the user is logged in, import variables from their current
-            # session environment.
-            eval "$(
-              ${systemctl} --user show-environment 2> /dev/null \
-              | ${sed} -En '/^(${exportedSystemdVariables})=/s/^/export /p'
-            )"
-
-            exec "$1/activate"
-          '';
-        in builtins.toString (pkgs.writeScript "hm-standalone-activate" /* bash */ ''
-          #! ${pkgs.runtimeShell} -el
-          
-          # FIXME(hardcoded): XDG dir, might be using legacy
-          standalone_activation_package="''${XDG_STATE_HOME:-"$HOME/.local/state"}/nix/profiles/home-manager"
-          activation_package="${userCfg.defaultConfiguration}"
-          [ -f "''${standalone_activation_package}/activate" ] &&
-            activation_package="''${standalone_activation_package}"
-          ${setupEnv} "''${activation_package}"
-        '');
-      };
-    };
 in {
   options = {
     home-manager.standalone = {
@@ -121,6 +60,68 @@ in {
     };
   };
   config = mkIf (cfg.users != {}) {
-    systemd.services = mapAttrs' generateUnit cfg.users;
+    systemd.services = mapAttrs' (name: userCfg: nameValuePair
+      "home-manager-standalone-${utils.escapeSystemdPath name}"
+      {
+        description = "Home Manager environment for ${name} (standalone)";
+        wantedBy = [ "multi-user.target" ];
+        wants = [ "nix-daemon.socket" ];
+        after = [ "nix-daemon.socket" ];
+        before = [ "systemd-user-sessions.service" ];
+
+        environment = optionalAttrs (userCfg.backupFileExtension != null) {
+          HOME_MANAGER_BACKUP_EXT = userCfg.backupFileExtension;
+        } // optionalAttrs userCfg.verbose { VERBOSE = "1"; }; 
+
+        unitConfig = { RequiresMountsFor = "/home/${name}"; };
+
+        stopIfChanged = false;
+
+        serviceConfig = {
+          User = name;
+          Type = "oneshot";
+          RemainAfterExit = "yes";
+          TimeoutStartSec = "5m";
+          SyslogIdentifier = "hm-standalone-activate-${name}";
+
+          ExecStart = let
+            systemctl =
+              "XDG_RUNTIME_DIR=\${XDG_RUNTIME_DIR:-/run/user/$UID} systemctl";
+
+            sed = "${pkgs.gnused}/bin/sed";
+
+            exportedSystemdVariables = concatStringsSep "|" [
+              "DBUS_SESSION_BUS_ADDRESS"
+              "DISPLAY"
+              "WAYLAND_DISPLAY"
+              "XAUTHORITY"
+              "XDG_RUNTIME_DIR"
+            ];
+            setupEnv = pkgs.writeScript "hm-setup-env" ''
+              #! ${pkgs.runtimeShell} -el
+
+              # The activation script is run by a login shell to make sure
+              # that the user is given a sane environment.
+              # If the user is logged in, import variables from their current
+              # session environment.
+              eval "$(
+                ${systemctl} --user show-environment 2> /dev/null \
+                | ${sed} -En '/^(${exportedSystemdVariables})=/s/^/export /p'
+              )"
+
+              exec "$1/activate"
+            '';
+          in builtins.toString (pkgs.writeScript "hm-standalone-activate" /* bash */ ''
+            #! ${pkgs.runtimeShell} -el
+            
+            # FIXME(hardcoded): XDG dir, might be using legacy
+            standalone_activation_package="''${XDG_STATE_HOME:-"$HOME/.local/state"}/nix/profiles/home-manager"
+            activation_package="${userCfg.defaultConfiguration}"
+            [ -f "''${standalone_activation_package}/activate" ] &&
+              activation_package="''${standalone_activation_package}"
+            ${setupEnv} "''${activation_package}"
+          '');
+        };
+      }) cfg.users;
   };
 }

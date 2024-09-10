@@ -76,7 +76,7 @@ in {
           HOME_MANAGER_BACKUP_EXT = userCfg.backupFileExtension;
         } // optionalAttrs userCfg.verbose { VERBOSE = "1"; }; 
 
-        unitConfig = { RequiresMountsFor = "/home/${name}"; };
+        unitConfig = { RequiresMountsFor = "${config.users.users.${name}.home}"; };
 
         stopIfChanged = false;
 

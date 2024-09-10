@@ -21,7 +21,9 @@ let
   userOpts = {
     options = {
       enable =
-        mkEnableOption "Enable home-manager standalone activation for this user";
+        mkEnableOption "Enable home-manager standalone activation for this user" // {
+          default = true;
+        };
 
       defaultConfiguration = mkOption {
         type = types.package;
@@ -50,8 +52,8 @@ in {
         default = {};
         example = {
           alice = {
-            enable = true;
             defaultConfiguration = literalExpression "self.homeConfigurations.alice.activationPackage";
+            verbose = true;
             backupFileExtension = "hm-bak";
           };
         };
@@ -63,6 +65,7 @@ in {
     systemd.services = mapAttrs' (name: userCfg: nameValuePair
       "home-manager-standalone-${utils.escapeSystemdPath name}"
       {
+        inherit (userCfg) enable;
         description = "Home Manager environment for ${name} (standalone)";
         wantedBy = [ "multi-user.target" ];
         wants = [ "nix-daemon.socket" ];

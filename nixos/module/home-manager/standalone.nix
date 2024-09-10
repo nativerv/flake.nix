@@ -97,7 +97,7 @@ in {
               "XAUTHORITY"
               "XDG_RUNTIME_DIR"
             ];
-            setupEnv = pkgs.writeScript "hm-setup-env" ''
+            setupEnv = pkgs.writeScript "hm-setup-env" /* bash */ ''
               #! ${pkgs.runtimeShell} -el
 
               # The activation script is run by a login shell to make sure
@@ -114,7 +114,6 @@ in {
           in builtins.toString (pkgs.writeScript "hm-standalone-activate" /* bash */ ''
             #! ${pkgs.runtimeShell} -el
             
-            # FIXME(hardcoded): XDG dir, might be using legacy
             standalone_activation_package="''${XDG_STATE_HOME:-"$HOME/.local/state"}/nix/profiles/home-manager"
             activation_package="${userCfg.defaultConfiguration}"
             [ -f "''${standalone_activation_package}/activate" ] &&

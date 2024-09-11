@@ -1,7 +1,26 @@
 local M = {}
 
 function M.xdg_user_dir(name)
-  vim.fn.system { 'xdg-user-dir', name }
+  local home = os.getenv 'HOME'
+  local defaults = {
+    DESKTOP = M.join_path { home, "desk", },
+    DOCUMENTS = M.join_path { home, "vid", },
+    DOWNLOAD = M.join_path { home, "dl", },
+    MUSIC = M.join_path { home, "mus", },
+    PICTURES = M.join_path { home, "pix", },
+    PUBLICSHARE = M.join_path { home, "pub", },
+    TEMPLATES = M.join_path { home, ".local/share/templates", },
+    VIDEOS = M.join_path { home, "vid", },
+  }
+
+  if not vim.tbl_contains(vim.tbl_keys(defaults), name) then
+    error("you did something really stupid dude")
+  end
+
+  local ok, dir = pcall(vim.fn.system, { 'xdg-user-dir', name })
+  if ok then return dir end
+
+  return defaults[name]
 end
 
 -- Simulate (cond ? T : F)
@@ -41,19 +60,20 @@ M.is_nerdfont_installed = function()
 end
 
 -- Define constants
+local home = os.getenv 'HOME'
 M.XDG_DOCUMENTS_DIR = M.xdg_user_dir 'DOCUMENTS'
 M.XDG_PICTURES_DIR = M.xdg_user_dir 'PICTURES'
-M.XDG_DOWNLOADS_DIR = M.xdg_user_dir 'DOWNLOADS'
+M.XDG_DOWNLOAD_DIR = M.xdg_user_dir 'DOWNLOAD'
 M.XDG_VIDEOS_DIR = M.xdg_user_dir 'VIDEOS'
 M.XDG_DESKTOP_DIR = M.xdg_user_dir 'DESKTOP'
 M.XDG_TEMPLATES_DIR = M.xdg_user_dir 'TEMPLATES'
 M.XDG_MUSIC_DIR = M.xdg_user_dir 'MUSIC'
 M.XDG_CACHE_HOME = os.getenv 'XDG_CACHE_HOME'
-    or (M.join_path { os.getenv 'HOME', '.cache' })
+  or (M.join_path { home, '.cache' })
 M.XDG_CONFIG_HOME = os.getenv 'XDG_CONFIG_HOME'
-    or (M.join_path { os.getenv 'HOME', '.config' })
+  or (M.join_path { home, '.config' })
 M.XDG_DATA_HOME = os.getenv 'XDG_DATA_HOME'
-    or (M.join_path { os.getenv 'HOME', '.local', 'share' })
+  or (M.join_path { home, '.local', 'share' })
 
 function M.is_empty(value)
   return value == nil or value == ''

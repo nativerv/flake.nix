@@ -2,6 +2,8 @@ local M = {}
 
 M.setup = function()
 
+  local u = require'user.utils'
+
   local configs = {}
 
   local captures = {}
@@ -16,7 +18,7 @@ M.setup = function()
   --  "ruby",       "rust",   "scheme", "scss",       "svelte",  "todotxt", "toml",       "tsx",
   --  "typescript", "vim",    "vue",    "wgsl",       "yaml",
   --}, -- one of "all", "maintained" (parsers with maintainers), or a list of languages
-  configs.parser_install_dir = require'user.utils'.XDG_DATA_HOME .. '/tree-sitter'
+  configs.parser_install_dir = u.join_path { u.XDG_DATA_HOME, 'tree-sitter' }
   configs.sync_install = true -- install languages synchronously (only applied to `ensure_installed`)
   configs.ignore_install = {} -- list of parsers to ignore installing
   configs.highlight = {

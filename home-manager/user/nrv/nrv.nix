@@ -56,6 +56,8 @@ in {
       zip
       chafa
       pulseaudio
+      manix
+      nix-search-cli
       self.packages.${system}.scripts
       (pkgs.wrapPackages [ pkgs.restic ] {
         environment = {
@@ -75,6 +77,10 @@ in {
     stateVersion = "24.05";
   };
 
+  # Notification daemon
+  services.dunst.enable = true;
+
+  # XDG config
   xdg = let
     homeDir = "${config.home.homeDirectory}";
   in {

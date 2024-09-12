@@ -46,10 +46,27 @@ in {
 
     # Import DISPLAY, HYPRLAND_INSTANCE_SIGNATURE, WAYLAND_DISPLAY,
     # XDG_CURRENT_DESKTOP to systemd
-    systemd.enable = true;
+    systemd = {
+      enable = true;
+      variables = [
+        "WAYLAND_DISPLAY"
+        "DISPLAY"
+        "HYPRLAND_INSTANCE_SIGNATURE"
+        "XDG_CURRENT_DESKTOP"
+        "XDG_SESSION_TYPE"
+        "MENU"
+        "BEMENU_BACKEND"
+        "QT_QPA_PLATFORM"
+        "TERMINAL"
+        "TERMCMD"
+      ];
+    };
 
     settings = lib.mkMerge [
       {
+        monitor = [
+          "HDMI-A-2, 1920x1080@71.91, 0x0, 1"
+        ];
         env = [
           "QT_QPA_PLATFORM,wayland"
           "MOZ_ENABLE_WAYLAND,1"
@@ -63,7 +80,7 @@ in {
         ];
 
         # The primary modifier key
-        "$myMod" = "ALT";
+        "$myMod" = "SUPER";
 
         # Terminal that i use on this compositor
         "$myTerminal" = "${pkgs.kitty}/bin/kitty";
@@ -164,7 +181,7 @@ in {
           "$myMod SHIFT, SPACE, fullscreen, 0"
 
           # Contain fullscreen inside window - manual toggle
-          "$myMod SHIFT, f, fakefullscreen,"
+          "$myMod SHIFT, f, fullscreenstate, -1 1,"
 
           # Dwindle layout keys
 
@@ -286,7 +303,7 @@ in {
           "kb_file" = ""; # [str] [] If you prefer, you can use a path to your custom .xkb file.
           "numlock_by_default" = "false"; # [bool] [false] Engage numlock by default.
           "resolve_binds_by_sym" = "false"; # [bool] [false] Determines how keybinds act when multiple layouts are used. If false, keybinds will always act as if the first specified layout is active. If true, keybinds specified by symbols are activated when you type the respective symbol with the current layout.
-          "repeat_rate" = "40"; # [int] [25] The repeat rate for held-down keys, in repeats per second.
+          "repeat_rate" = "35"; # [int] [25] The repeat rate for held-down keys, in repeats per second.
           "repeat_delay" = "400"; # [int] [600] Delay before a held-down key is repeated, in milliseconds.
           "sensitivity" = "0.0"; # [float] [0.0] Sets the mouse input sensitivity. Value is clamped to the range -1.0 to 1.0. libinput#pointer-acceleration
           "accel_profile" = ""; # [str] [] Sets the cursor acceleration profile. Can be one of adaptive, flat. Can also be custom, see below. Leave empty to use libinput’s default mode for your input device. libinput#pointer-acceleration [adaptive/flat/custom]
@@ -386,14 +403,14 @@ in {
           "close_special_on_empty" = "true"; # [bool] [true] close the special workspace if the last window is removed
           "new_window_takes_over_fullscreen" = "1"; # [int] [0] if there is a fullscreen or maximized window, decide whether a new tiled window opened should replace it, stay behind or disable the fullscreen/maximized state. 0 - behind, 1 - takes over, 2 - unfullscreen/unmaxize [0/1/2]
 	  # FIXME: reenable on 0.42
-          #"exit_window_retains_fullscreen" = "false"; # [bool] [false] if true, closing a fullscreen window makes the next focused window fullscreen
+          "exit_window_retains_fullscreen" = "false"; # [bool] [false] if true, closing a fullscreen window makes the next focused window fullscreen
           "initial_workspace_tracking" = "1"; # [int] [1] if enabled, windows will open on the workspace they were invoked on. 0 - disabled, 1 - single-shot, 2 - persistent (all children too)
           "middle_click_paste" = "true"; # [bool] [true] whether to enable middle-click-paste (aka primary selection)
 	};
 	binds = {
           "pass_mouse_when_bound" = "false"; # [bool] [false] if disabled, will not pass the mouse events to apps / dragging windows around if a keybind has been triggered.
           "scroll_event_delay" = "1"; # [int] [300] in ms, how many ms to wait after a scroll event to allow passing another one for the binds.
-          "workspace_back_and_forth" = "true"; # [bool] [false] If enabled, an attempt to switch to the currently focused workspace will instead switch to the previous workspace. Akin to i3’s auto_back_and_forth.
+          "workspace_back_and_forth" = "false"; # [bool] [false] If enabled, an attempt to switch to the currently focused workspace will instead switch to the previous workspace. Akin to i3’s auto_back_and_forth.
           "allow_workspace_cycles" = "false"; # [bool] [false] If enabled, workspaces don’t forget their previous workspace, so cycles can be created by switching to the first workspace in a sequence, then endlessly going to the previous workspace.
           "workspace_center_on" = "1"; # [int] [0] Whether switching workspaces should center the cursor on the workspace (0) or on the last active window for that workspace (1)
           "focus_preferred_method" = "0"; # [int] [0] sets the preferred focus finding method when using focuswindow/movewindow/etc with a direction. 0 - history (recent have priority), 1 - length (longer shared edges have priority)
@@ -411,11 +428,11 @@ in {
           "force_introspection" = "2"; # [int] [2] forces introspection at all times. Introspection is aimed at reducing GPU usage in certain cases, but might cause graphical glitches on nvidia. 0 - nothing, 1 - force always on, 2 - force always on if nvidia
 	};
 	# FIXME: reenable on 0.42
-	#render = {
-        #  "explicit_sync" = "2"; # [int] [2] Whether to enable explicit sync support. Requires a hyprland restart. 0 - no, 1 - yes, 2 - auto based on the gpu driver
-        #  "explicit_sync_kms" = "2"; # [int] [2] Whether to enable explicit sync support for the KMS layer. Requires explicit_sync to be enabled. 0 - no, 1 - yes, 2 - auto based on the gpu driver
-        #  "direct_scanout" = "false"; # [bool] [false] Enables direct scanout. Direct scanout attempts to reduce lag when there is only one fullscreen application on a screen (e.g. game). It is also recommended to set this to false if the fullscreen application shows graphical glitches.
-	#};
+	render = {
+         "explicit_sync" = "2"; # [int] [2] Whether to enable explicit sync support. Requires a hyprland restart. 0 - no, 1 - yes, 2 - auto based on the gpu driver
+         "explicit_sync_kms" = "2"; # [int] [2] Whether to enable explicit sync support for the KMS layer. Requires explicit_sync to be enabled. 0 - no, 1 - yes, 2 - auto based on the gpu driver
+         "direct_scanout" = "false"; # [bool] [false] Enables direct scanout. Direct scanout attempts to reduce lag when there is only one fullscreen application on a screen (e.g. game). It is also recommended to set this to false if the fullscreen application shows graphical glitches.
+	};
 	cursor = {
 	  # FIXME: reenable on 0.42
           #"sync_gsettings_theme" = "true"; # [bool] [true] sync xcursor theme with gsettings, it applies cursor-theme and cursor-size on theme load to gsettings making most CSD gtk based clients use same xcursor theme and size.
@@ -434,7 +451,7 @@ in {
           "hide_on_key_press" = "false"; # [bool] [false] Hides the cursor when you press any key until the mouse is moved.
           "hide_on_touch" = "true"; # [bool] [true] Hides the cursor when the last input was a touch input until a mouse input is done.
 	  # FIXME: reenable on 0.42
-          #"allow_dumb_copy" = "false"; # [bool] [false] Makes HW cursors work on Nvidia, at the cost of a possible hitch whenever the image changes
+          "allow_dumb_copy" = "false"; # [bool] [false] Makes HW cursors work on Nvidia, at the cost of a possible hitch whenever the image changes
 	};
         debug = {
           "overlay" = "false"; # [bool] [false] print the debug performance overlay. Disable VFR for accurate results.

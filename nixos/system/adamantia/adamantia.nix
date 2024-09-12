@@ -462,7 +462,8 @@
       flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
     '';
   };
-  xdg.portal.enable = true;
+  # xdg.portal.enable = true;
+  # xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-hyprland ];
   security.rtkit.enable = true;
 
   # GTK apps outside GNOME - cursor, theming & window decorations. 
@@ -550,26 +551,29 @@
   programs.zsh = {
     enable = true;
   };
+  
+  # Enable hyprland - brings necessary stuff; main config is in Home Manager
+  programs.hyprland.enable = true;
 
   # Setup Plasma
-  services.desktopManager.plasma6.enable = true;
-  services.displayManager.sddm.enable = true;
-  services.displayManager.sddm.wayland.enable = true;
+  # services.desktopManager.plasma6.enable = true;
+  # services.displayManager.sddm.enable = true;
+  # services.displayManager.sddm.wayland.enable = true;
   # FIXME: SDDM is broken (something related to themes?) and i need this to
   #        login:
-  services.displayManager.autoLogin.enable = true;
-  services.displayManager.autoLogin.user = "nrv";
-  environment.plasma6.excludePackages = with pkgs.kdePackages; [
-    plasma-browser-integration
-    #konsole
-    (lib.getBin qttools) # Expose qdbus in PATH
-
-    ark
-    elisa
-    gwenview
-    okular
-    kate
-    khelpcenter
-    print-manager
-  ];
+  # services.displayManager.autoLogin.enable = true;
+  # services.displayManager.autoLogin.user = "nrv";
+  # environment.plasma6.excludePackages = with pkgs.kdePackages; [
+  #   plasma-browser-integration
+  #   #konsole
+  #   (lib.getBin qttools) # Expose qdbus in PATH
+  #
+  #   ark
+  #   elisa
+  #   gwenview
+  #   okular
+  #   kate
+  #   khelpcenter
+  #   print-manager
+  # ];
 }

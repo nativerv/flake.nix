@@ -384,10 +384,31 @@
         "nixpkgs-unstable": "nixpkgs-unstable",
         "pipewire-screenaudio": "pipewire-screenaudio",
         "plasma-manager": "plasma-manager",
+        "scr": "scr",
         "session": "session",
         "sops-nix": "sops-nix",
         "tl": "tl",
         "tmux-sessionizer": "tmux-sessionizer"
+      }
+    },
+    "scr": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1726323710,
+        "narHash": "sha256-IEo+AkSkjz6+BROCWMyK0WjL6+k10H/U/QyjGzqib2g=",
+        "owner": "nativerv",
+        "repo": "scr",
+        "rev": "4a8369f6297957cfc1947638b1fb887e10e4add5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nativerv",
+        "repo": "scr",
+        "type": "github"
       }
     },
     "session": {

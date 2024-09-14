@@ -58,6 +58,7 @@ in {
       pulseaudio
       manix
       nix-search-cli
+      inputs.scr.packages.${system}.default
       self.packages.${system}.scripts
       (pkgs.wrapPackages [ pkgs.restic ] {
         environment = {

@@ -41,6 +41,9 @@ in {
   wayland.windowManager.hyprland = {
     enable = true;
 
+    # X programs compatibility
+    xwayland.enable = true;
+
     # Sane shit
     systemd.enableXdgAutostart = false;
 
@@ -77,6 +80,9 @@ in {
           "MENU,${pkgs.bemenu}/bin/bemenu"
           "LAUNCHER,${pkgs.bemenu}/bin/bemenu-run"
           "BEMENU_BACKEND,wayland"
+
+          # NOTE: fixes: nixpak: XAUTHORITY not set
+          "XAUTHORITY,/dev/null"
         ];
 
         # The primary modifier key

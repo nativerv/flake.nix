@@ -26,9 +26,12 @@ in {
     self.homeManagerModules."program.firefox"
     self.homeManagerModules."program.readline"
     inputs.envrund.homeManagerModules.default
+    self.homeManagerModules."archetype.sane"
   ];
 
   services.envrund.enable = true;
+
+  dream.archetype.sane.enable = true;
 
   # For some reason they separate some stuff under `home.*`
   home = {
@@ -173,5 +176,45 @@ in {
     #   dmenuSupport = false;
     # };
     settings.PASSWORD_STORE_DIR = "${config.xdg.dataHome}/pass";
+  };
+
+  # From hyprland wiki - setup cursor theme
+  home.pointerCursor = {
+    gtk.enable = true;
+    x11.enable = true;
+
+    # Use breeze cursor as a compromise
+    package = pkgs.kdePackages.breeze;
+    name = "breeze_cursors";
+
+    # Kind of resembles the vanilla Xorg cursor but worse quality?
+    # package = pkgs.vanilla-dmz;
+    # name = "DMZ-Black";
+
+    # Better resembles Xorg one than above but i'm not sure
+    # NOTE: sandboxed firefox with $XDG_STATE_HOME/nix/profile shared uses the
+    # vanilla Xorg cursor!
+    # package = pkgs.simp1e-cursors;
+    # name = "Simp1e-Dark";
+
+    size = 1080 / 48;
+  };
+  gtk = {
+    enable = true;
+
+    theme = {
+      package = pkgs.flat-remix-gtk;
+      name = "Flat-Remix-GTK-Grey-Darkest";
+    };
+
+    iconTheme = {
+      package = pkgs.kdePackages.breeze-icons;
+      name = "breeze";
+    };
+
+    font = {
+      name = "Sans";
+      size = 12;
+    };
   };
 }

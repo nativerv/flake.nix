@@ -278,7 +278,7 @@ in {
           "dim_around" = "0.4"; # [float] [0.4] how much the dimaround window rule should dim by. [0.0 - 1.0]
           "screen_shader" = ""; # [str] [] a path to a custom shader to be applied at the end of rendering. See examples/screenShader.frag for an example.
           blur = {
-            "enabled" = "true"; # [bool] [true] enable kawase window background blur
+            "enabled" = "false"; # [bool] [true] enable kawase window background blur
             "size" = "8"; # [int] [8] blur size (distance)
             "passes" = "1"; # [int] [1] the amount of passes to perform
             "ignore_opacity" = "false"; # [bool] [false] make the blur layer ignore the opacity of the window

@@ -475,6 +475,77 @@ in {
           "colored_stdout_logs" = "true"; # [bool] [true] enables colors in the stdout logs.
         };
       }
+      {
+        windowrulev2 = let
+          telegramMatch = "class:org.telegram.desktop, title:^Media viewer$";
+          telegramPopupMatch = "class:org.telegram.desktop,title:^TelegramDesktop$,floating:1";
+          scrMatch = "class:imv, title:^scr$";
+        in [
+          # Window Rule v1
+          # windowrule = RULE,WINDOW
+          # Window Rule v2
+          # RULE,MATCH[,MATCH...]
+
+          # Transparent terminals
+          "opacity 0.9 override 0.9 override,class:^(St|footclient|foot|Alacritty|kitty)$"
+
+          # Make Neovim always opaque
+          #opacity 1.0 override 1.0 override, title:NeoVim$
+
+          # FIXME Prevent stuff from fullscreening/contain fullscreens inside of the window
+          #fakefullscreen,      class:^(mpv|firefox)$
+          #nofullscreenrequest, class:^(mpv|firefox)$
+          #"fullscreenstate 1 0, class:^(mpv|firefox)$"
+
+          # Telegram media viewer - fix animations (tiling by default resizes windows)
+          "float,   ${telegramMatch}"
+          "center,  ${telegramMatch}"
+          "noanim,  ${telegramMatch}"
+
+          # Telegram pop-up media viewer - location
+          # FIXME: $telegramPopupMatch does not match
+          "float, ${telegramPopupMatch}"
+          "move 1500 160, ${telegramPopupMatch}"
+          "noborder, ${telegramPopupMatch}"
+
+          # Put telegram to workspace 9
+          "workspace 9 silent, class:org.telegram.desktop"
+
+          # Put VMs to workspace 2
+          "workspace 2 silent, class:qemu"
+
+          # scr screenshotting utility - fix animations (tiling by default resizes windows)
+          "float, ${scrMatch}"
+          "noanim, ${scrMatch}"
+
+          # `zet graph`
+          "tile, class:^Graphviz$"
+
+          # xdg-desktop-portal-termfilechooser
+          "float, title:ranger-filechooser"
+
+          # Firefox Discord
+          "idleinhibit always,title:Discord"
+
+          # Syncplay pseudotile (not supported now for windows that force their sizes.)
+          "pseudo, class:syncplay"
+          "tile, class:syncplay"
+
+          # Gimp Search Actions
+          # FIXME: not working (forced focus)
+          "stayfocused, initialTitle:^Search Actions$"
+
+          # Firefox ignore fullscreen
+          # FIXME: not working (ignore fullscreen)
+          "suppressevent fullscreen, class:firefox"
+
+          # Sxiv
+          "tile, class:^Sxiv$"
+
+          # Glxgears
+          "tile, initialTitle:^glxgears$"
+        ];
+      }
     ];
   };
 }

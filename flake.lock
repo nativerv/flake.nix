@@ -69,11 +69,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1725771647,
-        "narHash": "sha256-yzGmS6McNhBAh3BCRMKTjadO0iXpP9Bgg6EFSkxne0U=",
+        "lastModified": 1726617369,
+        "narHash": "sha256-ln0MM0KJ7I6i3ssZDtYVSAzYMrf1gN1fgCuW8nuNCkE=",
         "owner": "nativerv",
         "repo": "envrund",
-        "rev": "7298ec3c8dc4de17afac5f53a08c2506e854581f",
+        "rev": "3e0d6937d8ed35f28af119c7ecdf856a7d50a9d3",
         "type": "github"
       },
       "original": {

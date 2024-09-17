@@ -1,0 +1,44 @@
+#!/bin/sh
+
+# Characters to be used in PEEPO...
+# chars='     /********,.@@@%'
+# chars='     /********,%#@&!!@#$%^&).@@@%'
+
+: "${XDG_CONFIG_HOME:="${HOME}/.config"}"
+: "${XDG_CACHE_HOME:="${HOME}/.cache"}"
+: "${XDG_DATA_HOME:="${HOME}/.local/share"}"
+: "${XDG_STATE_HOME:="${HOME}/.local/state"}"
+
+[ -z "${PEEPOS_LOCATION-}" ] && [ -f "${XDG_CONFIG_HOME}/user-dirs.dirs" ] && . "${XDG_CONFIG_HOME}/user-dirs.dirs"
+: "${XDG_PICTURES_DIR:="${HOME}/Pictures"}"
+: "${PEEPOS_LOCATION:="${XDG_PICTURES_DIR}/pepes"}"
+
+# Subsequent defaults
+# Ascending priority
+pepes_dir="${PEEPOS_LOCATION}"
+
+# Exit if there is no place of peepos...
+if [ ! -d "${pepes_dir}" ]; then
+  echo 'Nowhere to find peepos...'
+  echo "random-pepe: error: no pepes in ${pepes_dir}" >&2
+  exit 1
+fi
+
+# Retreive peepos...
+peepos=$(find "${pepes_dir}" -type f -iname "*.png" -o -type f -iname "*.jpg" -o -type f -iname "*.webp")
+
+# Exit if there is not a single peepo...
+if [ "$(echo "${peepos}" | wc -l)" = 0 ]; then
+  echo 'No peepos there...'
+  exit 1
+fi
+
+# Select random peepo...
+peepo=$(echo "${peepos}" | shuf -n 1)
+
+# Debug stuff...
+echo "random-pepe: info: used image: ${peepo}" >&2
+
+# Convert peepo...
+#--chars="${chars}"
+jp2a --colors "${peepo}"

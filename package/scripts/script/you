@@ -1,0 +1,24 @@
+#!/bin/sh
+
+set -e
+
+LOGDIR="${XDG_DATA_HOME:-$HOME/.local/share}/you"
+
+mkdir -p "${LOGDIR}"
+
+printf 'Enter a url: ' >&2
+read -r 'url'
+
+yt-dlp \
+  --concurrent-fragments 10 \
+  --embed-metadata \
+  --embed-thumbnail \
+  --embed-chapters \
+  --embed-subs \
+  -o "%(extractor)s:%(id)s:%(title)s.%(ext)s" \
+  "${@}" \
+  "${url}"
+
+printf "%s\t%s\t%s\n" "${url}" "stub" "${?}" >> "${LOGDIR}/downloads.log"
+
+exit "${?}"

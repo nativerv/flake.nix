@@ -1,0 +1,40 @@
+#!/bin/sh
+
+# Author: nrv
+# Description: 
+#   Print fancy banner, list of upgradable packages
+#   and execute `sudo pacman -Syu` if that list is not
+#   empty
+
+set -e
+
+ITALIC="\033[3m"
+NORMAL="\033[0m"
+
+figlet -f slant 'System Upgrade'
+
+upgradable="$(unbuffer pacman -Qu || true)"
+upgradable_count="$(printf '%s' "${upgradable}" | wc -l)"
+upgradable_count="$((upgradable_count))"
+
+printf '\n'
+printf 'Upgradable packages (%s): ' "${upgradable_count}"
+printf '\n'
+
+if [ "${upgradable_count}" -ne '0' ]; then
+  printf '%s' "${upgradable}" | xargs -I{} printf '  {}\n'
+else
+  # shellcheck disable=2059
+  printf "  ${ITALIC}No packages is upgradable at the moment.${NORMAL}"
+fi
+
+printf '\n\n'
+printf "Press any key to continue..."
+read -r '_'
+
+if [ "${upgradable_count}" -ne '0' ]; then
+  printf 'Executing [1;32msudo pacman -Syu[0m...'
+  printf '\n'
+  sudo pacman -Syu
+fi
+

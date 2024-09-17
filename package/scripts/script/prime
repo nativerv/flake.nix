@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -u
+v=
+while :; do
+  case "${1}" in
+    -v|--verbose) v=true ;;
+    *) break ;;
+  esac
+  shift
+done
+
+n=${1}
+divisors="$(
+  seq "${n}" |
+    awk "{ print ${n}/\$1 }" |
+    grep -v -e '\.' -e '^1$'
+)"
+[ "${v}" = true ] && printf '%s\n' "${divisors}"
+test "${n}" = "${divisors}"

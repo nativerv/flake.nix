@@ -1,0 +1,10 @@
+#!/bin/sh
+
+[ "${1}" = '-i' ] && i=
+
+nvim ~/dox/notes/$(date '+%Y%m%d%H%M%S')-diary.md \
+  +"norm! i# Diary entry #$(
+      head -n1 ~/dox/notes/*-diary.md | tr -d '\n' | grep -oE '[0-9]+$' | tail -n1 | awk '{print$1+1}'
+  )" \
+  +'norm! a#[diary](diary.md)## Initial' \
+  "${i++"startinsert"}"

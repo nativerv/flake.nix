@@ -1,0 +1,6 @@
+#!/bin/sh
+
+message="$(echo ${@})"
+[ -z "${message}" ] && message="Enter password:"
+
+dmenu -P -p "${message}" 

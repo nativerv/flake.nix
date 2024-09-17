@@ -1,0 +1,39 @@
+#!/bin/sh
+
+# Author: nrv
+# Description: hardlink the file to XDG_PUBLICSHARE dir inside folder
+# with name of *sha256sum* of that file, so you can use it from firejailed apps
+# example: ~/pub/dnd/0d16530cd4e06015d1d8a71309c297e67abf923451afccbd89e5aadf08213689/cat.jpg
+
+set -eu
+
+PUBLIC_HOME="$(xdg-user-dir PUBLICSHARE)"
+: "${PUBLIC_HOME:="${HOME}/Public"}"
+: "${WHITE_HOME:="${PUBLIC_HOME}/dnd"}"
+
+white_one() {
+	file_path="${1}"
+	file_name="${file_path##*/}"
+	hash="$(sha256sum "${file_path}" | cut -d' ' -f1)"
+	pub_file_dir="${WHITE_HOME}/${hash}"
+	pub_file_path="${pub_file_dir}/${file_name}"
+
+	pub_dir_drive="$(stat -c '%d' "${WHITE_HOME}")"
+	source_dir_drive="$(stat -c '%d' "${file_path}")"
+
+	mkdir -p "${pub_file_dir}"
+
+	if [ "${file_path}" = "${pub_file_path}" ]; then
+		printf '%s\n' "${pub_file_path}"
+	elif [ "${pub_dir_drive}" = "${source_dir_drive}" ]; then
+		ln -f "${file_path}" "${pub_file_path}" &&
+			printf '%s\n' "${pub_file_path}"
+	else
+		cp -f "${file_path}" "${pub_file_path}" &&
+			printf '%s\n' "${pub_file_path}"
+	fi
+}
+
+for file in "${@}"; do
+	white_one "${file}"
+done

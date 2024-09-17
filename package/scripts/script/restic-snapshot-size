@@ -1,0 +1,3 @@
+#!/bin/sh
+
+jq '.total_size' | xargs -I{} sh -c 'printf "%.04fG\n" "$(cl {}/1024^3)"'

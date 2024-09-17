@@ -1,0 +1,4 @@
+#!/bin/sh
+
+file="$(mktemp)"
+[ "${#}" -gt 0 ] && find "${@}" | sed 's/^\(.*\)/file \1/g' > "${file}" && printf '%s' "${file}"

@@ -234,7 +234,7 @@ in {
         #   silent! execute a:firstline . "," . a:lastline . 's/\V[[Empty]]//g'
         #   silent! execute a:firstline . "," . a:lastline . 's/\v(\s+".+" \= ")\[(.+)\]";(.*)\[\[(\S+,\s?\S+)\]\](.*)$/\1\2";\3[\4]\5'
         #   silent! execute a:firstline . "," . a:lastline . 's/\v^(\s*)(.*\[\[Auto]].*)/\1#\2'
-	# TODO: unset commenting
+        # TODO: unset commenting
         # endfunction
         # command! -range HyprDefault :call <range>HyprDefault()
 
@@ -301,7 +301,7 @@ in {
           "kb_model" = ""; # [str] [] Appropriate XKB keymap parameter. See the note below.
           "kb_layout" = fromJSONIfUnlockedOr (
              warn "Repo is not unlocked! Hyprland will use EN layout only"
-	     "us"
+             "us"
            ) "${flake}/sus/nrv/eval/hyprland/kb_layout.json"; # [str] [us] Appropriate XKB keymap parameter
           "kb_variant" = ""; # [str] [] Appropriate XKB keymap parameter
           "kb_options" = "caps:escape,grp:switch"; # [str] [] Appropriate XKB keymap parameter
@@ -322,14 +322,14 @@ in {
           "scroll_factor" = "1.0"; # [float] [1.0] Multiplier added to scroll movement for external mice. Note that there is a separate setting for touchpad scroll_factor.
           "natural_scroll" = "false"; # [bool] [false] Inverts scrolling direction. When enabled, scrolling moves content directly, rather than manipulating a scrollbar.
           "follow_mouse" = "1"; # [int] [1] Specify if and how cursor movement should affect window focus. See the note below. [0/1/2/3]
-	  # FIXME: reenable on 0.42
+          # FIXME: reenable on 0.42
           #"focus_on_close" = "0"; # [int] [0] Controls the window focus behavior when a window is closed. When set to 0, focus will shift to the next window candidate. When set to 1, focus will shift to the window under the cursor. [0/1]
           "mouse_refocus" = "true"; # [bool] [true] If disabled, mouse focus won’t switch to the hovered window unless the mouse crosses a window boundary when follow_mouse=1.
           "float_switch_override_focus" = "1"; # [int] [1] If enabled (1 or 2), focus will change to the window under the cursor when changing from tiled-to-floating and vice versa. If 2, focus will also follow mouse on float-to-float switches.
           "special_fallthrough" = "false"; # [bool] [false] if enabled, having only floating windows in the special workspace will not block focusing windows in the regular workspace.
           "off_window_axis_events" = "1"; # [int] [1] Handles axis events around (gaps/border for tiled, dragarea/border for floated) a focused window. 0 ignores axis events 1 sends out-of-bound coordinates 2 fakes pointer coordinates to the closest point inside the window 3 warps the cursor to the closest point inside the window
           #"emulate_discrete_scroll" = "1"; # [int] [1] Emulates discrete scrolling from high resolution scrolling events. 0 disables it, 1 enables handling of non-standard events only, and 2 force enables all scroll wheel events to be handled
-	  touchpad = {
+          touchpad = {
             "disable_while_typing" = "true"; # [bool] [true] Disable the touchpad while typing.
             "natural_scroll" = "false"; # [bool] [false] Inverts scrolling direction. When enabled, scrolling moves content directly, rather than manipulating a scrollbar.
             "scroll_factor" = "1.0"; # [float] [1.0] Multiplier applied to the amount of scroll movement.
@@ -339,14 +339,14 @@ in {
             "tap-to-click" = "true"; # [bool] [true] Tapping on the touchpad with 1, 2, or 3 fingers will send LMB, RMB, and MMB respectively.
             "drag_lock" = "false"; # [bool] [false] When enabled, lifting the finger off for a short time while dragging will not drop the dragged item. libinput#tap-and-drag
             "tap-and-drag" = "false"; # [bool] [false] Sets the tap and drag mode for the touchpad
-	  };
-	  touchdevice = {
-	    "transform" = "0"; # [int] [0] Transform the input from touchdevices. The possible transformations are the same as those of the monitors
+          };
+          touchdevice = {
+            "transform" = "0"; # [int] [0] Transform the input from touchdevices. The possible transformations are the same as those of the monitors
             #"output" = "[[Auto]]"; # [string] [[[Auto]]] The monitor to bind touch devices. The default is auto-detection. To stop auto-detection, use an empty string or the “” value.
             "enabled" = "true"; # [bool] [true] Whether input is enabled for touch devices.
-	  };
-	  tablet = {
-	    "transform" = "0"; # [int] [0] transform the input from tablets. The possible transformations are the same as those of the monitors
+          };
+          tablet = {
+            "transform" = "0"; # [int] [0] transform the input from tablets. The possible transformations are the same as those of the monitors
             "output" = ""; # [string] [] the monitor to bind tablets. Empty means unbound.
             "region_position" = "0, 0"; # [vec2] [0, 0] position of the mapped region in monitor layout.
             "region_size" = "0, 0"; # [vec2] [0, 0] size of the mapped region. When this variable is set, tablet input will be mapped to the region. [0, 0] or invalid size means unset.
@@ -354,17 +354,17 @@ in {
             "left_handed" = "false"; # [bool] [false] if enabled, the tablet will be rotated 180 degrees
             "active_area_size" = "0, 0"; # [vec2] [0, 0] size of tablet’s active area in mm
             "active_area_position" = "0, 0"; # [vec2] [0, 0] position of the active area in mm
-	  };
+          };
         };
-	group = {
-	  "insert_after_current" = "true"; # [bool] [true] whether new windows in a group spawn after current or at group tail
+        group = {
+          "insert_after_current" = "true"; # [bool] [true] whether new windows in a group spawn after current or at group tail
           "focus_removed_window" = "true"; # [bool] [true] whether Hyprland should focus on the window that has just been moved out of the group
           "col.border_active" = "0x66ffff00"; # [gradient] [0x66ffff00] active group border color
           "col.border_inactive" = "0x66777700"; # [gradient] [0x66777700] inactive (out of focus) group border color
           "col.border_locked_active" = "0x66ff5500"; # [gradient] [0x66ff5500] active locked group border color
           "col.border_locked_inactive" = "0x66775500"; # [gradient] [0x66775500] inactive locked group border color
-	  groupbar = {
-	    "enabled" = "true"; # [bool] [true] enables groupbars
+          groupbar = {
+            "enabled" = "true"; # [bool] [true] enables groupbars
             "font_family" = ""; # [string] [] font used to display groupbar titles, use misc:font_family if not specified
             "font_size" = "8"; # [int] [8] font size of groupbar title
             "gradients" = "true"; # [bool] [true] enables gradients
@@ -378,10 +378,10 @@ in {
             "col.inactive" = "0x66777700"; # [gradient] [0x66777700] inactive (out of focus) group border color
             "col.locked_active" = "0x66ff5500"; # [gradient] [0x66ff5500] active locked group border color
             "col.locked_inactive" = "0x66775500"; # [gradient] [0x66775500] inactive locked group border color
-	  };
-	};
-	misc = {
-	  "disable_hyprland_logo" = "true"; # [bool] [false] disables the random Hyprland logo / anime girl background. :(
+          };
+        };
+        misc = {
+          "disable_hyprland_logo" = "true"; # [bool] [false] disables the random Hyprland logo / anime girl background. :(
           "disable_splash_rendering" = "true"; # [bool] [false] disables the Hyprland splash rendering. (requires a monitor reload to take effect)
           "col.splash" = "0xffffffff"; # [color] [0xffffffff] Changes the color of the splash text (requires a monitor reload to take effect).
           "font_family" = "monospace"; # [string] [Sans] Set the global default font to render the text including debug fps/notification, config error messages and etc., selected from system fonts.
@@ -404,16 +404,16 @@ in {
           "render_ahead_of_time" = "false"; # [bool] [false] [Warning: buggy] starts rendering before your monitor displays a frame in order to lower latency
           "render_ahead_safezone" = "1"; # [int] [1] how many ms of safezone to add to rendering ahead of time. Recommended 1-2.
           "allow_session_lock_restore" = "false"; # [bool] [false] if true, will allow you to restart a lockscreen app in case it crashes (red screen of death)
-	  # TODO: colors
+          # TODO: colors
           "background_color" = "0x111111"; # [color] [0x111111] change the background color. (requires enabled disable_hyprland_logo)
           "close_special_on_empty" = "true"; # [bool] [true] close the special workspace if the last window is removed
           "new_window_takes_over_fullscreen" = "1"; # [int] [0] if there is a fullscreen or maximized window, decide whether a new tiled window opened should replace it, stay behind or disable the fullscreen/maximized state. 0 - behind, 1 - takes over, 2 - unfullscreen/unmaxize [0/1/2]
-	  # FIXME: reenable on 0.42
+          # FIXME: reenable on 0.42
           "exit_window_retains_fullscreen" = "false"; # [bool] [false] if true, closing a fullscreen window makes the next focused window fullscreen
           "initial_workspace_tracking" = "1"; # [int] [1] if enabled, windows will open on the workspace they were invoked on. 0 - disabled, 1 - single-shot, 2 - persistent (all children too)
           "middle_click_paste" = "true"; # [bool] [true] whether to enable middle-click-paste (aka primary selection)
-	};
-	binds = {
+        };
+        binds = {
           "pass_mouse_when_bound" = "false"; # [bool] [false] if disabled, will not pass the mouse events to apps / dragging windows around if a keybind has been triggered.
           "scroll_event_delay" = "1"; # [int] [300] in ms, how many ms to wait after a scroll event to allow passing another one for the binds.
           "workspace_back_and_forth" = "false"; # [bool] [false] If enabled, an attempt to switch to the currently focused workspace will instead switch to the previous workspace. Akin to i3’s auto_back_and_forth.
@@ -424,23 +424,23 @@ in {
           "movefocus_cycles_fullscreen" = "true"; # [bool] [true] If enabled, when on a fullscreen window, movefocus will cycle fullscreen, if not, it will move the focus in a direction.
           "disable_keybind_grabbing" = "false"; # [bool] [false] If enabled, apps that request keybinds to be disabled (e.g. VMs) will not be able to do so.
           "window_direction_monitor_fallback" = "true"; # [bool] [true] If enabled, moving a window or focus over the edge of a monitor with a direction will move it to the next monitor in that direction.
-	};
-	xwayland = {
+        };
+        xwayland = {
           "use_nearest_neighbor" = "true"; # [bool] [true] uses the nearest neighbor filtering for xwayland apps, making them pixelated rather than blurry
           "force_zero_scaling" = "false"; # [bool] [false] forces a scale of 1 on xwayland windows on scaled displays.
-	};
-	opengl = {
+        };
+        opengl = {
           "nvidia_anti_flicker" = "true"; # [bool] [true] reduces flickering on nvidia at the cost of possible frame drops on lower-end GPUs. On non-nvidia, this is ignored.
           "force_introspection" = "2"; # [int] [2] forces introspection at all times. Introspection is aimed at reducing GPU usage in certain cases, but might cause graphical glitches on nvidia. 0 - nothing, 1 - force always on, 2 - force always on if nvidia
-	};
-	# FIXME: reenable on 0.42
-	render = {
-         "explicit_sync" = "2"; # [int] [2] Whether to enable explicit sync support. Requires a hyprland restart. 0 - no, 1 - yes, 2 - auto based on the gpu driver
-         "explicit_sync_kms" = "2"; # [int] [2] Whether to enable explicit sync support for the KMS layer. Requires explicit_sync to be enabled. 0 - no, 1 - yes, 2 - auto based on the gpu driver
-         "direct_scanout" = "false"; # [bool] [false] Enables direct scanout. Direct scanout attempts to reduce lag when there is only one fullscreen application on a screen (e.g. game). It is also recommended to set this to false if the fullscreen application shows graphical glitches.
-	};
-	cursor = {
-	  # FIXME: reenable on 0.42
+        };
+        # FIXME: reenable on 0.42
+        render = {
+          "explicit_sync" = "2"; # [int] [2] Whether to enable explicit sync support. Requires a hyprland restart. 0 - no, 1 - yes, 2 - auto based on the gpu driver
+          "explicit_sync_kms" = "2"; # [int] [2] Whether to enable explicit sync support for the KMS layer. Requires explicit_sync to be enabled. 0 - no, 1 - yes, 2 - auto based on the gpu driver
+          "direct_scanout" = "false"; # [bool] [false] Enables direct scanout. Direct scanout attempts to reduce lag when there is only one fullscreen application on a screen (e.g. game). It is also recommended to set this to false if the fullscreen application shows graphical glitches.
+        };
+        cursor = {
+          # FIXME: reenable on 0.42
           #"sync_gsettings_theme" = "true"; # [bool] [true] sync xcursor theme with gsettings, it applies cursor-theme and cursor-size on theme load to gsettings making most CSD gtk based clients use same xcursor theme and size.
           "no_hardware_cursors" = "false"; # [bool] [false] disables hardware cursors
           "no_break_fs_vrr" = "true"; # [bool] [false] disables scheduling new frames on cursor movement for fullscreen apps with VRR enabled to avoid framerate spikes (requires no_hardware_cursors = true)
@@ -456,9 +456,9 @@ in {
           "enable_hyprcursor" = "true"; # [bool] [true] whether to enable hyprcursor support
           "hide_on_key_press" = "false"; # [bool] [false] Hides the cursor when you press any key until the mouse is moved.
           "hide_on_touch" = "true"; # [bool] [true] Hides the cursor when the last input was a touch input until a mouse input is done.
-	  # FIXME: reenable on 0.42
+          # FIXME: reenable on 0.42
           "allow_dumb_copy" = "false"; # [bool] [false] Makes HW cursors work on Nvidia, at the cost of a possible hitch whenever the image changes
-	};
+        };
         debug = {
           "overlay" = "false"; # [bool] [false] print the debug performance overlay. Disable VFR for accurate results.
           "damage_blink" = "false"; # [bool] [false] (epilepsy warning!) flash areas updated with damage tracking

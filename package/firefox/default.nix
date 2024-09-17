@@ -17,28 +17,43 @@
     config = { sloth, ... }: {
 
       # the application to isolate
+      app.package = package;
+
       # NOTE: Swap with this comment to test stuff:
+
       # app.package = pkgs.symlinkJoin {
       #   inherit name;
       #   paths = [ (pkgs.writeShellScriptBin "${name}" ''
-      #     ${pkgs.coreutils}/bin/ls -la ~
-      #     ${pkgs.coreutils}/bin/ls -la ~/pr
-      #     ${pkgs.coreutils}/bin/ls -la /home/nrv/pr/pipewire-screenaudio/native/connector-rs/target/debug
-      #     ${pkgs.coreutils}/bin/cat ~/pr/pipewire-screenaudio/native/native-messaging-hosts/firefox.json
-      #     ${pkgs.coreutils}/bin/cat /usr/lib/mozilla/native-messaging-hosts/com.icedborn.pipewirescreenaudioconnector.json
+      #     # ${pkgs.coreutils}/bin/ls -la ~
+      #     # ${pkgs.coreutils}/bin/ls -la ~/pr
+      #     # ${pkgs.coreutils}/bin/ls -la /home/nrv/pr/pipewire-screenaudio/native/connector-rs/target/debug
+      #     # ${pkgs.coreutils}/bin/cat ~/pr/pipewire-screenaudio/native/native-messaging-hosts/firefox.json
+      #     # ${pkgs.coreutils}/bin/cat /usr/lib/mozilla/native-messaging-hosts/com.icedborn.pipewirescreenaudioconnector.json
       #     # echo
       #     # echo Current system
       #     # ${pkgs.findutils}/bin/find -L /run/current-system/sw/lib/mozilla
       #     # echo
       #     # ${pkgs.findutils}/bin/find -L / -maxdepth 2
       #
-      #     echo
-      #     ${pkgs.findutils}/bin/find -L /usr
+      #     ${pkgs.coreutils}/bin/ls -la /usr/share/icons/breeze_cursors
+      #     ${pkgs.file}/bin/file /usr/share/icons/breeze_cursors/cursors/default
+      #     ${pkgs.file}/bin/file ~/.icons/breeze_cursors/cursors/default
       #
-      #     #${package}/bin/${name} ''${@}
+      #     echo
+      #     # ${pkgs.findutils}/bin/find -L /usr
+      #
+      #     echo XCURSOR_THEME=$XCURSOR_THEME
+      #     echo XCURSOR_PATH=
+      #     echo $XCURSOR_PATH | tr ':' '\n'
+      #
+      #     ${pkgs.file}/bin/file ~/.config/gtk-3.0/settings.ini
+      #
+      #     echo XDG_STATE_HOME=$XDG_STATE_HOME
+      #     echo XDG_CONFIG_HOME=$XDG_CONFIG_HOME
+      #
+      #     ${package}/bin/${name} ''${@}
       #   '') package ];
       # };
-      app.package = package;
 
       # path to the executable to be wrapped
       # this is usually autodetected but
@@ -134,8 +149,18 @@
           # NOTE: The following is required for native-messaging-hosts to work,
           # at least `pipewire-screenaudio`.
           # TODO: restrict this further up to `bindEntireStore = false`
+          # XXX: Maybe just remove this line?
           "/run/current-system/sw"
           [ "${package}/lib/mozilla" "/usr/lib/mozilla" ]
+          [ "/run/current-system/sw/share/icons" "/usr/share/icons" ]
+
+          # Themes/Theming/Icons/Cursors
+          (concat [homeDir "/.icons"])
+          (concat [xdgDataHome "/icons"])
+          (concat [xdgConfigHome "/gtk-3.0"])
+          (concat [xdgConfigHome "/gtk-4.0"])
+          (concat [xdgConfigHome "/dconf"])
+          # (concat [xdgStateHome "/nix/profile"])
         ];
         bind.dev = [
           "/dev/dri"

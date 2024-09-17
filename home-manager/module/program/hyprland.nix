@@ -477,17 +477,16 @@ in {
       }
       {
         windowrulev2 = let
-          telegramMatch = "class:org.telegram.desktop, title:^Media viewer$";
-          telegramPopupMatch = "class:org.telegram.desktop,title:^TelegramDesktop$,floating:1";
+          telegramMatch = "initialTitle:^Telegram$";
+          telegramMediaViewerMatch = "initialTitle:^Media viewer$";
+          telegramPopupMatch = "initialTitle:^TelegramDesktop$, floating:1";
           scrMatch = "class:imv, title:^scr$";
         in [
-          # Window Rule v1
-          # windowrule = RULE,WINDOW
-          # Window Rule v2
-          # RULE,MATCH[,MATCH...]
+          # Window Rule v1: RULE,WINDOW
+          # Window Rule v2: RULE,MATCH[,MATCH...]
 
           # Transparent terminals
-          "opacity 0.9 override 0.9 override,class:^(St|footclient|foot|Alacritty|kitty)$"
+          # "opacity 0.9 override 0.9 override,class:^(St|footclient|foot|Alacritty|kitty)$"
 
           # Make Neovim always opaque
           #opacity 1.0 override 1.0 override, title:NeoVim$
@@ -498,18 +497,19 @@ in {
           #"fullscreenstate 1 0, class:^(mpv|firefox)$"
 
           # Telegram media viewer - fix animations (tiling by default resizes windows)
-          "float,   ${telegramMatch}"
-          "center,  ${telegramMatch}"
-          "noanim,  ${telegramMatch}"
+          "float,     ${telegramMediaViewerMatch}"
+          "center,    ${telegramMediaViewerMatch}"
+          "noanim,    ${telegramMediaViewerMatch}"
+          "noborder,  ${telegramMediaViewerMatch}"
 
           # Telegram pop-up media viewer - location
           # FIXME: $telegramPopupMatch does not match
           "float, ${telegramPopupMatch}"
-          "move 1500 160, ${telegramPopupMatch}"
+          # "move 1500 160, ${telegramPopupMatch}"
           "noborder, ${telegramPopupMatch}"
 
           # Put telegram to workspace 9
-          "workspace 9 silent, class:org.telegram.desktop"
+          "workspace 9 silent, ${telegramMatch}"
 
           # Put VMs to workspace 2
           "workspace 2 silent, class:qemu"
@@ -517,6 +517,8 @@ in {
           # scr screenshotting utility - fix animations (tiling by default resizes windows)
           "float, ${scrMatch}"
           "noanim, ${scrMatch}"
+          "move 0 0, ${scrMatch}"
+          "size 100% 100%, ${scrMatch}"
 
           # `zet graph`
           "tile, class:^Graphviz$"

@@ -433,11 +433,10 @@ in {
           "nvidia_anti_flicker" = "true"; # [bool] [true] reduces flickering on nvidia at the cost of possible frame drops on lower-end GPUs. On non-nvidia, this is ignored.
           "force_introspection" = "2"; # [int] [2] forces introspection at all times. Introspection is aimed at reducing GPU usage in certain cases, but might cause graphical glitches on nvidia. 0 - nothing, 1 - force always on, 2 - force always on if nvidia
         };
-        # FIXME: reenable on 0.42
         render = {
           "explicit_sync" = "2"; # [int] [2] Whether to enable explicit sync support. Requires a hyprland restart. 0 - no, 1 - yes, 2 - auto based on the gpu driver
           "explicit_sync_kms" = "2"; # [int] [2] Whether to enable explicit sync support for the KMS layer. Requires explicit_sync to be enabled. 0 - no, 1 - yes, 2 - auto based on the gpu driver
-          "direct_scanout" = "false"; # [bool] [false] Enables direct scanout. Direct scanout attempts to reduce lag when there is only one fullscreen application on a screen (e.g. game). It is also recommended to set this to false if the fullscreen application shows graphical glitches.
+          "direct_scanout" = "true"; # [bool] [false] Enables direct scanout. Direct scanout attempts to reduce lag when there is only one fullscreen application on a screen (e.g. game). It is also recommended to set this to false if the fullscreen application shows graphical glitches.
         };
         cursor = {
           # FIXME: reenable on 0.42
@@ -503,7 +502,6 @@ in {
           "noborder,  ${telegramMediaViewerMatch}"
 
           # Telegram pop-up media viewer - location
-          # FIXME: $telegramPopupMatch does not match
           "float, ${telegramPopupMatch}"
           # "move 1500 160, ${telegramPopupMatch}"
           "noborder, ${telegramPopupMatch}"

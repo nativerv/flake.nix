@@ -27,11 +27,13 @@ in {
     self.homeManagerModules."program.readline"
     inputs.envrund.homeManagerModules.default
     self.homeManagerModules."archetype.sane"
+    self.homeManagerModules."program.ranger"
   ];
 
   services.envrund.enable = true;
 
   dream.archetype.sane.enable = true;
+  dream.program.ranger.enable = true;
 
   # For some reason they separate some stuff under `home.*`
   home = {

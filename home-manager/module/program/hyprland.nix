@@ -452,7 +452,7 @@ in {
           "warp_on_change_workspace" = "true"; # [bool] [false] If true, move the cursor to the last focused window after changing the workspace.
           "default_monitor" = ""; # [str] [] the name of a default monitor for the cursor to be set to on startup (see hyprctl monitors for names)
           "zoom_factor" = "1.0"; # [float] [1.0] the factor to zoom by around the cursor. Like a magnifying glass. Minimum 1.0 (meaning no zoom)
-          "zoom_rigid" = "false"; # [bool] [false] whether the zoom should follow the cursor rigidly (cursor is always centered if it can be) or loosely
+          "zoom_rigid" = "true"; # [bool] [false] whether the zoom should follow the cursor rigidly (cursor is always centered if it can be) or loosely
           "enable_hyprcursor" = "true"; # [bool] [true] whether to enable hyprcursor support
           "hide_on_key_press" = "false"; # [bool] [false] Hides the cursor when you press any key until the mouse is moved.
           "hide_on_touch" = "true"; # [bool] [true] Hides the cursor when the last input was a touch input until a mouse input is done.

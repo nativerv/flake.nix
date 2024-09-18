@@ -537,7 +537,7 @@ in {
 
           # Firefox ignore fullscreen
           # FIXME: not working (ignore fullscreen)
-          "suppressevent fullscreen, class:firefox"
+          # "suppressevent fullscreen, class:firefox"
 
           # Sxiv
           "tile, class:^Sxiv$"

@@ -28,12 +28,16 @@ in {
     inputs.envrund.homeManagerModules.default
     self.homeManagerModules."archetype.sane"
     self.homeManagerModules."program.ranger"
+    self.homeManagerModules."program.eww"
+    inputs.ev.homeManagerModules.default
   ];
 
   services.envrund.enable = true;
+  services.ev.enable = true;
 
   dream.archetype.sane.enable = true;
   dream.program.ranger.enable = true;
+  dream.program.eww.enable = true;
 
   # For some reason they separate some stuff under `home.*`
   home = {
@@ -65,6 +69,9 @@ in {
       nix-search-cli
       inputs.scr.packages.${system}.default
       self.packages.${system}.scripts
+      (inputs.nixpkgs-24-05.legacyPackages.${system}.nerdfonts.override {
+        fonts = [ "NerdFontsSymbolsOnly" ];
+      })
       (pkgs.wrapPackages [ pkgs.restic ] {
         environment = {
           RESTIC_PASSWORD_COMMAND = "${pass}/bin/pass show ${self.config.backups.restic.key.sk.pass-path or "dummy"}";

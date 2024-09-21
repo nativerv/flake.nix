@@ -4,6 +4,6 @@
 # FIXME: you should handle the initial no windows case (null shows in eww) here
 # instead of hardcoding it in eww with `?:`.
 
-hyprctl activewindow -j | gojq -r '.title'
-socat -u "UNIX-CONNECT:/tmp/hypr/${HYPRLAND_INSTANCE_SIGNATURE}/.socket2.sock" '-' |
+hyprctl activewindow -j | jq -r '.title'
+socat -u "UNIX-CONNECT:${XDG_RUNTIME_DIR:-"/run/user/$(id -u)"}/hypr/${HYPRLAND_INSTANCE_SIGNATURE}/.socket2.sock" '-' |
   stdbuf -o0 awk -F '>>|,' '/^activewindow>>/{print $3}'

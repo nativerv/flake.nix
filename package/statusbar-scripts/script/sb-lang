@@ -6,7 +6,7 @@ info() {
 
 get_lang_hyprland() {
   hyprctl devices -j |
-    gojq -r '.keyboards[] | .active_keymap' |
+    jq -r '.keyboards[] | .active_keymap' |
     head -n1 |
     cut -c1-2 |
     tr 'a-z' 'A-Z'

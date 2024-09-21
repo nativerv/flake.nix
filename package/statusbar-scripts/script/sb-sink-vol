@@ -1,0 +1,5 @@
+#!/bin/sh
+pactl get-sink-volume '@DEFAULT_SINK@' |
+  head -n 1 |
+  sed -e 's,.* \([0-9][0-9]*\)%.*,\1,' |
+  xargs printf '%+3s'

@@ -82,6 +82,26 @@
         "type": "github"
       }
     },
+    "ev": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1726776416,
+        "narHash": "sha256-31wEI+dtWg4NQ0fS9x42+sO58LZYx64Bq0c0l7gDX7o=",
+        "owner": "nativerv",
+        "repo": "ev",
+        "rev": "21ae331ba37eb47b8a7208781f2bd8928680dc72",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nativerv",
+        "repo": "ev",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -369,6 +389,7 @@
         "deploy-rs": "deploy-rs",
         "disko": "disko",
         "envrund": "envrund",
+        "ev": "ev",
         "hardware": "hardware",
         "home-manager": "home-manager",
         "impermanence": "impermanence",

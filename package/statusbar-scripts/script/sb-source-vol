@@ -1,0 +1,6 @@
+#!/bin/sh
+
+pactl get-source-volume '@DEFAULT_SOURCE@' |
+  head -n 1 |
+  sed -e 's,.* \([0-9][0-9]*\)%.*,\1,' |
+  xargs printf '%+3s'

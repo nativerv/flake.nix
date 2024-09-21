@@ -94,6 +94,11 @@
       # url = "git+file:///home/nrv/pr/scr?ref=HEAD";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+    ev = {
+      url = "github:nativerv/ev";
+      # url = "git+file:///home/nrv/pr/ev?ref=HEAD";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
 
     # This is here only to be pinned in the registry by
     # `nixos/module/archetype/sane.nix`

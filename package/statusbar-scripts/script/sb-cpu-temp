@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# Author: nrv
+# Description: Get max temperature among all cores
+# Finds the sensor from a list of knows ones
+# and caches it if found for future runs.
+# ...or outputs N/A.
+
+set -u
+
+known_sensors="
+coretemp-isa-*
+k10temp-pci-*
+amdgpu-pci-*
+"
+file="${XDG_RUNTIME_DIR:-"/run/user/$(id -u)"}/sb-cpu-temp-sensor"
+
+is_found=true
+if [ ! -f "${file}" ]; then
+  for sensor in ${known_sensors}; do
+    sensors >/dev/null 2>&1 -u "${sensor}" || continue
+    mkdir -p "$(dirname "${file}")"
+    printf '%s' "${sensor}" > "${file}"
+    break
+  done
+  is_found=false
+fi
+
+[ "${is_found}" != true ] && printf 'N/A' && exit
+
+sensors -u "$(cat "${file}")" \
+  | grep -E 'temp[0-9]+_input'  \
+  | cut -d' ' -f4  \
+  | sort -rn  \
+  | head -n1  \
+  | xargs printf '%.0f'

@@ -112,13 +112,13 @@
     :halign "end"
     :space-evenly false
     (box :space-evenly false (label :text "") (raw-label :text "${round(EWW_CPU["avg"], 0)}%"))
-    (box :space-evenly false (label :text "") (raw-label :text "${cpu-temperature}"))
+    (box :space-evenly false (label :text "") (raw-label :text "${cpu-temperature}"))
     (box :space-evenly false (label :text "") (raw-label :text "${memory}"))
-    (box :space-evenly false (label :text "") (raw-label :text "${weather}"))
+    (box :space-evenly false (label :text "") (raw-label :text "${weather}"))
     (box :space-evenly false (label :text "") (raw-label :text "${network-rx}"))
     (box :space-evenly false (label :text "") (raw-label :text "${network-tx}"))
-    (box :space-evenly false (label :text "") (raw-label :text "${updates}"))
-    (box :space-evenly false (label :text "") (raw-label :text "${date}"))
+    (box :space-evenly false (label :text "󰏔") (raw-label :text "${updates}"))
+    (box :space-evenly false (label :text "󱑂") (raw-label :text "${date}"))
     (box :space-evenly false (label :text "") (raw-label :text "${language}"))
     (box :space-evenly false (label :text "") (raw-label :text "${source}"))
     (box :space-evenly false (label :text "") (raw-label :text "${sink}"))

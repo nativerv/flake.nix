@@ -11,7 +11,7 @@ set -u
 known_sensors="
 coretemp-isa-*
 k10temp-pci-*
-amdgpu-pci-*
+zenpower-pci-*
 "
 file="${XDG_RUNTIME_DIR:-"/run/user/$(id -u)"}/sb-cpu-temp-sensor"
 
@@ -28,9 +28,9 @@ fi
 
 [ "${is_found}" != true ] && printf 'N/A' && exit
 
-sensors -u "$(cat "${file}")" \
-  | grep -E 'temp[0-9]+_input'  \
-  | cut -d' ' -f4  \
-  | sort -rn  \
-  | head -n1  \
-  | xargs printf '%.0f'
+sensors -u "$(cat "${file}")" |
+  grep -E 'temp[0-9]+_input' |
+  cut -d' ' -f4 |
+  sort -rn |
+  head -n1 |
+  xargs printf '%.0f'

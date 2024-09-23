@@ -239,7 +239,6 @@ in {
         # command! -range HyprDefault :call <range>HyprDefault()
 
         general = {
-          "sensitivity" = "1.0"; # [float] [1.0] mouse sensitivity (legacy, may cause bugs if not 1, prefer input:sensitivity)
           "border_size" = "1"; # [int] [1] size of the border around windows
           "no_border_on_floating" = "false"; # [bool] [false] disable borders for floating windows
           "gaps_in" = "5"; # [int] [5] gaps between windows, also supports css style gaps (top, right, bottom, left -> 5,10,15,20)
@@ -251,7 +250,6 @@ in {
           "col.nogroup_border_active" = "0xffff00ff"; # [gradient] [0xffff00ff] active border color for window that cannot be added to a group
           "layout" = "$myLayout"; # [str] [dwindle] which layout to use. [dwindle/master]
           "no_focus_fallback" = "false"; # [bool] [false] if true, will not fall back to the next available window when moving focus in a direction where no window was found
-          "apply_sens_to_raw" = "false"; # [bool] [false] if on, will also apply the sensitivity to raw mouse output (e.g. sensitivity in games) NOTICE: really not recommended.
           "resize_on_border" = "false"; # [bool] [false] enables resizing windows by clicking and dragging on borders and gaps
           "extend_border_grab_area" = "15"; # [int] [15] extends the area around the border where you can click and drag on, only used when general:resize_on_border is on.
           "hover_icon_on_border" = "true"; # [bool] [true] show a cursor icon when hovering over borders, only used when general:resize_on_border is on.

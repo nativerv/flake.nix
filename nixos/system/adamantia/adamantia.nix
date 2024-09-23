@@ -49,6 +49,8 @@
     self.nixosModules."home-manager.standalone"
   ];
 
+  nix.package = pkgs.nixVersions.latest;
+
   home-manager.standalone.users.nrv = {
     enable = true;
     defaultConfiguration = self.homeConfigurations.nrv.activationPackage;

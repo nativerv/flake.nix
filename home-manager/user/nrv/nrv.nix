@@ -130,7 +130,7 @@ in {
 
   # Setup declarative user channels / access to <nixpkgs> in
   # legacy nix commands
-  nix.package = pkgs.nixVersions.nix_2_23;
+  nix.package = pkgs.nixVersions.latest;
   #nix.settings = (pkgs.callPackage (import "${flake}/nixos/module/archetype/sane.nix" { inherit self flake inputs; }) {}).nix.settings;
   nix.settings = {
     use-xdg-base-directories = true;

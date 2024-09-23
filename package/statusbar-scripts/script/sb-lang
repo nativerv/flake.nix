@@ -1,10 +1,12 @@
 #!/bin/sh
 
+set -u
+
 info() {
-  printf >&2 'switch-lang: %s\n' "${1}"
+  printf >&2 'sb-lang: %s\n' "${1}"
 }
 
-get_lang_hyprland() {
+lang_hyprland() {
   hyprctl devices -j |
     jq -r '.keyboards[] | .active_keymap' |
     head -n1 |
@@ -12,19 +14,28 @@ get_lang_hyprland() {
     tr 'a-z' 'A-Z'
 }
 
-case "${XDG_SESSION_TYPE}" in
-  wayland)
-    case "${XDG_CURRENT_DESKTOP}" in
-      *Hyprland* | *hyprland*) get_lang_hyprland ;;
-      *) info "'${XDG_CURRENT_DESKTOP}': not implemented" ;;
-    esac
-    ;;
-  X11)
-    xkblayout-state print '%n' | cut -c 1-2 | tr a-z A-Z
-    ;;
-  *)
-		info 'sb-lang: your display server does not support getting input language programmatically or XDG_SESSION_TYPE is unset'
-    exit 1
-    ;;
-esac
+lang_x11() {
+  xkblayout-state print '%n' | cut -c 1-2 | tr a-z A-Z
+}
 
+# Match for Hyprland
+[ -z "${listen-}" ] &&
+  [ "${XDG_SESSION_TYPE-}" = 'wayland' ] &&
+  printf '%s' "${XDG_CURRENT_DESKTOP-}" | grep -qi 'hyprland' &&
+  lang='lang_hyprland'
+
+# Match for X11
+[ -z "${listen-}" ] &&
+  printf '%s' "${XDG_SESSION_TYPE-}" | grep -qi 'x11' &&
+  listen='lang_x11'
+
+# Fallback
+if [ -z "${lang-}" ]; then
+  info 'getting input language for your display server is not supported or XDG_SESSION_TYPE is unset'
+  info "display server is: '${XDG_CURRENT_DESKTOP-}' on '${XDG_SESSION_TYPE:-"tty"}'"
+  printf '??\n'
+  exit 1
+fi
+
+# Actual thing
+"${lang}"

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -u
+
 info() {
   printf >&2 'switch-lang: %s\n' "${1}"
 }
@@ -15,22 +17,29 @@ switch_hyprland() {
     )"
 }
 
-switch_lang() {
-  case "${XDG_SESSION_TYPE}" in
-    X11)
-      xkblayout-state set +1
-      ;;
-    wayland)
-      case "${XDG_CURRENT_DESKTOP}" in
-        *Hyprland* | *hyprland*) switch_hyprland ;;
-        *) info "'${XDG_CURRENT_DESKTOP}': not implemented" ;;
-      esac
-      ;;
-    *)
-      info 'your display server does not support switching languages programmatically or XDG_SESSION_TYPE is unset' && return 1
-      exit 1
-      ;;
-  esac
+switch_x11() {
+  xkblayout-state set +1
+  command 2>/dev/null -v ev &&
+    ev emit 'switch-lang' 'lang' 'change'
 }
 
-switch_lang && ev emit lang_change lang_change
+# Match for Hyprland
+[ -z "${switch-}" ] &&
+  [ "${XDG_SESSION_TYPE-}" = 'wayland' ] &&
+  printf '%s' "${XDG_CURRENT_DESKTOP-}" | grep -qi 'hyprland' &&
+  switch='switch_hyprland'
+
+# Match for X11
+[ -z "${switch-}" ] &&
+  printf '%s' "${XDG_SESSION_TYPE-}" | grep -qi 'x11' &&
+  switch='switch_x11'
+
+# Fallback
+if [ -z "${switch-}" ]; then
+  info 'setting input language for your display server is not supported or XDG_SESSION_TYPE is unset'
+  info "display server is: '${XDG_CURRENT_DESKTOP-}' on '${XDG_SESSION_TYPE:-"tty"}'"
+  exit 1
+fi
+
+# Actual thing
+"${switch}"

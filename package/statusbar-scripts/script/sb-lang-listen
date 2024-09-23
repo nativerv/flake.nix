@@ -1,6 +1,47 @@
 #!/bin/sh
 
+set -u
+
+: ${XDG_RUNTIME_DIR:="/run/user/$(id -u)"}
+HYPR_RUNTIME_DIR="${XDG_RUNTIME_DIR}/hypr/${HYPRLAND_INSTANCE_SIGNATURE}";
+
+info() {
+  printf >&2 'sb-lang-listen: %s\n' "${1}"
+}
+
+# listen_generic() {
+#   ev listen | grep --line-buffered 'switch-lang' 
+# }
+
+listen_hyprland() {
+  socat -u "UNIX-CONNECT:${HYPR_RUNTIME_DIR}/.socket2.sock" '-' |
+    stdbuf -o0 awk -F '>>|,' '/^activelayout/ { print $3 }' |
+    stdbuf -oL uniq
+}
+
+# Match for Hyprland
+[ -z "${listen-}" ] &&
+  [ "${XDG_SESSION_TYPE-}" = 'wayland' ] &&
+  printf '%s' "${XDG_CURRENT_DESKTOP-}" | grep -qi 'hyprland' &&
+  listen='listen_hyprland'
+
+# Match for generic (using `ev`)
+# [ -z "${listen-}" ] &&
+#   printf '%s' "${XDG_SESSION_TYPE-}" | grep -Eqi '(wayland|x11)' &&
+#   { pgrep -x '.ev-wrapped' || pgrep -x 'ev'; } >/dev/null &&
+#   command >/dev/null -v ev &&
+#   listen="listen_generic"
+
+# Fallback
+if [ -z "${listen-}" ]; then
+  info 'getting input language for your display server is not supported or XDG_SESSION_TYPE is unset'
+  info "display server is: '${XDG_CURRENT_DESKTOP-}' on '${XDG_SESSION_TYPE:-"tty"}'"
+  printf '??\n'
+  exit 1
+fi
+
+# Actual thing
 sb-lang
-ev listen | grep --line-buffered 'lang_change' | while read -r _; do
+"${listen}" | while read -r _; do
   sb-lang
 done

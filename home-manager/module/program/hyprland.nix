@@ -201,7 +201,7 @@ in {
           "$myMod SHIFT, o, changegroupactive, f"
 
           # Rotate split 90°
-          "$myMod, BRACKETLEFT, togglesplit,"
+          "$myMod, BRACKETLEFT, togglesplit"
           "$myMod, APOSTROPHE, pin"
 
           "SUPER, mouse_up, exec, zoom out"
@@ -255,6 +255,10 @@ in {
           "hover_icon_on_border" = "true"; # [bool] [true] show a cursor icon when hovering over borders, only used when general:resize_on_border is on.
           "allow_tearing" = "false"; # [bool] [false] master switch for allowing tearing to occur. See the Tearing page.
           "resize_corner" = "0"; # [int] [0] force floating windows to use a specific corner when being resized (1-4 going clockwise from top left, 0 to disable)
+        };
+
+        dwindle = {
+          preserve_split = true;
         };
 
         decoration = {

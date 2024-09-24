@@ -111,8 +111,10 @@ in mkMerge [
   {
     xdg.dataFile."nvim/lazy".source =
       "${pkgs.vimUtils.packDir config.programs.neovim.finalPackage.passthru.packpathDirs}/pack/myNeovimPackages/start";
-    xdg.dataFile."tree-sitter".source =
-      "${head pkgs.vimPlugins.nvim-treesitter.withAllGrammars.passthru.dependencies}";
+    xdg.dataFile."tree-sitter".source = pkgs.symlinkJoin {
+      name = "treesitter-all-parsers";
+      paths = pkgs.vimPlugins.nvim-treesitter.withAllGrammars.passthru.dependencies;
+    };
   }
 
   # Draft

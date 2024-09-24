@@ -159,7 +159,7 @@
         inherit (nixpkgs-unstable) lib;
         inherit flake self inputs;
       };
-      # This is a custom attribute where i store common configurations specific
+      # A custom output where i store common configurations specific
       # to this flake and stuff defined in it which don't fit into `lib`
       config = import ./config {
         inherit (nixpkgs-unstable) lib;
@@ -173,6 +173,15 @@
         self.legacyPackages.${system}.callPackage
         ./package
         { inherit flake self inputs; }
+      );
+      # A custom output containing package groups instead of individual
+      # packages
+      # Declared in ./package/NAME
+      # Available through `nix run .#packageGroups.SYSTEM.NAME.PACKAGE`
+      packageGroups = forAllSystems (system: self.lib.readPackages
+        (import)
+        ./package-group
+        ({ inherit flake self inputs; } // self.legacyPackages.${system})
       );
       apps = forAllSystems (system: {
         disko-adamantia-image.type = "app";

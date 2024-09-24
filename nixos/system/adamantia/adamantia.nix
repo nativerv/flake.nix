@@ -224,7 +224,7 @@
       "8425e349")
     "${flake}/sus/${config.system.name}/eval/hostid.json"; 
   # FIXME: other kernel packages, also verify latest ZFS version
-  boot.kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
+  boot.kernelPackages = self.packageGroups.${pkgs.system}.zfs-compatible-linux-kernels.latest;
   boot.zfs.forceImportRoot = false;
 
   # Impermanence

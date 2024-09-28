@@ -2,6 +2,23 @@
 
 set -u
 
+info() {
+  printf 'xdg-doc-allow: %s\n' "${1}"
+}
+
+usage() {
+  info "usage: xdg-doc-allow [-rw] APP FILE"
+  info "  adds FILE to the document portal and grants"
+  info "  permissions to APP"
+  info "  default permissions is read and write unless -r or -w is givven"
+  info "  -r or -w is given"
+  info "flags:"
+  info "  -v  be verbose"
+  info "  -h  print this & exit"
+  info "  -r  grant read permission"
+  info "  -w  grant write permission"
+}
+
 call() {
   gdbus call \
     --session \
@@ -12,11 +29,39 @@ call() {
     grep -v "^$" # skip empty returns
 }
 
+while getopts rwvh opts
+do
+    case $opts in
+    r)    read=true ;;
+    w)    write=true ;;
+    v)    set -x ;;
+    h)    usage && exit ;;
+    ?)    usage
+          exit 2;;
+    esac
+done
+shift $(($OPTIND - 1))
+
+permissions='read
+write'
+
+if [ -n "${read-}" ] || [ -n "${write-}" ]; then
+  [ -z "${read-}" ] && permissions="$(printf '%s' "${permissions}" | grep -v 'read')"
+  [ -z "${write-}" ] && permissions="$(printf '%s' "${permissions}" | grep -v 'write')"
+fi
+
 app_id="$1"
 file="$2"
 
 mountpoint="$(call 'org.freedesktop.portal.Documents.GetMountPoint')"
+permissions="$(
+  printf '[%s]' "$(
+    printf '%s' "${permissions}" |
+      sed -E "s/(^|$)/'/g" |
+      paste -sd','
+  )"
+)"
 id="$(call 'org.freedesktop.portal.Documents.Add' 0 true false < "$file")"
-call 2>/dev/null 'org.freedesktop.portal.Documents.GrantPermissions' "$id" "$app_id" "['read', 'write']" 
+call 2>/dev/null 'org.freedesktop.portal.Documents.GrantPermissions' "$id" "$app_id" "${permissions}"
 
 printf '%s' "$mountpoint/$id/${file##*/}"

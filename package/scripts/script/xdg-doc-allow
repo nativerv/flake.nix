@@ -19,4 +19,4 @@ mountpoint="$(call 'org.freedesktop.portal.Documents.GetMountPoint')"
 id="$(call 'org.freedesktop.portal.Documents.Add' 0 true false < "$file")"
 call 2>/dev/null 'org.freedesktop.portal.Documents.GrantPermissions' "$id" "$app_id" "['read', 'write']" 
 
-printf '%s' "$mountpoint/$id/''${file##*/}"
+printf '%s' "$mountpoint/$id/${file##*/}"

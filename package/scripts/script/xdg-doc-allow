@@ -1,0 +1,22 @@
+#!/bin/sh
+
+set -u
+
+call() {
+  gdbus call \
+    --session \
+    --dest org.freedesktop.portal.Documents \
+    --object-path /org/freedesktop/portal/documents \
+    --method "$@" |
+    sed "s/^(b\?'\?//;s/'\?,\?)$//" | # remove brackets from the return
+    grep -v "^$" # skip empty returns
+}
+
+app_id="$1"
+file="$2"
+
+mountpoint="$(call 'org.freedesktop.portal.Documents.GetMountPoint')"
+id="$(call 'org.freedesktop.portal.Documents.Add' 0 true false < "$file")"
+call 2>/dev/null 'org.freedesktop.portal.Documents.GrantPermissions' "$id" "$app_id" "['read', 'write']" 
+
+printf '%s' "$mountpoint/$id/''${file##*/}"

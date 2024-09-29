@@ -17,43 +17,57 @@ usage() {
   info "  -h  print this & exit"
   info "  -r  grant read permission"
   info "  -w  grant write permission"
+  info "  -d  deny (revoke) instead of allow, requires at least one of -r, -w"
 }
 
 call() {
   gdbus call \
     --session \
-    --dest org.freedesktop.portal.Documents \
-    --object-path /org/freedesktop/portal/documents \
+    --dest 'org.freedesktop.portal.Documents' \
+    --object-path '/org/freedesktop/portal/documents' \
     --method "$@" |
     sed "s/^(b\?'\?//;s/'\?,\?)$//" | # remove brackets from the return
     grep -v "^$" # skip empty returns
 }
 
-while getopts rwvh opts
+grant() {
+  mountpoint="$(call 'org.freedesktop.portal.Documents.GetMountPoint')"
+  id="$(call 'org.freedesktop.portal.Documents.Add' 0 true false < "$file")"
+  call 2>/dev/null 'org.freedesktop.portal.Documents.GrantPermissions' "$id" "$app_id" "${permissions}"
+
+  printf '%s' "$mountpoint/$id/${file##*/}"
+}
+
+revoke() {
+  id="$(call 'org.freedesktop.portal.Documents.Lookup' "b'${file}'")"
+  [ -z "${id}" ] && info "file not shared: '${file}'" && exit 1
+  call 'org.freedesktop.portal.Documents.RevokePermissions' "${id}" "${app_id}" "${permissions}"
+}
+
+# Parse args
+while getopts rwvhd opts
 do
     case $opts in
-    r)    read=true ;;
-    w)    write=true ;;
-    v)    set -x ;;
-    h)    usage && exit ;;
-    ?)    usage
-          exit 2;;
+    r) read=true ;;
+    w) write=true ;;
+    d) revoke=true ;;
+    v) set -x ;;
+    h) usage && exit ;;
+    ?) usage && exit 2 ;;
     esac
 done
 shift $(($OPTIND - 1))
 
+app_id="$1"
+file="$2"
+
+# Handle permission flags
 permissions='read
 write'
-
 if [ -n "${read-}" ] || [ -n "${write-}" ]; then
   [ -z "${read-}" ] && permissions="$(printf '%s' "${permissions}" | grep -v 'read')"
   [ -z "${write-}" ] && permissions="$(printf '%s' "${permissions}" | grep -v 'write')"
 fi
-
-app_id="$1"
-file="$2"
-
-mountpoint="$(call 'org.freedesktop.portal.Documents.GetMountPoint')"
 permissions="$(
   printf '[%s]' "$(
     printf '%s' "${permissions}" |
@@ -61,7 +75,7 @@ permissions="$(
       paste -sd','
   )"
 )"
-id="$(call 'org.freedesktop.portal.Documents.Add' 0 true false < "$file")"
-call 2>/dev/null 'org.freedesktop.portal.Documents.GrantPermissions' "$id" "$app_id" "${permissions}"
 
-printf '%s' "$mountpoint/$id/${file##*/}"
+# Main
+[ "${revoke-}" = true ] && { revoke; exit; }
+grant

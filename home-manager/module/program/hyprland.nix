@@ -15,7 +15,7 @@ with lib;
 let
 in {
   xdg.portal = {
-    enable = false;
+    enable = true;
 
     # For NixOS FHS envs (and maybe will work for my sandboxes too? dunno, they
     # are 'flatpaks' anyway)
@@ -34,7 +34,7 @@ in {
     config.common.default = "*";
     # You must include a portal impl here. Can't have multiple it seems...
     extraPortals = with pkgs; [
-      xdg-desktop-portal-hyprland
+      xdg-desktop-portal-gtk
     ];
   };
 
@@ -73,7 +73,7 @@ in {
         env = [
           "QT_QPA_PLATFORM,wayland"
           "MOZ_ENABLE_WAYLAND,1"
-          #"XDG_CURRENT_DESKTOP,Hyprland:wlroots:gnome"
+          "XDG_CURRENT_DESKTOP,Hyprland"
           "XDG_SESSION_TYPE,wayland"
           "TERMCMD,$myTerminal"
           "TERMINAL,$myTerminal"

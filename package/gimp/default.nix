@@ -1,6 +1,7 @@
-{ pkgs, lib, mkNixPak, ... }:
+# FIXME(hardcoded): self/dependency injection
+{ pkgs, package ? pkgs.gimp, lib, mkNixPak, self, ... }:
 
-# FIXME: Nixpak'ed GTK2 (or X11?) apps (GIMP 2.x).
+# FIXME: Nixpak'ed GTK2 (or X11?) apps (GIMP 2.x): gui scaling or something
 
 # Assert that we're on GIMP 2, as this profile is hardcoded for GIMP 2/GTK2 only.
 assert !lib.versionAtLeast pkgs.gimp.version "2.11";
@@ -13,11 +14,7 @@ let
     config = { sloth, ... }: {
 
       # the application to isolate
-      app.package = pkgs.gimp-with-plugins.override {
-        plugins = [
-          #pkgs.gimpPlugins.resynthesizer
-        ];
-      };
+      app.package = package;
 
       # path to the executable to be wrapped
       # this is usually autodetected but

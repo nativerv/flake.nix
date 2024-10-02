@@ -69,6 +69,13 @@ in {
       nix-search-cli
       inputs.scr.packages.${system}.default
       self.packages.${system}.scripts
+      (self.packages.${system}.gimp.override {
+        package = pkgs.wrapPackages [ (pkgs.gimp-with-plugins.override {
+          plugins = [ ];
+        }) ] {
+          flags = [ "--no-splash" ];
+        };
+      })
       (inputs.nixpkgs-24-05.legacyPackages.${system}.nerdfonts.override {
         fonts = [ "NerdFontsSymbolsOnly" ];
       })

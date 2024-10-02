@@ -28,6 +28,7 @@ in {
         "media"
         "vg"
         "steam"
+        "vm"
       ];
 
       shell = pkgs.zsh;

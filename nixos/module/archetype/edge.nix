@@ -5,6 +5,17 @@
   pkgs ? null,
   ...
 }:
+with builtins;
+with lib;
+with self.lib;
+let
+  cfg = config.dream.archetype.edge;
+in
 {
-  nix.package = pkgs.nixVersions.git;
+  options.dream.archetype.edge = {
+    enable = mkEnableOption "Enable archetype.edge";
+  };
+  config = mkIf cfg.enable {
+    nix.package = pkgs.nixVersions.git;
+  };
 }

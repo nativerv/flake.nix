@@ -49,6 +49,11 @@
     self.nixosModules."home-manager.standalone"
   ];
 
+  dream.archetype = {
+    minimal.enable = true;
+    default.enable = true;
+  };
+
   nix.package = pkgs.nixVersions.latest;
 
   home-manager.standalone.users.nrv = {

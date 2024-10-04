@@ -1,53 +1,68 @@
-{ ... }:
 {
+  self ? null,
+  ...
+}:
+{
+  config ? null,
   lib ? null,
   pkgs ? null,
   ...
 }:
+with builtins;
+with lib;
+with self.lib;
+let
+  cfg = config.dream.archetype.minimal;
+in
 {
-  # oom daemon - out of memory process killer
-  systemd.oomd.enable = false;
-
-  environment.shellAliases = {
-    ls = null;
-    ll = null;
-    l = null;
+  options.dream.archetype.minimal = {
+    enable = mkEnableOption "Enable archetype.minimal";
   };
+  config = mkIf cfg.enable {
+    # oom daemon - out of memory process killer
+    systemd.oomd.enable = false;
 
-  # environment.systemPackages = lib.mkForce (with pkgs; [
-  #   # acl
-  #   # attr
-  #   bashInteractive # bash with ncurses support
-  #   # bzip2
-  #   coreutils-full
-  #   # cpio
-  #   # curl
-  #   # diffutils
-  #   # findutils
-  #   # gawk
-  #   # stdenv.cc.libc
-  #   # getent
-  #   # getconf
-  #   # gnugrep
-  #   # gnupatch
-  #   # gnused
-  #   # gnutar
-  #   # gzip
-  #   # xz
-  #   # less
-  #   # libcap
-  #   # ncurses
-  #   # netcat
-  #   # config.programs.ssh.package
-  #   # mkpasswd
-  #   # procps
-  #   # su
-  #   # time
-  #   # util-linux
-  #   # which
-  #   # zstd
-  # ]);
+    environment.shellAliases = {
+      ls = null;
+      ll = null;
+      l = null;
+    };
 
-  # disable default not strictly necessary packages - nano, perl, etc
-  environment.defaultPackages = [];
+    # environment.systemPackages = lib.mkForce (with pkgs; [
+    #   # acl
+    #   # attr
+    #   bashInteractive # bash with ncurses support
+    #   # bzip2
+    #   coreutils-full
+    #   # cpio
+    #   # curl
+    #   # diffutils
+    #   # findutils
+    #   # gawk
+    #   # stdenv.cc.libc
+    #   # getent
+    #   # getconf
+    #   # gnugrep
+    #   # gnupatch
+    #   # gnused
+    #   # gnutar
+    #   # gzip
+    #   # xz
+    #   # less
+    #   # libcap
+    #   # ncurses
+    #   # netcat
+    #   # config.programs.ssh.package
+    #   # mkpasswd
+    #   # procps
+    #   # su
+    #   # time
+    #   # util-linux
+    #   # which
+    #   # zstd
+    # ]);
+
+    # disable default not strictly necessary packages - nano, perl, etc
+    environment.defaultPackages = [];
+  };
 }

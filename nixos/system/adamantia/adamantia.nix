@@ -49,6 +49,13 @@
     self.nixosModules."home-manager.standalone"
   ];
 
+  dream.program.neovim.enable = true;
+  dream.program.htop.enable = true;
+  dream.program.bash.enable = true;
+  dream.program.sudo.enable = true;
+  dream.program.nix-index.enable = true;
+  dream.program.keyd.enable = true;
+
   dream.server.sshd.enable = true;
     
   dream.subsystem = {

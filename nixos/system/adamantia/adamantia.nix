@@ -49,6 +49,8 @@
     self.nixosModules."home-manager.standalone"
   ];
 
+  dream.server.sshd.enable = true;
+    
   dream.subsystem = {
     zram.enable = true;
   };

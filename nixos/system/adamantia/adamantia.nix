@@ -464,11 +464,8 @@
       flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
     '';
   };
-  xdg.portal.enable = true;
-  xdg.portal.extraPortals = [
-    # FIXME: this should be in user's config (home-manager)
-    pkgs.xdg-desktop-portal-gtk
-  ];
+  # xdg.portal.enable = true;
+  # xdg.portal.extraPortals = [ ];
   security.rtkit.enable = true;
 
   # GTK apps outside GNOME - cursor, theming & window decorations. 

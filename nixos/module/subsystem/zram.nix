@@ -1,6 +1,10 @@
-{ ... }:
 {
-  lib,
+  self ? null,
+  ...
+}:
+{
+  config ? null,
+  lib ? null,
   ...
 }:
 
@@ -18,12 +22,24 @@
 # Summary: lzo-rle --- best for speed
 #          zstd    --- best for size
 
+with builtins;
+with lib;
+with self.lib;
+let
+  cfg = config.dream.subsystem.zram;
+in
 {
-  zramSwap.enable = true;
-  zramSwap.priority  = 100;
-  zramSwap.memoryMax = null;
-  zramSwap.algorithm = lib.mkDefault "lz4"; # lzo
-  #zramSwap.numDevices = 1; # no longer supported
-  zramSwap.swapDevices = 1;
-  zramSwap.memoryPercent = 100;
+  options.dream.subsystem.zram = {
+    enable = mkEnableOption "Enable subsystem.zram";
+  };
+  # TODO(dream: options): zram
+  config = mkIf cfg.enable {
+    zramSwap.enable = true;
+    zramSwap.priority  = 100;
+    zramSwap.memoryMax = null;
+    zramSwap.algorithm = lib.mkDefault "lz4"; # lzo
+    #zramSwap.numDevices = 1; # no longer supported
+    zramSwap.swapDevices = 1;
+    zramSwap.memoryPercent = 100;
+  };
 }

@@ -49,6 +49,10 @@
     self.nixosModules."home-manager.standalone"
   ];
 
+  dream.subsystem = {
+    zram.enable = true;
+  };
+
   dream.archetype = {
     minimal.enable = true;
     default.enable = true;

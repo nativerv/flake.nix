@@ -194,3 +194,7 @@ vim.keymap.set('n', 'K', 'kJ', { desc = 'Join lines upwards' })
 -- Put the current time
 vim.keymap.set('n', '<leader><leader>ut', require'user.lib.put'.time('%c'), { desc = 'Put the current time (system locale)' })
 vim.keymap.set('n', '<leader><leader>uT', require'user.lib.put'.time('%Y%m%d%H%M%S'), { desc = 'Put the current time (zettelkasten)' })
+
+-- Select last pasted text
+vim.keymap.set('n', 'gp', '`[v`]', { desc = 'Visual on last pasted text' })
+vim.keymap.set('n', 'gP', '`[V`]', { desc = 'Visual line on last pasted text' })

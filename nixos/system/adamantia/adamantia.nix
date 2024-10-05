@@ -46,6 +46,7 @@
 
     self.nixosModules."user.nrv"
     self.nixosModules."user.gamer"
+
     self.nixosModules."home-manager.standalone"
   ];
 
@@ -65,6 +66,11 @@
   dream.archetype = {
     minimal.enable = true;
     default.enable = true;
+  };
+
+  dream.user = {
+    nrv.enable = true;
+    gamer.enable = true;
   };
 
   nix.package = pkgs.nixVersions.latest;

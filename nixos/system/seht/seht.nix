@@ -41,6 +41,9 @@
     self.nixosModules."user.nrv"
   ];
 
+  dream.platform.qemu.enable = true;
+  dream.platform.nixos-shell.enable = true;
+
   virtualisation = {
     forwardPorts = [
       { from = "host"; host.port = 2223; guest.port = 22; }

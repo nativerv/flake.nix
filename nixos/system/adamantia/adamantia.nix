@@ -113,6 +113,7 @@
       imports = [
         self.nixosModules."platform.qemu"
       ];
+      dream.platform.qemu.enable = true;
 
       # FIXME: impermanence breaks VMs (stage-1 waiting for device /mnt-root/...
       #        something)

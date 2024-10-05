@@ -13,9 +13,14 @@
 with self.lib;
 with lib;
 let
+  cfg = config.dream.program.${name};
   name = "zathura";
-in mkMerge [
-  {
+in
+{
+  options.dream.program.${name} = {
+    enable = mkEnableOption "Enable program.${name}";
+  };
+  config = mkIf cfg.enable {
     programs.${name} = {
       enable = true;
       package = self.packages.${pkgs.system}.${name};
@@ -34,5 +39,5 @@ in mkMerge [
         mv "$file" "$file.$(date +%s).bak"
       run cp --no-clobber --verbose "${storeFile}" "$file"
     '';
-  }
-]
+  };
+}

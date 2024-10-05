@@ -36,8 +36,21 @@ in {
   services.ev.enable = true;
 
   dream.archetype.sane.enable = true;
-  dream.program.ranger.enable = true;
-  dream.program.eww.enable = true;
+
+  dream.program = {
+    ranger.enable = true;
+    eww.enable = true;
+    zsh.enable = true;
+    tmux.enable = true;
+    git.enable = true;
+    plasma.enable = true;
+    hyprland.enable = true;
+    kitty.enable = true;
+    neovim.enable = true;
+    zathura.enable = true;
+    firefox.enable = true;
+    readline.enable = true;
+  };
 
   # For some reason they separate some stuff under `home.*`
   home = {

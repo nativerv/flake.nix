@@ -10,11 +10,13 @@
   config,
   ...
 }:
-with self.lib;
+with builtins;
 with lib;
+with self.lib;
 let
   cfg = config.dream.program.ranger;
-in {
+in
+{
   options.dream.program.ranger = {
     enable = mkEnableOption "Enable ranger file manager & config";
   };

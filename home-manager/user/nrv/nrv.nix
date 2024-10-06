@@ -15,20 +15,8 @@
   name = builtins.baseNameOf ./.;
 in {
   imports = [
-    self.homeManagerModules."program.zsh"
-    self.homeManagerModules."program.tmux"
-    self.homeManagerModules."program.git"
-    self.homeManagerModules."program.plasma"
-    self.homeManagerModules."program.hyprland"
-    self.homeManagerModules."program.kitty"
-    self.homeManagerModules."program.neovim"
-    self.homeManagerModules."program.zathura"
-    self.homeManagerModules."program.firefox"
-    self.homeManagerModules."program.readline"
+    self.homeManagerModules.dream
     inputs.envrund.homeManagerModules.default
-    self.homeManagerModules."archetype.sane"
-    self.homeManagerModules."program.ranger"
-    self.homeManagerModules."program.eww"
     inputs.ev.homeManagerModules.default
   ];
 

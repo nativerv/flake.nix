@@ -38,7 +38,7 @@ in
       ];
 
       # Import my old config for now - seems to work fine apart from plugins
-      extraConfig = builtins.readFile "${flake}/home-manager/module/program/tmux/tmux.conf";
+      extraConfig = builtins.readFile ./tmux/tmux.conf;
     };
   };
 }

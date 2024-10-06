@@ -1,7 +1,10 @@
 {
+  self ? null,
   ...
 }:
 {
+  config ? null,
+  lib ? null,
   pkgs ? null,
   ...
 }:

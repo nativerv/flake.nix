@@ -15,15 +15,15 @@ let
   cfg = config.dream.platform.nixos-shell;
 in
 {
-  imports = optional cfg.enable inputs.nixos-shell.nixosModules.nixos-shell;
+  # imports = [ inputs.nixos-shell.nixosModules.nixos-shell ];
   options.dream.platform.nixos-shell = {
     enable = mkEnableOption "Enable platform.nixos-shell";
   };
   config = mkIf cfg.enable {
-    nixos-shell.mounts = {
-      mountHome = false;
-      mountNixProfile = false;
-      cache = "none"; # default is "loose"
-    };
+    # nixos-shell.mounts = {
+    #   mountHome = false;
+    #   mountNixProfile = false;
+    #   cache = "none"; # default is "loose"
+    # };
   };
 }

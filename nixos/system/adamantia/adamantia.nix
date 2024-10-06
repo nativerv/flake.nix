@@ -24,41 +24,23 @@
     (import ./disko.nix { inherit self flake inputs; })
 
     inputs.impermanence.nixosModules.impermanence
-
     inputs.sops-nix.nixosModules.sops
 
-    self.nixosModules."archetype.minimal"
-    self.nixosModules."archetype.default"
-    # self.nixosModules."archetype.edge"
-
-    #self.nixosModules."bootloader.grub"
-
-    self.nixosModules."subsystem.zram"
-
-    self.nixosModules."server.sshd"
-
-    self.nixosModules."program.neovim"
-    self.nixosModules."program.htop"
-    self.nixosModules."program.bash"
-    self.nixosModules."program.sudo"
-    self.nixosModules."program.nix-index"
-    self.nixosModules."program.keyd"
-
-    self.nixosModules."user.nrv"
-    self.nixosModules."user.gamer"
-
     self.nixosModules."home-manager.standalone"
+    self.nixosModules.dream
   ];
 
-  dream.program.neovim.enable = true;
-  dream.program.htop.enable = true;
-  dream.program.bash.enable = true;
-  dream.program.sudo.enable = true;
-  dream.program.nix-index.enable = true;
-  dream.program.keyd.enable = true;
+  dream.program = {
+    neovim.enable = true;
+    htop.enable = true;
+    bash.enable = true;
+    sudo.enable = true;
+    nix-index.enable = true;
+    keyd.enable = true;
+  };
 
   dream.server.sshd.enable = true;
-    
+
   dream.subsystem = {
     zram.enable = true;
   };

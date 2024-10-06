@@ -16,11 +16,11 @@ let
   cfg = config.dream.platform.qemu;
 in
 {
-  imports = optional cfg.enable (modulesPath + "/profiles/qemu-guest.nix");
   options.dream.platform.qemu = {
     enable = mkEnableOption "Enable platform.qemu";
   };
   config = mkIf cfg.enable {
+    # _module.args.imports = optional cfg.enable (modulesPath + "/profiles/qemu-guest.nix");
     boot.initrd.availableKernelModules = [
       "ata_piix"
       "uhci_hcd"

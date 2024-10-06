@@ -191,11 +191,11 @@
       });
       
       # Configuration modules for NixOS systems
-      # Declared in ./nixos/module/TYPE/NAME
-      # Available through `self.nixosModules."module-type.module-name"`
-      nixosModules = self.lib.readModulesRecursive'
-        ./nixos/module
-        { inherit flake self inputs; };
+      # Primary is `dream`, it's declared in ./nixos/module/dream,
+      # available as `self.nixosModules.dream` or `self.nixosModules.default`
+      # Other modules if any declared in ./nixos/module/generic, 
+      # available through `self.nixosModules."module-type.module-name"`
+      nixosModules = import ./nixos/module { inherit flake self inputs; };
 
       # Configuration modules for Home Manager
       # Declared in ./home-manager/module/TYPE/NAME

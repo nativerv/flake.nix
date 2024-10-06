@@ -17,14 +17,12 @@ let
   cfg = config.dream.archetype.default;
 in
 {
-  imports = [
-    self.nixosModules."archetype.sane"
-  ];
   options.dream.archetype.default = {
     enable = mkEnableOption "Enable archetype.default";
   };
   config = mkIf cfg.enable {
     dream.archetype.sane.enable = true;
+
     # My custom groups under my own gid range. Defined in a common config file.
     # NOTE: NixOS does not permit specifying extra groups as gids.
     #       All of the places referencing my custom groups would refer to the

@@ -417,7 +417,6 @@ in
             "background_color" = "0x111111"; # [color] [0x111111] change the background color. (requires enabled disable_hyprland_logo)
             "close_special_on_empty" = "true"; # [bool] [true] close the special workspace if the last window is removed
             "new_window_takes_over_fullscreen" = "1"; # [int] [0] if there is a fullscreen or maximized window, decide whether a new tiled window opened should replace it, stay behind or disable the fullscreen/maximized state. 0 - behind, 1 - takes over, 2 - unfullscreen/unmaxize [0/1/2]
-            # FIXME: reenable on 0.42
             "exit_window_retains_fullscreen" = "false"; # [bool] [false] if true, closing a fullscreen window makes the next focused window fullscreen
             "initial_workspace_tracking" = "1"; # [int] [1] if enabled, windows will open on the workspace they were invoked on. 0 - disabled, 1 - single-shot, 2 - persistent (all children too)
             "middle_click_paste" = "true"; # [bool] [true] whether to enable middle-click-paste (aka primary selection)
@@ -448,8 +447,7 @@ in
             "direct_scanout" = "true"; # [bool] [false] Enables direct scanout. Direct scanout attempts to reduce lag when there is only one fullscreen application on a screen (e.g. game). It is also recommended to set this to false if the fullscreen application shows graphical glitches.
           };
           cursor = {
-            # FIXME: reenable on 0.42
-            #"sync_gsettings_theme" = "true"; # [bool] [true] sync xcursor theme with gsettings, it applies cursor-theme and cursor-size on theme load to gsettings making most CSD gtk based clients use same xcursor theme and size.
+            "sync_gsettings_theme" = "true"; # [bool] [true] sync xcursor theme with gsettings, it applies cursor-theme and cursor-size on theme load to gsettings making most CSD gtk based clients use same xcursor theme and size.
             "no_hardware_cursors" = "false"; # [bool] [false] disables hardware cursors
             "no_break_fs_vrr" = "true"; # [bool] [false] disables scheduling new frames on cursor movement for fullscreen apps with VRR enabled to avoid framerate spikes (requires no_hardware_cursors = true)
             "min_refresh_rate" = "24"; # [int] [24] minimum refresh rate for cursor movement when no_break_fs_vrr is active. Set to minimum supported refresh rate or higher
@@ -464,7 +462,6 @@ in
             "enable_hyprcursor" = "true"; # [bool] [true] whether to enable hyprcursor support
             "hide_on_key_press" = "false"; # [bool] [false] Hides the cursor when you press any key until the mouse is moved.
             "hide_on_touch" = "true"; # [bool] [true] Hides the cursor when the last input was a touch input until a mouse input is done.
-            # FIXME: reenable on 0.42
             "allow_dumb_copy" = "false"; # [bool] [false] Makes HW cursors work on Nvidia, at the cost of a possible hitch whenever the image changes
           };
           debug = {

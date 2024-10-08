@@ -274,9 +274,6 @@
     };
   };
 
-  # FIXME: provisioned ssh host keys modified by NixOS at some point for some
-  #        reason - the comment among something else in the private key -
-  #        fingerprint changes.
   services.openssh.hostKeys = [
     { path = "/persist/cred/etc/ssh/ssh_host_ed25519_key"; type = "ed25519"; }
     { path = "/persist/cred/etc/ssh/ssh_host_rsa_key"; type = "rsa"; bits = 4096; }
@@ -452,7 +449,6 @@
   # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
   networking.useDHCP = lib.mkDefault true;
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-  # FIXME: enable me pls
   hardware.enableRedistributableFirmware = true;
   # ===
 

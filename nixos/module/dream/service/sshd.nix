@@ -11,12 +11,12 @@ with builtins;
 with lib;
 with self.lib;
 let
-  cfg = config.dream.server.sshd;
+  cfg = config.dream.service.sshd;
 in
 # TODO: more ssh implementations?
 {
-  options.dream.server.sshd = {
-    enable = mkEnableOption "Enable server.sshd - SSH server";
+  options.dream.service.sshd = {
+    enable = mkEnableOption "Enable service.sshd - SSH server";
     port = mkOption {
       type = types.port;
       default = 42069;

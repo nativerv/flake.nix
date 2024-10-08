@@ -282,10 +282,10 @@
     { path = "/persist/cred/etc/ssh/ssh_host_rsa_key"; type = "rsa"; bits = 4096; }
   ];
 
-  # FIXME: Permit for deployment while testing.
-  # TODO: Find a way to enable that on non-vm build, but which is in fact
-  #       running in a VM.
-  services.openssh.settings.PermitRootLogin = "yes";
+  # # Permit for deployment while testing.
+  # # TODO: Find a way to enable that on non-vm build, but which is in fact
+  # #       running in a VM.
+  # services.openssh.settings.PermitRootLogin = "yes";
 
   # TODO: fix env vars (xdg & otherwise)
   environment.persistence = {

@@ -30,16 +30,24 @@ let
 in
 {
   options.dream.subsystem.zram = {
-    enable = mkEnableOption "Enable subsystem.zram";
+    enable = mkEnableOption "Enable subsystem.zram - virtual swap by compressing memory";
+    algorithm = mkOption {
+      type = types.str;
+      default = "lz4";
+      example = "lzo";
+    };
+    memoryPercent = mkOption {
+      type = types.int;
+      default = 100;
+      example = 50;
+    };
   };
-  # TODO(dream: options): zram
   config = mkIf cfg.enable {
     zramSwap.enable = true;
     zramSwap.priority  = 100;
     zramSwap.memoryMax = null;
-    zramSwap.algorithm = lib.mkDefault "lz4"; # lzo
-    #zramSwap.numDevices = 1; # no longer supported
+    zramSwap.algorithm = mkDefault cfg.algorithm;
     zramSwap.swapDevices = 1;
-    zramSwap.memoryPercent = 100;
+    zramSwap.memoryPercent = mkDefault 100;
   };
 }

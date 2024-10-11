@@ -41,6 +41,10 @@
 
   dream.service.sshd.enable = true;
 
+  dream.subsystem.networking = { 
+    dns.dnscrypt = true;
+  };
+
   dream.subsystem = {
     zram.enable = true;
   };
@@ -548,9 +552,6 @@
     peers = [ umbriel-bfs.peer ];
     inherit (umbriel-bfs.interface) address;
   };
-  # TODO: decouple wireguard from dnscrypt-proxy. The server should probably
-  #       have a DNS server anyway
-  services.dnscrypt-proxy2.enable = true;
 
   # Setup zsh
   programs.zsh = {

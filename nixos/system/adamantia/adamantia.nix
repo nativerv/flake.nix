@@ -39,7 +39,7 @@
     keyd.enable = true;
   };
 
-  dream.server.sshd.enable = true;
+  dream.service.sshd.enable = true;
 
   dream.subsystem = {
     zram.enable = true;

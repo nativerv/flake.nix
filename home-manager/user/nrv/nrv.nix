@@ -47,6 +47,13 @@ in {
     packages = with pkgs; let
       pass = config.programs.password-store.package;
     in [
+      # for transcrypt
+      transcrypt
+      vim
+
+      # the rest
+      calc
+      openssl # for something dk prob need to rm and see what happens
       git-annex
       delta
       pulsemixer

@@ -52,6 +52,7 @@
   dream.archetype = {
     minimal.enable = true;
     default.enable = true;
+    graphical.enable = true;
   };
 
   dream.user = {
@@ -489,32 +490,13 @@
   };
   environment.systemPackages = with pkgs; [
     git
-    stow
-    imv
-    foot
-    kitty
-    rsync
-    restic
-    rclone
     file
-    ranger
-    eza
-    ncdu
-    sops
-    calc
+    rsync
     p7zip
-    openssl
-    transcrypt
-    vim
+    curl
 
-    #self.packages.${system}.nixpak-test
-    self.packages.${system}.firefox
-    self.packages.${system}.telegram-desktop
-    self.packages.${system}.ungoogled-chromium
-    self.packages.${system}.gimp
-    self.packages.${system}.mpv
-    self.packages.${system}.vlc
-    self.packages.${system}.zathura
+    ncdu
+
   ];
 
   # Firejail example for later

@@ -22,6 +22,10 @@ in
     enable = mkEnableOption "Enable archetype.sane";
   };
   config = mkIf cfg.enable {
+    # NOTE: setting time zone here actually matters
+    #       KDE spectale **segfaults** when this isn not set LUL
+    time.timeZone = mkDefault "UTC";
+
     # Clean tmp just in case
     boot.tmp.cleanOnBoot = true;
 

@@ -72,27 +72,9 @@
   # System zone
   # NOTE: setting time zone here actually matters
   #       KDE spectale **segfaults** when this isn not set LUL
-  time.timeZone = let
-    # TODO: use default from `dream`
-    defaultTimeZone = "UTC";
-  in self.lib.fromJSONIfUnlockedOr (
-    lib.warn
-      "Repo is not unlocked! Will use default time zone: '${defaultTimeZone}'"
-      defaultTimeZone
+  time.timeZone = self.lib.fromJSONIfUnlockedOr (
+    warn "Repo is not unlocked! Will use default time zone: 'UTC'" "UTC"
   ) "${flake}/sus/${config.system.name}/eval/timezone.json";
-
-  # System language
-  i18n.defaultLocale = "en_US.UTF-8";
-  console = {
-    font = "Lat2-Terminus16";
-    keyMap = "us";
-    # Use services.xserver.xkb.options in tty:
-    # WARNING: this option is exclusive with console.keyMap without builting warning!
-    # TODO: maybe contribute a fix (console.useXkbConfig xor console.keyMap)
-    #useXkbConfig = true;
-  };
-
-  # Keyboard settings (mappings)
 
   # Virtual machine-scoped config
   virtualisation = let

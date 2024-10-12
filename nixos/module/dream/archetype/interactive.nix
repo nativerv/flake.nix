@@ -24,12 +24,14 @@ in
       rsync
       p7zip
       curl
+      git # TODO: does git belong here?
     ];
     dream.program = {
-      htop.enable = true;
       # TODO(dream: normie): 
       bash.enable = true;
+
       sudo.enable = true;
+      htop.enable = true;
     };
   };
 }

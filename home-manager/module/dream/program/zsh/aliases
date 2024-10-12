@@ -138,7 +138,8 @@ alias history="'${EDITOR:-vim}' '${HISTFILE}'"
 function ls() {
   command 2>/dev/null >&2 -v unbuffer &&
     unbuffer=unbuffer
-  ${unbuffer} exa \
+  # FIXME: eza dependency
+  ${unbuffer} eza \
     --color='always' \
     --group-directories-first \
     --time-style=long-iso \

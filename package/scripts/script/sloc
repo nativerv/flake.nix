@@ -46,15 +46,31 @@ debug_files() {
   fi
 }
 
+each_cat() {
+  xargs -d'\n' -I{} cat '{}'
+}
+
 case "${1}" in
   clike)
     find "${2}" -type f |
       grep -Ei '\.(rs|c|cpp|cs|cc|h|js|ts|tsx|jsx)$' |
       maybe_exclude |
       debug_files |
-      xargs -d'\n' -I{} cat '{}' |
+      each_cat |
       grep -Ev \
         -e '^[[:space:]]*//' \
+        -e '^[[:space:]]*$' \
+        -e '^[][[:space:]{}();,]*$' |
+      wc -l
+    ;;
+  nix)
+    find "${2}" -type f |
+      grep -Ei '\.(nix)$' |
+      maybe_exclude |
+      debug_files |
+      each_cat |
+      grep -Ev \
+        -e '^[[:space:]]*#' \
         -e '^[[:space:]]*$' \
         -e '^[][[:space:]{}();,]*$' |
       wc -l
@@ -62,8 +78,6 @@ case "${1}" in
   *)
     printf >&2 'sloc: usage: sloc LANG ROOT\n'
     printf >&2 '  counts sloc of language LANG in directory ROOT\n'
-    printf >&2 '  languages: clike, (todo more)\n'
+    printf >&2 '  languages: clike, nix, (todo more)\n'
     ;;
 esac
-
-

@@ -52,6 +52,7 @@ in {
       vim
 
       # the rest
+      eza
       calc
       openssl # for something dk prob need to rm and see what happens
       git-annex

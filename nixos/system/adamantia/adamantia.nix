@@ -32,9 +32,6 @@
 
   dream.program = {
     neovim.enable = true;
-    htop.enable = true;
-    bash.enable = true;
-    sudo.enable = true;
     nix-index.enable = true;
     keyd.enable = true;
   };
@@ -50,9 +47,11 @@
   };
 
   dream.archetype = {
-    minimal.enable = true;
+    minimal.enable = true; # -everything unnecessary by default
     default.enable = true;
-    graphical.enable = true;
+    remote.enable = true; # +remote login
+    graphical.enable = true; # +interactive
+    quick.enable = true; # various depending on the above, e.g. quick graphical
   };
 
   dream.user = {
@@ -472,13 +471,6 @@
   };
   environment.systemPackages = with pkgs; [
     git
-    file
-    rsync
-    p7zip
-    curl
-
-    ncdu
-
   ];
 
   # Firejail example for later

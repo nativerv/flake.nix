@@ -25,6 +25,11 @@ in
       p7zip
       curl
     ];
-    dream.program.htop.enable = true;
+    dream.program = {
+      htop.enable = true;
+      # TODO(dream: normie): 
+      bash.enable = true;
+      sudo.enable = true;
+    };
   };
 }

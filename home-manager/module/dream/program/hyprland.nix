@@ -41,6 +41,7 @@ in
       config.common.default = "*";
       # You must include a portal impl here. Can't have multiple it seems...
       extraPortals = with pkgs; [
+        xdg-desktop-portal-hyprland
         xdg-desktop-portal-gtk
       ];
     };

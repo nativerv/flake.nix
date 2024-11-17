@@ -52,6 +52,11 @@ in {
       vim
 
       # the rest
+      self.packages.${system}.telegram-desktop
+      self.packages.${system}.ungoogled-chromium
+      self.packages.${system}.mpv
+      self.packages.${system}.vlc
+      self.packages.${system}.zathura
       eza
       calc
       openssl # for something dk prob need to rm and see what happens

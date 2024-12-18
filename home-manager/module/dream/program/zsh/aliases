@@ -103,6 +103,9 @@ alias watch="watch --color --interval 0.5 "
 alias mitmproxy="mitmproxy --set confdir=${XDG_CONFIG_HOME}/mitmproxy"
 alias mitmweb="mitmweb --set confdir=${XDG_CONFIG_HOME}/mitmproxy"
 
+# Configure make
+alias make="make -s"
+
 # Aliases for Git
 alias git="git "
 alias g="git"

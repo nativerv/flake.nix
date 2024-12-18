@@ -14,6 +14,9 @@ unsetopt beep
 # Disable cd by typing path only
 unsetopt autocd 
 
+# Enable timestamps in command history
+setopt extended_history
+
 # Disable ctrl-s to freeze terminal.
 stty stop undef
 #zle_highlight=('paste:none')

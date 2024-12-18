@@ -442,17 +442,7 @@
   system.stateVersion = "24.05";
 
   # Flatpak
-  services.flatpak.enable = true;
-  systemd.services.install-flatpak-repos = {
-    wantedBy = [ "multi-user.target" ];
-    wants = [ "network-online.target" ];
-    after = [ "network-online.target" ];
-    path = [ pkgs.flatpak ];
-    serviceConfig.Type = "oneshot";
-    script = ''
-      flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-    '';
-  };
+  dream.program.flatpak.enable = true;
   # xdg.portal.enable = true;
   # xdg.portal.extraPortals = [ ];
 

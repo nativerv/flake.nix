@@ -53,7 +53,7 @@ each_cat() {
 case "${1}" in
   clike)
     find "${2}" -type f |
-      grep -Ei '\.(rs|c|cpp|cs|cc|h|js|ts|tsx|jsx)$' |
+      grep -Ei '\.(rs|c|cpp|cs|cc|h|js|ts|tsx|jsx|odin|zig|jai|go)$' |
       maybe_exclude |
       debug_files |
       each_cat |

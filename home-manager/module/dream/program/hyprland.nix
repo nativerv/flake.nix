@@ -551,6 +551,8 @@ in
 
             # Glxgears
             "tile, initialTitle:^glxgears$"
+
+            "float, initialTitle:\\[FLOATME\\]"
           ];
         }
       ];

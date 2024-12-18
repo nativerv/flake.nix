@@ -455,7 +455,6 @@
   };
   # xdg.portal.enable = true;
   # xdg.portal.extraPortals = [ ];
-  security.rtkit.enable = true;
 
   # GTK apps outside GNOME - cursor, theming & window decorations. 
   programs.dconf.enable = true;

@@ -49,6 +49,14 @@ M.setup = function()
 			target = "^(%*?)().-(%*?)()$",
 		},
 	}
+  local strike = {
+    add = { "~~", "~~" },
+    find = "~~.-~~",
+    delete = "^(~~?)().-(~~?)()$",
+    change = {
+      target = "^(~~?)().-(~~?)()$",
+    },
+  }
 	require("nvim-surround").setup({
 		move_cursor = false,
 		surrounds = {
@@ -56,6 +64,8 @@ M.setup = function()
 			["S"] = strong,
 			["e"] = emphasis,
 			["E"] = emphasis,
+			["x"] = strike,
+			["X"] = strike,
 		},
 	})
 	require("user.lib.plugin-management").apply_module_mappings(M.mappings)

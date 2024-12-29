@@ -11,4 +11,6 @@ function send_ocs7 {
 
 add-zsh-hook -Uz chpwd send_ocs7
 
+command -v >/dev/null 2>&1 'direnv' && eval "$(direnv hook zsh)"
+
 # vim:ft=zsh

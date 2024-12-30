@@ -15,6 +15,7 @@
         --suffix PATH : ${lib.makeBinPath [
           # FIXME(hardcoded): dep of one specific script
           glib # for xdg-doc-allow
+          pandoc # for dict, render
         ]}
     done
   '';

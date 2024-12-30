@@ -466,7 +466,7 @@ in
             "enable_hyprcursor" = "true"; # [bool] [true] whether to enable hyprcursor support
             "hide_on_key_press" = "false"; # [bool] [false] Hides the cursor when you press any key until the mouse is moved.
             "hide_on_touch" = "true"; # [bool] [true] Hides the cursor when the last input was a touch input until a mouse input is done.
-            "allow_dumb_copy" = "false"; # [bool] [false] Makes HW cursors work on Nvidia, at the cost of a possible hitch whenever the image changes
+            "use_cpu_buffer" = "false"; # [bool] [false] Makes HW cursors use a CPU buffer. Required on Nvidia to have HW cursors. Experimental.
           };
           debug = {
             "overlay" = "false"; # [bool] [false] print the debug performance overlay. Disable VFR for accurate results.
@@ -532,10 +532,10 @@ in
             "tile, class:^Graphviz$"
 
             # xdg-desktop-portal-termfilechooser
-            "float, title:ranger-filechooser"
+            "float, title:.*ranger-filechooser.*"
 
             # Firefox Discord
-            "idleinhibit always,title:Discord"
+            "idleinhibit always,title:.*Discord.*"
 
             # Syncplay pseudotile (not supported now for windows that force their sizes.)
             "pseudo, class:syncplay"
@@ -555,7 +555,7 @@ in
             # Glxgears
             "tile, initialTitle:^glxgears$"
 
-            "float, initialTitle:\\[FLOATME\\]"
+            "float, initialTitle:.*\\[FLOATME\\].*"
           ];
         }
       ];

@@ -38,6 +38,7 @@ in {
     zathura.enable = true;
     firefox.enable = true;
     readline.enable = true;
+    direnv.enable = true;
   };
 
   # For some reason they separate some stuff under `home.*`

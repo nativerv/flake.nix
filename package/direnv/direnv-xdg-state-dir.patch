@@ -1,0 +1,61 @@
+diff --git a/internal/cmd/config.go b/internal/cmd/config.go
+index 1d70f37..85568ce 100644
+--- a/internal/cmd/config.go
++++ b/internal/cmd/config.go
+@@ -20,6 +20,7 @@ type Config struct {
+ 	ConfDir         string
+ 	CacheDir        string
+ 	DataDir         string
++	StateDir        string
+ 	SelfPath        string
+ 	BashPath        string
+ 	RCFile          string
+@@ -230,17 +231,25 @@ func LoadConfig(env Env) (config *Config, err error) {
+ 		return
+ 	}
+ 
++	if config.StateDir == "" {
++		config.StateDir = xdg.StateDir(env, "direnv")
++	}
++	if config.StateDir == "" {
++		err = fmt.Errorf("couldn't find a state directory for direnv")
++		return
++	}
++
+ 	return
+ }
+ 
+ // AllowDir is the folder where all the "allow" files are stored.
+ func (config *Config) AllowDir() string {
+-	return filepath.Join(config.DataDir, "allow")
++	return filepath.Join(config.StateDir, "allow")
+ }
+ 
+ // DenyDir is the folder where all the "deny" files are stored.
+ func (config *Config) DenyDir() string {
+-	return filepath.Join(config.DataDir, "deny")
++	return filepath.Join(config.StateDir, "deny")
+ }
+ 
+ // LoadedRC returns a RC file if any has been loaded
+diff --git a/xdg/xdg.go b/xdg/xdg.go
+index 361606c..ffb5e8b 100644
+--- a/xdg/xdg.go
++++ b/xdg/xdg.go
+@@ -44,3 +44,16 @@ func CacheDir(env map[string]string, programName string) string {
+ 	// the process' UID
+ 	return ""
+ }
++
++// DataDir returns the data folder for the application
++func StateDir(env map[string]string, programName string) string {
++	if env["XDG_STATE_HOME"] != "" {
++		return filepath.Join(env["XDG_STATE_HOME"], programName)
++	} else if env["HOME"] != "" {
++		return filepath.Join(env["HOME"], ".local", "state", programName)
++	}
++	// In theory we could also read /etc/passwd and look for the home based on
++	// the process' UID
++	return ""
++}
++

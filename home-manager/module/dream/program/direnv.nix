@@ -17,13 +17,17 @@ let
   cfg = config.dream.program.direnv;
 in {
   options.dream.program.direnv = {
-    # FIXME: add package option
     # FIXME: add integration option, currently hardcoded in ZSH cofig with a check
     enable = mkEnableOption "Enable program.direnv";
+    package = mkOption {
+      type = types.package;
+      default = self.packages.${pkgs.system}.direnv;
+    };
   };
   config = mkIf cfg.enable {
     programs.direnv = {
       enable = true;
+      package = cfg.package;
       silent = true;
       nix-direnv.enable = true;
     };

@@ -224,11 +224,11 @@
 
       # The devshell
       # Available through `nix develop` or `nix-shell` (legacy)
-      # devShells = forAllSystems (system: {
-      #   default = self.legacyPackages.${system}.callPackage ./shell.nix {
-      #     inherit inputs;
-      #   };
-      # });
+      devShells = forAllSystems (system: {
+        default = self.legacyPackages.${system}.callPackage ./shell.nix {
+          inherit flake self inputs; 
+        };
+      });
       
       # Deployments
       # Available through `deploy .#deployment-name.profile-name`

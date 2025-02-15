@@ -6,7 +6,6 @@
 }: let
   scriptOverride = pkgs.writeShellScriptBin "sops" ''
     set -uo pipefail
-    set -x
 
     if [ -n "''${SOPS_AGE_KEY_COMMAND:-}" ]; then
       dir="$(mktemp -d)"
@@ -15,6 +14,11 @@
       chmod 600 "''${SOPS_AGE_KEY_FILE}"
       trap 'rm -f "''${SOPS_AGE_KEY_FILE}"' INT TERM EXIT
       sh -c "''${SOPS_AGE_KEY_COMMAND}" > "''${SOPS_AGE_KEY_FILE}"
+    else
+      printf >&2 'sops (dream-wrapper): ERROR: environment variable `SOPS_AGE_KEY_COMMAND` is empty or undefined\n'
+      printf >&2 'sops (dream-wrapper): INFO: `SOPS_AGE_KEY_COMMAND` must contain a command that prints `age` private key\n'
+      printf >&2 'sops (dream-wrapper): INFO: example: `pass show sops/myproject/key` (see https://www.passwordstore.org/)'
+      exit 1
     fi
     ${sops}/bin/sops "''${@}"
   '';

@@ -20,7 +20,7 @@ in
   };
   config = mkIf cfg.enable {
     # oom daemon - out of memory process killer
-    systemd.oomd.enable = false;
+    systemd.oomd.enable = mkDefault false;
 
     environment.shellAliases = {
       ls = null;
@@ -64,5 +64,18 @@ in
 
     # disable default not strictly necessary packages - nano, perl, etc
     environment.defaultPackages = [];
+
+    documentation = {
+      enable = mkDefault false;
+      man = {
+        enable = mkDefault false;
+      };
+      dev.enable = mkDefault false; 
+      doc.enable = mkDefault false; 
+      info.enable = mkDefault false; 
+      nixos = {
+        enable = mkDefault false;
+      };
+    };
   };
 }

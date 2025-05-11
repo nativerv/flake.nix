@@ -175,11 +175,11 @@ require("lazy").setup({
   --   'folke/which-key.nvim',
   --   config = require('user.plugin.which-key').setup,
   -- },
-  {
-    dir = plugin 'dstein64/nvim-scrollview',
-    event = { "VeryLazy" },
-    config = require('user.plugin.nvim-scrollview').setup,
-  },
+  -- {
+  --   dir = plugin 'dstein64/nvim-scrollview',
+  --   event = { "VeryLazy" },
+  --   config = require('user.plugin.nvim-scrollview').setup,
+  -- },
   -- {
   --   'ghillb/cybu.nvim',
   --   enabled = false,

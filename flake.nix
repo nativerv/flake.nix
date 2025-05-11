@@ -224,6 +224,7 @@
 
       # The devshell
       # Available through `nix develop` or `nix-shell` (legacy)
+      # Or loaded automatically with nix-direnv (see https://github.com/nix-community/nix-direnv)
       devShells = forAllSystems (system: {
         default = self.legacyPackages.${system}.callPackage ./shell.nix {
           inherit flake self inputs; 

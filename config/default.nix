@@ -14,6 +14,7 @@
 }: let in {
   /* Default nixpkgs config */
   nixpkgs = { pkgs }: {
+    # FIXME: this should be reused in systems?
     allowUnfreePredicate = self.lib.unfreeWhiteList (with pkgs; [
       #hello-unfree
     ]);

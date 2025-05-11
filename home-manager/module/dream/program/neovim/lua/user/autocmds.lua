@@ -284,6 +284,8 @@ vim.api.nvim_create_autocmd({ 'ColorScheme' }, {
     vim.api.nvim_set_hl(0, 'LspDiagnosticsUnderlineInformation', { link = 'Information' })
     vim.api.nvim_set_hl(0, 'LspDiagnosticsUnderlineHint', { link = 'Hint' })
 
+    vim.cmd [[ highlight CursorLine ctermbg='236' guibg='#303030' ]] 
+
     -- For some reason i need to specify this (non lsp variant) for
     -- undercurl to properly work on hints, replacing the default
     -- grey bg cyan text behavior

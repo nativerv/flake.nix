@@ -55,6 +55,9 @@ let
     # Core
     lazy-nvim
 
+    # Theme
+    # rose-pine
+
     # Text Nav
     camelcasemotion
     vim-visual-star-search

@@ -28,6 +28,11 @@ require("lazy").setup({
   --   "folke/tokyonight.nvim",
   --   opts = { style = "night" },
   -- },
+  -- {
+  --   dir = plugin 'rose-pine/rose-pine', -- WARNING: the correct github handle is rose-pine/neovim!!!
+  --   event = { "VeryLazy" },
+  --   config = require('user.plugin.rose-pine').setup,
+  -- },
 
   -- Telescope (generic picker/fuzzy finder)
   {

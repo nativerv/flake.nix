@@ -32,14 +32,14 @@ let
     allGrammarsNames = [ "ada" "agda" "angular" "apex" "arduino" "asm" "astro" "authzed" "bash" "bass" "beancount" "bibtex" "bicep" "bitbake" "blueprint" "bp" "c" "c_sharp" "cairo" "capnp" "chatito" "circom" "clojure" "cmake" "comment" "commonlisp" "cooklang" "corn" "cpon" "cpp" "css" "csv" "cuda" "cue" "cylc" "d" "dart" "desktop" "devicetree" "dhall" "diff" "disassembly" "djot" "dockerfile" "dot" "doxygen" "dtd" "earthfile" "ebnf" "editorconfig" "eds" "eex" "elixir" "elm" "elsa" "elvish" "erlang" "facility" "faust" "fennel" "fidl" "firrtl" "fish" "foam" "forth" "fortran" "fsh" "fsharp" "func" "fusion" "gdscript" "gdshader" "git_config" "git_rebase" "gitattributes" "gitcommit" "gitignore" "gleam" "glimmer" "glimmer_javascript" "glimmer_typescript" "glsl" "gn" "gnuplot" "go" "goctl" "godot_resource" "gomod" "gosum" "gotmpl" "gowork" "gpg" "graphql" "gren" "groovy" "gstlaunch" "hare" "haskell" "haskell_persistent" "hcl" "heex" "helm" "hjson" "hlsl" "hlsplaylist" "hocon" "hoon" "html" "htmldjango" "http" "hurl" "hyprlang" "idl" "ini" "inko" "ispc" "janet_simple" "java" "javascript" "jq" "jsdoc" "json" "json5" "jsonc" "jsonnet" "julia" "just" "kconfig" "kdl" "kotlin" "koto" "kusto" "lalrpop" "latex" "ledger" "leo" "linkerscript" "liquid" "liquidsoap" "llvm" "lua" "luadoc" "luap" "luau" "m68k" "make" "markdown" "markdown_inline" "matlab" "menhir" "meson" "mlir" "muttrc" "nasm" "nginx" "nim" "nim_format_string" "ninja" "nix" "norg" "nqc" "nu" "objc" "objdump" "ocaml" "ocaml_interface" "ocamllex" "odin" "pascal" "passwd" "pem" "perl" "php" "php_only" "phpdoc" "pioasm" "po" "pod" "poe_filter" "pony" "powershell" "printf" "prisma" "problog" "prolog" "promql" "properties" "proto" "prql" "psv" "pug" "puppet" "purescript" "pymanifest" "python" "ql" "qmldir" "qmljs" "query" "r" "ralph" "rasi" "rbs" "re2c" "readline" "regex" "rego" "requirements" "rescript" "rnoweb" "robot" "robots" "roc" "ron" "rst" "ruby" "runescript" "rust" "scala" "scfg" "scss" "sflog" "slang" "slint" "smali" "smithy" "solidity" "soql" "sosl" "sourcepawn" "sparql" "sql" "squirrel" "ssh_config" "starlark" "strace" "styled" "supercollider" "superhtml" "surface" "svelte" "sway" "swift" "sxhkdrc" "systemtap" "t32" "tablegen" "tact" "tcl" "teal" "templ" "terraform" "textproto" "thrift" "tiger" "tlaplus" "tmux" "todotxt" "toml" "tsv" "tsx" "turtle" "twig" "typescript" "typespec" "typoscript" "typst" "udev" "ungrammar" "unison" "usd" "uxntal" "v" "vala" "vento" "verilog" "vhdl" "vhs" "vim" "vimdoc" "vrl" "vue" "wgsl" "wgsl_bevy" "wing" "wit" "xcompose" "xml" "xresources" "yaml" "yang" "yuck" "zathurarc" "zig" "ziggy" "ziggy_schema" ];
     overrides = {
       odin = p.odin.overrideAttrs (let 
-        rev = "e8adc739b78409a99f8c31313f0bb54cc538cf73";
+        rev = "d2ca8efb4487e156a60d5bd6db2598b872629403";
       in {
         version = "0.0.0+rev=${substring 0 7 rev}";
         src = pkgs.fetchFromGitHub {
-          owner = "amaanq";
+          owner = "tree-sitter-grammars";
           repo = "tree-sitter-odin";
           inherit rev;
-          hash = "sha256-vlw5XaHTdsgO9H4y8z0u0faYzs+L3UZPhqhD/IJ6khY=";
+          hash = "sha256-aPeaGERAP1Fav2QAjZy1zXciCuUTQYrsqXaSQsYG0oU=";
         };
       });
     };

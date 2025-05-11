@@ -113,6 +113,7 @@ M.setup = function()
   local config = {}
   config.extensions = {}
   config.defaults = {
+    layout_config = { preview_cutoff = 40, },
     file_ignore_patterns = {
       -- you need two variants for each, there's no simple way of doing them in one (afaik)
       [[^%.git/]],
@@ -133,6 +134,10 @@ M.setup = function()
     },
     live_grep = {
       hidden = true,
+      file_ignore_patterns = { 
+        "node_modules",
+        "checkpoint/",
+      },
       --no_ignore = true,
     },
   }

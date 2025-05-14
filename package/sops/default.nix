@@ -17,7 +17,7 @@
     else
       printf >&2 'sops (dream-wrapper): ERROR: environment variable `SOPS_AGE_KEY_COMMAND` is empty or undefined\n'
       printf >&2 'sops (dream-wrapper): INFO: `SOPS_AGE_KEY_COMMAND` must contain a command that prints `age` private key\n'
-      printf >&2 'sops (dream-wrapper): INFO: example: `pass show sops/myproject/key` (see https://www.passwordstore.org/)'
+      printf >&2 'sops (dream-wrapper): INFO: example: `pass show sops/myproject/key` (see https://www.passwordstore.org/)\n'
       exit 1
     fi
     ${sops}/bin/sops "''${@}"

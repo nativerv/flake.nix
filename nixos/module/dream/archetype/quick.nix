@@ -22,6 +22,10 @@ in
     enable = mkEnableOption "Enable archetype.quick - this machine is a quick setup that should have common (opinionated) programs installed, depending on other archetypes. Basically this archetype is a is a 'distro' of NixOS with sane defaults for use";
   };
   config = mkIf cfg.enable {
+    programs.firefox = {
+      enable = true;
+      policies = self.config.firefox.policies;
+    };
     environment.systemPackages = with pkgs;
       (optionals cfgGraphical.enable [
         imv

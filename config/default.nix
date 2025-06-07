@@ -22,4 +22,6 @@
   groups = import ./groups.nix { inherit lib; };
   #users  = import ./users.nix { inherit lib; };
   backups = self.lib.fromJSONIfUnlockedOr {} "${flake}/sus/common/backups.json";
+
+  firefox = import ./firefox.nix;
 }

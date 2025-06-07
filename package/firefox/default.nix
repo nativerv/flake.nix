@@ -3,13 +3,14 @@
   mkNixPak,
   inputs,
 
+  firefoxPackage ? pkgs.firefox,
+
+  name ? "firefox",
+  appId ? "org.mozilla.firefox",
   nativeMessagingHosts ? [ ],
   ...
 }: let
-  name = "firefox";
-  appId = "org.mozilla.firefox";
-
-  package = pkgs.firefox-bin.override {
+  package = firefoxPackage.override {
     inherit nativeMessagingHosts;
   };
 

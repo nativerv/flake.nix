@@ -31,7 +31,11 @@ in
       programs.firefox = {
         enable = true;
         package = firefox-dream;
+        policies = self.config.firefox.policies;
       };
+      # home.packages = [
+      #   librewolf-dream
+      # ];
     }
   ]);
 }

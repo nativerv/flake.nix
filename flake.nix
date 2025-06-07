@@ -7,7 +7,8 @@
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgs-22-11.url = "github:nixos/nixpkgs/nixos-22.11";
     nixpkgs-23-11.url = "github:nixos/nixpkgs/nixos-23.11";
-    nixpkgs-24-05.url = "github:nixos/nixpkgs/nixos-24.05";
+    nixpkgs-24-05.url = "github:nixos/nixpkgs/nixos-24.05"; # FIXME: ???
+    nixpkgs-25-05.url = "github:nixos/nixpkgs/nixos-25.05";
     
     # Sandboxing
     nixpak.url = "github:nixpak/nixpak";
@@ -27,7 +28,7 @@
     # Secret management framework
     sops-nix.url = "github:Mic92/sops-nix";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs-unstable";
-    sops-nix.inputs.nixpkgs-stable.follows = "nixpkgs-24-05";
+    sops-nix.inputs.nixpkgs-stable.follows = "nixpkgs-24-05"; # FIXME: ???
 
     # NixOS VM helper - `nixos-shell`
     nixos-shell.url = "github:Mic92/nixos-shell";

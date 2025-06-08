@@ -443,7 +443,6 @@ in
           };
           opengl = {
             "nvidia_anti_flicker" = "true"; # [bool] [true] reduces flickering on nvidia at the cost of possible frame drops on lower-end GPUs. On non-nvidia, this is ignored.
-            "force_introspection" = "2"; # [int] [2] forces introspection at all times. Introspection is aimed at reducing GPU usage in certain cases, but might cause graphical glitches on nvidia. 0 - nothing, 1 - force always on, 2 - force always on if nvidia
           };
           render = {
             "explicit_sync" = "2"; # [int] [2] Whether to enable explicit sync support. Requires a hyprland restart. 0 - no, 1 - yes, 2 - auto based on the gpu driver
@@ -468,6 +467,11 @@ in
             "hide_on_touch" = "true"; # [bool] [true] Hides the cursor when the last input was a touch input until a mouse input is done.
             "use_cpu_buffer" = "false"; # [bool] [false] Makes HW cursors use a CPU buffer. Required on Nvidia to have HW cursors. Experimental.
           };
+          ecosystem = {
+            "no_update_news" = "true"; # [bool] [false] disable the popup that shows up when you update hyprland to a new version.  
+            "no_donation_nag" = "true"; # [bool] [false] disable the popup that shows up twice a year encouraging to donate.  
+            "enforce_permissions" = "false"; # [bool] [false] whether to enable permission control.  
+          };
           debug = {
             "overlay" = "false"; # [bool] [false] print the debug performance overlay. Disable VFR for accurate results.
             "damage_blink" = "false"; # [bool] [false] (epilepsy warning!) flash areas updated with damage tracking
@@ -477,7 +481,6 @@ in
             "enable_stdout_logs" = "false"; # [bool] [false] enables logging to stdout
             "manual_crash" = "0"; # [int] [0] set to 1 and then back to 0 to crash Hyprland.
             "suppress_errors" = "false"; # [bool] [false] if true, do not display config file parsing errors.
-            "watchdog_timeout" = "5"; # [int] [5] sets the timeout in seconds for watchdog to abort processing of a signal of the main thread. Set to 0 to disable.
             "disable_scale_checks" = "false"; # [bool] [false] disables verification of the scale factors. Will result in pixel alignment and rounding errors.
             "error_limit" = "5"; # [int] [5] limits the number of displayed config file parsing errors.
             "error_position" = "0"; # [int] [0] sets the position of the error bar. top - 0, bottom - 1

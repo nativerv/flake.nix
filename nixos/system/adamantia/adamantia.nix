@@ -216,8 +216,14 @@
       # Not really required to be unique if disks are not shared across network
       "8425e349")
     "${flake}/sus/${config.system.name}/eval/hostid.json"; 
-  # FIXME: other kernel packages, also verify latest ZFS version
-  boot.kernelPackages = self.packageGroups.${pkgs.system}.zfs-compatible-linux-kernels.latest;
+  boot.kernelPackages = let # FIXME: other kernel packages, also verify latest ZFS version
+    zfs-compatible-linux-kernels = (pkgs.callPackage "${flake}/package-group/zfs-compatible-linux-kernels" {
+      inherit (config.boot.zfs.package) kernelModuleAttribute;
+      inherit (pkgs) system;
+    });
+  in
+    zfs-compatible-linux-kernels.latest
+  ;
   boot.zfs.forceImportRoot = false;
 
   # Impermanence

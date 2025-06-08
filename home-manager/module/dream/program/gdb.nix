@@ -24,7 +24,7 @@ in
     {
       # XXX: do i want to install gdb here? it's usually installed per project
       #      in it's devshell.
-      configFile."gdb/gdbearlyinit".text = ''
+      xdg.configFile."gdb/gdbearlyinit".text = ''
         set history save on
         set history size ${toString (1024*1024)}
         set history remove-duplicates 2

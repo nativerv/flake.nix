@@ -39,6 +39,7 @@ in {
     firefox.enable = true;
     readline.enable = true;
     direnv.enable = true;
+    gdb.enable = true;
   };
 
   # For some reason they separate some stuff under `home.*`
@@ -84,6 +85,28 @@ in {
       nix-search-cli
       inputs.scr.packages.${system}.default
       self.packages.${system}.scripts
+      pcmanfm
+      
+      # from often-`nix run`/`nix shell`ed
+      yt-dlp
+      nvtopPackages.amd
+      fd
+      rlwrap
+      zbar
+      qrencode
+      obs-studio
+      lsof
+
+      (self.packages.${system}.firefox.override {
+        firefoxPackage = librewolf;
+        name = "librewolf";
+        appId = "net.librewolf.librewolf";
+      })
+
+      # overrides
+      (pkgs.wrapPackages [ gnome-graphs ] {
+        environment.GDK_DEBUG = "gl-prefer-gl"; # INFO: this one counters a segfault on startup for me.
+      })
       (self.packages.${system}.gimp.override {
         package = pkgs.wrapPackages [ (pkgs.gimp-with-plugins.override {
           plugins = [ ];

@@ -32,7 +32,7 @@ in
     
       interval = "never";
       output = outputPath;
-      localuser = null; # INFO: unsupported by mlocate, "null" to suppress warning
+      #localuser = null; # INFO: unsupported by mlocate, "null" to suppress warning # NOTE: was removed at some point.
       # extraFlags = [
       #   "--verbose"
       # ];

@@ -8,7 +8,7 @@
 -- Author: nrv
 -- URL: https://github.com/nativerv/flake.nix
 
-local SUPPORTED_VERSION = 10
+local SUPPORTED_VERSION = 11
 vim.g.bad_message = ''
 
 -- This file contains only `xpcall` calls and this function,
@@ -45,7 +45,7 @@ if not (vim.version().major == 0 and vim.version().minor == SUPPORTED_VERSION) t
   --  'You neovim must be of version 0.9. The config will not work, falling back to default.',
   --  vim.log.levels.OFF
   --)
-  vim.g.bad_message = 'ERROR: You neovim must be of version 0.9. Plugins will not work, falling back to vanilla.'
+  vim.g.bad_message = 'ERROR: You neovim must be of version 0.' .. SUPPORTED_VERSION .. '. Plugins will not work, falling back to vanilla.'
   return
 end
 

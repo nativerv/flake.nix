@@ -45,5 +45,6 @@ vim.opt.showtabline = 0
 --vim.opt.fixendofline = false
 
 vim.g.compile_tex = true -- Compile latex on save by default (i have autocmds for that)
+vim.g.tex_comment_nospell = 1 -- Don't spellcheck comments.
 
 -- vim.g.loaded_netrw = 1

@@ -304,12 +304,12 @@ vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
   ),
   callback = function()
     if vim.g.compile_tex then
-      local compile_cmd = string.format(
-        'pdflatex -output-directory=%s %s',
-        vim.fn.expand '%:h',
-        vim.fn.expand '%'
-      )
-      os.execute(compile_cmd)
+      vim.uv.spawn("pdflatex", {
+        args = {
+          '-output-directory=' .. vim.fn.expand '%:h',
+          vim.fn.expand '%',
+        },
+      })
     end
   end,
 })

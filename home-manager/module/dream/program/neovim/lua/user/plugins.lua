@@ -90,7 +90,8 @@ require("lazy").setup({
   }, -- Vimscript
   {
     dir = plugin 'kylechui/nvim-surround',
-    keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.nvim-surround').mappings, true),
+    -- keys = require'user.lib.plugin-management'.extract_keys_from_module_mappings(require('user.plugin.nvim-surround').mappings, true),
+    event = { 'VeryLazy', },
     config = require('user.plugin.nvim-surround').setup,
   },
   -- {

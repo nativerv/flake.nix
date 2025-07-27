@@ -8,6 +8,9 @@
       glib
       util-linux
       bash
+      xdg-utils
+      grim
+      chafa
       (writeShellScriptBin "${name}" ''
         exec ${pkgs.bash}/bin/bash
       '')
@@ -50,6 +53,8 @@
 
       gpu.enable = false;
 
+      waylandProxy.enable = true;
+
       bubblewrap = {
         env.PATH = "${package}/bin";
 
@@ -58,6 +63,12 @@
 
         # disable all network access
         network = false;
+
+        sockets = {
+          wayland = true;
+          pulse = true;
+          pipewire = true;
+        };
 
         # lists of paths to be mounted inside the sandbox
         # supports runtime resolution of environment variables

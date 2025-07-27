@@ -12,7 +12,7 @@
       # path to the executable to be wrapped
       # this is usually autodetected but
       # can be set explicitly nonetheless
-      app.binPath = "bin/${name}";
+      app.binPath = "bin/Telegram";
 
       # enabled by default, flip to disable
       # and to remove dependency on xdg-dbus-proxy
@@ -61,10 +61,15 @@
       # flatpak id: for Flatpak emulation and the portals (documents, etc) to work
       flatpak.appId = appId;
 
-      gpu.enable = true;
+      gpu = {
+        enable = true;
+        provider = "bundle";
+      };
 
       etc.sslCertificates.enable = true;
       fonts.enable = true;
+
+      waylandProxy.enable = true;
 
       bubblewrap = {
         # Bind only paths that app needs

@@ -58,10 +58,15 @@
       # flatpak id: for Flatpak emulation and the portals (documents, etc) to work
       flatpak.appId = appId;
 
-      gpu.enable = true;
+      gpu = {
+        enable = true;
+        provider = "bundle";
+      };
 
       etc.sslCertificates.enable = true;
       fonts.enable = true;
+
+      waylandProxy.enable = true;
 
       bubblewrap = {
         # Bind only paths that app needs

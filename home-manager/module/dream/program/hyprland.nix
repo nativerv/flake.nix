@@ -414,8 +414,6 @@ in
             "swallow_exception_regex" = ''(^wev$|\[DEBUG\])''; # [str] [] The title regex to be used for windows that should not be swallowed by the windows specified in swallow_regex (e.g. wev). The regex is matched against the parent (e.g. Kitty) window’s title on the assumption that it changes to whatever process it’s running.
             "focus_on_activate" = "false"; # [bool] [false] Whether Hyprland should focus an app that requests to be focused (an activate request)
             "mouse_move_focuses_monitor" = "true"; # [bool] [true] Whether mouse moving into a different monitor should focus it
-            "render_ahead_of_time" = "false"; # [bool] [false] [Warning: buggy] starts rendering before your monitor displays a frame in order to lower latency
-            "render_ahead_safezone" = "1"; # [int] [1] how many ms of safezone to add to rendering ahead of time. Recommended 1-2.
             "allow_session_lock_restore" = "false"; # [bool] [false] if true, will allow you to restart a lockscreen app in case it crashes (red screen of death)
             # TODO: colors
             "background_color" = "0x111111"; # [color] [0x111111] change the background color. (requires enabled disable_hyprland_logo)
@@ -445,8 +443,6 @@ in
             "nvidia_anti_flicker" = "true"; # [bool] [true] reduces flickering on nvidia at the cost of possible frame drops on lower-end GPUs. On non-nvidia, this is ignored.
           };
           render = {
-            "explicit_sync" = "2"; # [int] [2] Whether to enable explicit sync support. Requires a hyprland restart. 0 - no, 1 - yes, 2 - auto based on the gpu driver
-            "explicit_sync_kms" = "2"; # [int] [2] Whether to enable explicit sync support for the KMS layer. Requires explicit_sync to be enabled. 0 - no, 1 - yes, 2 - auto based on the gpu driver
             "direct_scanout" = "true"; # [bool] [false] Enables direct scanout. Direct scanout attempts to reduce lag when there is only one fullscreen application on a screen (e.g. game). It is also recommended to set this to false if the fullscreen application shows graphical glitches.
           };
           cursor = {
